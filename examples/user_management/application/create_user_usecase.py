@@ -8,13 +8,12 @@ business logic, and observability.
 :since: 2025-11-03
 """
 
+from examples.user_management.application.ports import UserRepositoryPort
+from examples.user_management.domain.email import Email
+from examples.user_management.domain.user import User
 from forgebase.application.dto_base import DTOBase
 from forgebase.application.usecase_base import UseCaseBase
 from forgebase.domain.exceptions import BusinessRuleViolation, ValidationError
-
-from ..domain.email import Email
-from ..domain.user import User
-from .ports import UserRepositoryPort
 
 
 class CreateUserInput(DTOBase):

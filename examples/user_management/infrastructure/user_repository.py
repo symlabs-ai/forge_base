@@ -8,8 +8,8 @@ Perfect for examples and testing.
 :since: 2025-11-03
 """
 
-from ..application.ports import UserRepositoryPort
-from ..domain.user import User
+from examples.user_management.application.ports import UserRepositoryPort
+from examples.user_management.domain.user import User
 
 
 class InMemoryUserRepository(UserRepositoryPort):

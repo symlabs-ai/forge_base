@@ -10,10 +10,9 @@ Demonstrates a proper Entity implementation with business logic.
 import uuid
 from datetime import datetime
 
+from examples.user_management.domain.email import Email
 from forgebase.domain.entity_base import EntityBase
 from forgebase.domain.exceptions import BusinessRuleViolation, ValidationError
-
-from .email import Email
 
 
 class User(EntityBase):

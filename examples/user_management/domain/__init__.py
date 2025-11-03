@@ -1,6 +1,6 @@
 """Domain layer for User Management example."""
 
-from .email import Email
-from .user import User
+from examples.user_management.domain.email import Email
+from examples.user_management.domain.user import User
 
 __all__ = ['User', 'Email']
