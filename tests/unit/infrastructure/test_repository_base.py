@@ -9,7 +9,6 @@ to verify the contract and expected behavior.
 """
 
 import unittest
-from typing import Optional
 
 from src.forgebase.domain.entity_base import EntityBase
 from src.forgebase.infrastructure.repository.repository_base import (

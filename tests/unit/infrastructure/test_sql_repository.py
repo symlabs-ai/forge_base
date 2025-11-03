@@ -18,7 +18,6 @@ NOTE: These tests require SQLAlchemy to be installed:
 """
 
 import unittest
-from typing import Optional
 
 # Try to import SQLAlchemy, skip tests if not available
 try:
