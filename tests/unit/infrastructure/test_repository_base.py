@@ -15,6 +15,7 @@ from src.forgebase.infrastructure.repository.repository_base import (
     RepositoryBase,
     RepositoryError,
 )
+from tests.contract_tests.repository_contract import RepositoryContractTestMixin
 
 
 class MockEntity(EntityBase):
@@ -59,12 +60,21 @@ class InMemoryRepository(RepositoryBase[MockEntity]):
         return id in self._storage
 
 
-class TestRepositoryBase(unittest.TestCase):
+class TestRepositoryBase(RepositoryContractTestMixin, unittest.TestCase):
     """Test suite for RepositoryBase interface."""
 
     def setUp(self):
         """Set up test fixtures."""
         self.repository = InMemoryRepository()
+
+    # Contract Test Implementation
+    def create_repository(self) -> RepositoryBase:
+        """Create a fresh repository instance for contract tests."""
+        return InMemoryRepository()
+
+    def create_entity(self, id: str) -> EntityBase:
+        """Create a test entity with given ID for contract tests."""
+        return MockEntity(id=id, name=f"Entity {id}")
 
     def test_save_entity(self):
         """Test saving an entity."""

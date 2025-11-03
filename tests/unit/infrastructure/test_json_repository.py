@@ -21,7 +21,11 @@ from pathlib import Path
 
 from src.forgebase.domain.entity_base import EntityBase
 from src.forgebase.infrastructure.repository.json_repository import JSONRepository
-from src.forgebase.infrastructure.repository.repository_base import RepositoryError
+from src.forgebase.infrastructure.repository.repository_base import (
+    RepositoryBase,
+    RepositoryError,
+)
+from tests.contract_tests.repository_contract import RepositoryContractTestMixin
 
 
 class MockEntity(EntityBase):
@@ -57,7 +61,7 @@ class MockEntity(EntityBase):
         )
 
 
-class TestJSONRepository(unittest.TestCase):
+class TestJSONRepository(RepositoryContractTestMixin, unittest.TestCase):
     """Test suite for JSONRepository."""
 
     def setUp(self):
@@ -75,6 +79,22 @@ class TestJSONRepository(unittest.TestCase):
     def tearDown(self):
         """Clean up temporary directory."""
         shutil.rmtree(self.temp_dir, ignore_errors=True)
+
+    # Contract Test Implementation
+    def create_repository(self) -> RepositoryBase:
+        """Create a fresh repository instance for contract tests."""
+        temp_dir = tempfile.mkdtemp()
+        storage_path = Path(temp_dir) / "contract_test_storage.json"
+        return JSONRepository(
+            file_path=str(storage_path),
+            entity_class=MockEntity,
+            to_dict=lambda e: e.to_dict(),
+            from_dict=MockEntity.from_dict
+        )
+
+    def create_entity(self, id: str) -> EntityBase:
+        """Create a test entity with given ID for contract tests."""
+        return MockEntity(id=id, name=f"Entity {id}", value=42)
 
     def test_initialization_creates_empty_file(self):
         """Test that initialization creates an empty storage file."""
