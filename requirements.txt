@@ -1,0 +1,10 @@
+# ForgeBase Dependencies
+
+# Core dependencies
+pyyaml>=6.0  # ConfigLoader: YAML configuration support
+
+# Optional dependencies
+# Uncomment if using SQLRepository
+# sqlalchemy>=2.0  # SQLRepository: SQL database support
+
+# Development dependencies (install with: pip install -r requirements-dev.txt)

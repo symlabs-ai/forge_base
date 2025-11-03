@@ -1,0 +1,15 @@
+# ForgeBase Development Dependencies
+
+# Include base requirements
+-r requirements.txt
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Optional: SQL support for testing
+sqlalchemy>=2.0
+
+# Code quality
+ruff>=0.1.0  # Linter and formatter
+mypy>=1.7.0  # Type checking
