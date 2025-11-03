@@ -35,7 +35,7 @@ def not_empty(value: str | None, field_name: str = "Value") -> None:
     :raises ValidationError: If string is None, empty, or whitespace
     """
     not_null(value, field_name)
-    if not value or not value.strip():  # type: ignore
+    if not value or not value.strip():
         raise ValidationError(f"{field_name} cannot be empty")
 
 

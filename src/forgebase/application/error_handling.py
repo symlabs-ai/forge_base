@@ -35,7 +35,7 @@ class InvalidInputError(ApplicationError):
 
 
 def handle_domain_errors(domain_exception: type[DomainException],
-                        application_exception: type[ApplicationError]):
+                        application_exception: type[ApplicationError]) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """
     Decorator to convert domain exceptions to application exceptions.
 
@@ -53,7 +53,7 @@ def handle_domain_errors(domain_exception: type[DomainException],
             entity = Entity(dto.value)
             entity.validate()  # May raise ValidationError
     """
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             try:

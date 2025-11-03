@@ -43,6 +43,7 @@ Example::
 """
 
 import functools
+import inspect
 import time
 from collections.abc import Callable
 from typing import Any
@@ -57,7 +58,7 @@ def track_metrics(
     track_duration: bool = True,
     track_count: bool = True,
     **labels: str
-) -> Callable:
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """
     Decorator for automatic metrics tracking.
 
@@ -108,22 +109,23 @@ def track_metrics(
             pass
     """
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         """Inner decorator function."""
         metric_name = name or func.__name__
         metric_labels = labels
 
         # Check if function is async
-        is_async = functools.iscoroutinefunction(func)
+        is_async = inspect.iscoroutinefunction(func)
 
         if is_async:
             @functools.wraps(func)
-            async def async_wrapper(*args, **kwargs) -> Any:
+            async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
                 """Async wrapper for instrumented function."""
                 # Increment invocation count
                 if track_count:
                     metrics.increment(
                         f"{metric_name}.count",
+                        amount=1,
                         **metric_labels
                     )
 
@@ -137,6 +139,7 @@ def track_metrics(
                     if track_count:
                         metrics.increment(
                             f"{metric_name}.success",
+                            amount=1,
                             **metric_labels
                         )
 
@@ -147,6 +150,7 @@ def track_metrics(
                     if track_errors:
                         metrics.increment(
                             f"{metric_name}.errors",
+                            amount=1,
                             error_type=type(e).__name__,
                             **metric_labels
                         )
@@ -166,12 +170,13 @@ def track_metrics(
             return async_wrapper
 
         @functools.wraps(func)
-        def sync_wrapper(*args, **kwargs) -> Any:
+        def sync_wrapper(*args: Any, **kwargs: Any) -> Any:
             """Sync wrapper for instrumented function."""
             # Increment invocation count
             if track_count:
                 metrics.increment(
                     f"{metric_name}.count",
+                    amount=1,
                     **metric_labels
                 )
 
@@ -185,6 +190,7 @@ def track_metrics(
                 if track_count:
                     metrics.increment(
                         f"{metric_name}.success",
+                        amount=1,
                         **metric_labels
                     )
 
@@ -195,6 +201,7 @@ def track_metrics(
                 if track_errors:
                     metrics.increment(
                         f"{metric_name}.errors",
+                        amount=1,
                         error_type=type(e).__name__,
                         **metric_labels
                     )
@@ -220,7 +227,7 @@ def track_usecase(
     metrics: TrackMetrics,
     name: str | None = None,
     **labels: str
-) -> Callable:
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """
     Decorator specifically for UseCase instrumentation.
 
@@ -252,8 +259,11 @@ def track_usecase(
         # - create_user.errors
     """
     return track_metrics(
-        metrics,
+        metrics=metrics,
         name=f"usecase.{name}" if name else None,
+        track_errors=True,
+        track_duration=True,
+        track_count=True,
         **labels
     )
 
@@ -262,7 +272,7 @@ def track_port(
     metrics: TrackMetrics,
     name: str | None = None,
     **labels: str
-) -> Callable:
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """
     Decorator specifically for Port instrumentation.
 
@@ -294,8 +304,11 @@ def track_port(
         # - port.user_repository.errors
     """
     return track_metrics(
-        metrics,
+        metrics=metrics,
         name=f"port.{name}" if name else None,
+        track_errors=True,
+        track_duration=True,
+        track_count=True,
         **labels
     )
 
@@ -304,7 +317,7 @@ def track_adapter(
     metrics: TrackMetrics,
     name: str | None = None,
     **labels: str
-) -> Callable:
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """
     Decorator specifically for Adapter instrumentation.
 
@@ -336,7 +349,10 @@ def track_adapter(
         # - adapter.http_request.errors
     """
     return track_metrics(
-        metrics,
+        metrics=metrics,
         name=f"adapter.{name}" if name else None,
+        track_errors=True,
+        track_duration=True,
+        track_count=True,
         **labels
     )

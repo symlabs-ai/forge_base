@@ -48,7 +48,7 @@ class ValueObjectBase(ABC):
         :class:`EntityBase` - For objects with identity
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the value object."""
         self._frozen = False
 
