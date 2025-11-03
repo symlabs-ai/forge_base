@@ -7,9 +7,7 @@ Author: {author}
 Created: {date}
 """
 
-from typing import Any
-
-from forgebase.application.use_case_base import UseCaseBase
+from forgebase.application.usecase_base import UseCaseBase
 
 
 class {class_name}Input:
@@ -106,3 +104,39 @@ class {class_name}(UseCaseBase[{class_name}Input, {class_name}Output]):
         """
         # TODO: Implement business logic
         return f"Processed: {{input_dto.example_param}}"
+
+    def _before_execute(self) -> None:
+        """
+        Hook called before execute().
+
+        Override for pre-execution logic like:
+        - Starting transactions
+        - Beginning metric collection
+        - Logging execution start
+        """
+        pass
+
+    def _after_execute(self) -> None:
+        """
+        Hook called after successful execute().
+
+        Override for post-execution logic like:
+        - Committing transactions
+        - Recording metrics
+        - Logging success
+        """
+        pass
+
+    def _on_error(self, error: Exception) -> None:
+        """
+        Hook called when execute() raises an exception.
+
+        Override for error handling like:
+        - Rolling back transactions
+        - Logging errors
+        - Recording failure metrics
+
+        :param error: The exception that was raised
+        :type error: Exception
+        """
+        pass

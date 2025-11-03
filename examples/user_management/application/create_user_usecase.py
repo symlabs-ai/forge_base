@@ -129,7 +129,7 @@ class CreateUserOutput(DTOBase):
         )
 
 
-class CreateUserUseCase(UseCaseBase):
+class CreateUserUseCase(UseCaseBase[CreateUserInput, CreateUserOutput]):
     """
     UseCase for creating a new user.
 
@@ -142,6 +142,10 @@ class CreateUserUseCase(UseCaseBase):
 
     This demonstrates the UseCase pattern: application-specific business logic
     that orchestrates domain objects and infrastructure ports.
+
+    Type parameters:
+        - TInput: CreateUserInput
+        - TOutput: CreateUserOutput
 
     Example::
 

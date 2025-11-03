@@ -10,10 +10,14 @@ Created: 2025-11-03
 """
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Generic, TypeVar
+
+# Type variables for input and output DTOs
+TInput = TypeVar("TInput")
+TOutput = TypeVar("TOutput")
 
 
-class UseCaseBase(ABC):
+class UseCaseBase(ABC, Generic[TInput, TOutput]):
     """
     Abstract base class for all use cases (ValueTracks).
 
@@ -21,21 +25,39 @@ class UseCaseBase(ABC):
     and communicating with external systems through ports. They remain
     framework-independent and testable.
 
+    This class is generic over input and output types, providing type safety
+    for use case implementations.
+
     Design Decisions:
+        - Generic types (TInput, TOutput) enable type-safe use case contracts
         - Lifecycle hooks (_before_execute, _after_execute, _on_error) enable
           cross-cutting concerns like logging, metrics, transactions
-        - Abstract execute() enforces consistent interface
-        - No return type specified - use cases return domain-appropriate types
+        - Abstract execute() enforces consistent interface with strong typing
+
+    :param TInput: Type of the input DTO
+    :param TOutput: Type of the output DTO
 
     :Example:
 
-        class CreateUserUseCase(UseCaseBase):
+        class CreateUserInput:
+            def __init__(self, email: str, name: str):
+                self.email = email
+                self.name = name
+
+        class UserOutput:
+            def __init__(self, id: str, email: str, name: str):
+                self.id = id
+                self.email = email
+                self.name = name
+
+        class CreateUserUseCase(UseCaseBase[CreateUserInput, UserOutput]):
             def __init__(self, user_repository: UserRepositoryPort):
                 self.user_repository = user_repository
 
-            def execute(self, input_dto: CreateUserDTO) -> UserDTO:
+            def execute(self, input_dto: CreateUserInput) -> UserOutput:
                 # Validate input
-                input_dto.validate()
+                if not input_dto.email or "@" not in input_dto.email:
+                    raise ValueError("Invalid email")
 
                 # Create domain entity
                 user = User(None, input_dto.email, input_dto.name)
@@ -44,13 +66,16 @@ class UseCaseBase(ABC):
                 # Persist
                 self.user_repository.save(user)
 
-                return UserDTO.from_entity(user)
+                # Return output DTO
+                return UserOutput(user.id, user.email, user.name)
 
     .. note::
-        Override lifecycle hooks for cross-cutting concerns.
+        Override lifecycle hooks for cross-cutting concerns like logging,
+        metrics, and transaction management.
 
     .. seealso::
         :class:`PortBase` - For external communication contracts
+        :class:`DTOBase` - For data transfer objects
     """
 
     @abstractmethod
@@ -111,7 +136,7 @@ class UseCaseBase(ABC):
         pass
 
     @abstractmethod
-    def execute(self, *args: Any, **kwargs: Any) -> Any:
+    def execute(self, input_dto: TInput) -> TOutput:
         """
         Execute the use case logic.
 
@@ -119,30 +144,31 @@ class UseCaseBase(ABC):
         It contains the core application logic, orchestrating domain
         entities and ports.
 
-        :param args: Positional arguments (typically DTOs)
-        :param kwargs: Keyword arguments
-        :return: Use case result (typically a DTO)
-        :rtype: Any
+        :param input_dto: Input data transfer object
+        :type input_dto: TInput
+        :return: Use case result as output DTO
+        :rtype: TOutput
 
         :Example:
 
-            def execute(self, input_dto: CreateOrderDTO) -> OrderDTO:
-                # 1. Validate input
-                input_dto.validate()
+            class CreateOrderUseCase(UseCaseBase[CreateOrderDTO, OrderDTO]):
+                def execute(self, input_dto: CreateOrderDTO) -> OrderDTO:
+                    # 1. Validate input
+                    input_dto.validate()
 
-                # 2. Load domain entities
-                customer = self.customer_repo.find_by_id(input_dto.customer_id)
-                if not customer:
-                    raise EntityNotFoundError("Customer not found")
+                    # 2. Load domain entities
+                    customer = self.customer_repo.find_by_id(input_dto.customer_id)
+                    if not customer:
+                        raise EntityNotFoundError("Customer not found")
 
-                # 3. Execute domain logic
-                order = Order.create(customer, input_dto.items)
-                order.validate()
+                    # 3. Execute domain logic
+                    order = Order.create(customer, input_dto.items)
+                    order.validate()
 
-                # 4. Persist
-                self.order_repo.save(order)
+                    # 4. Persist
+                    self.order_repo.save(order)
 
-                # 5. Return result
-                return OrderDTO.from_entity(order)
+                    # 5. Return result
+                    return OrderDTO.from_entity(order)
         """
         pass
