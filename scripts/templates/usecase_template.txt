@@ -1,0 +1,108 @@
+"""
+{name} Use Case.
+
+{description}
+
+Author: {author}
+Created: {date}
+"""
+
+from typing import Any
+
+from forgebase.application.use_case_base import UseCaseBase
+
+
+class {class_name}Input:
+    """
+    Input DTO for {class_name}.
+
+    :param example_param: Description of parameter
+    :type example_param: str
+    """
+
+    def __init__(self, example_param: str) -> None:
+        """Initialize input DTO."""
+        self.example_param = example_param
+
+
+class {class_name}Output:
+    """
+    Output DTO for {class_name}.
+
+    :param result: Description of result
+    :type result: str
+    """
+
+    def __init__(self, result: str) -> None:
+        """Initialize output DTO."""
+        self.result = result
+
+
+class {class_name}(UseCaseBase[{class_name}Input, {class_name}Output]):
+    """
+    Use Case: {name}.
+
+    {description}
+
+    Business Rules:
+        - TODO: Document business rules
+        - TODO: Document validations
+        - TODO: Document constraints
+
+    Dependencies:
+        - TODO: List required ports/repositories
+    """
+
+    def __init__(self) -> None:
+        """
+        Initialize use case with dependencies.
+
+        :param dependency: TODO: Add required dependencies
+        :type dependency: TODO: Add type
+        """
+        # TODO: Store dependencies
+        pass
+
+    def execute(self, input_dto: {class_name}Input) -> {class_name}Output:
+        """
+        Execute the use case.
+
+        :param input_dto: Input data
+        :type input_dto: {class_name}Input
+        :return: Execution result
+        :rtype: {class_name}Output
+        :raises ValueError: When input validation fails
+        :raises ApplicationError: When business logic fails
+        """
+        # TODO: Implement validation
+        self._validate_input(input_dto)
+
+        # TODO: Implement business logic
+        result = self._execute_business_logic(input_dto)
+
+        # TODO: Return output
+        return {class_name}Output(result=result)
+
+    def _validate_input(self, input_dto: {class_name}Input) -> None:
+        """
+        Validate input data.
+
+        :param input_dto: Input to validate
+        :type input_dto: {class_name}Input
+        :raises ValueError: When validation fails
+        """
+        # TODO: Implement validation logic
+        if not input_dto.example_param:
+            raise ValueError("example_param cannot be empty")
+
+    def _execute_business_logic(self, input_dto: {class_name}Input) -> str:
+        """
+        Execute core business logic.
+
+        :param input_dto: Input data
+        :type input_dto: {class_name}Input
+        :return: Processing result
+        :rtype: str
+        """
+        # TODO: Implement business logic
+        return f"Processed: {{input_dto.example_param}}"

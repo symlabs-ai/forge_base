@@ -1,0 +1,85 @@
+"""
+{name} Adapter.
+
+{description}
+
+Author: {author}
+Created: {date}
+"""
+
+from typing import Any
+
+# TODO: Import the port interface this adapter implements
+# from forgebase.application.ports.{port_name} import {port_class}
+
+
+class {class_name}:
+    """
+    Adapter: {name}.
+
+    {description}
+
+    This adapter implements the {port_name} port using {implementation_detail}.
+
+    Configuration:
+        - TODO: Document required configuration
+        - TODO: Document environment variables
+        - TODO: Document dependencies
+
+    Example::
+
+        adapter = {class_name}(config={{"key": "value"}})
+        result = adapter.example_operation("test")
+    """
+
+    def __init__(self, config: dict[str, Any] | None = None) -> None:
+        """
+        Initialize adapter with configuration.
+
+        :param config: Adapter configuration
+        :type config: Optional[Dict[str, Any]]
+        """
+        self.config = config or {{}}
+        self._initialize()
+
+    def _initialize(self) -> None:
+        """Initialize adapter resources (connections, clients, etc.)."""
+        # TODO: Initialize resources
+        pass
+
+    def example_operation(self, param: str) -> Any:
+        """
+        Implementation of example_operation from port.
+
+        :param param: Description of parameter
+        :type param: str
+        :return: Description of return value
+        :rtype: Any
+        :raises RuntimeError: When operation fails
+        """
+        # TODO: Implement operation
+        return f"Processed {{param}} using {implementation_detail}"
+
+    def another_operation(self) -> bool:
+        """
+        Implementation of another_operation from port.
+
+        :return: Operation success status
+        :rtype: bool
+        """
+        # TODO: Implement operation
+        return True
+
+    def shutdown(self) -> None:
+        """
+        Clean up adapter resources.
+
+        Called when adapter is no longer needed to release connections,
+        close files, etc.
+        """
+        # TODO: Cleanup resources
+        pass
+
+    def __repr__(self) -> str:
+        """String representation of adapter."""
+        return f"{class_name}(config={{self.config}})"

@@ -1,0 +1,5 @@
+[lint]
+# Exclude template files from linting (they contain Python template placeholders)
+exclude = [
+    "scripts/templates/*.py",
+]

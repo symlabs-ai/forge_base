@@ -1,0 +1,57 @@
+"""
+{name} Port.
+
+{description}
+
+Author: {author}
+Created: {date}
+"""
+
+from abc import ABC, abstractmethod
+from typing import Any
+
+
+class {class_name}(ABC):
+    """
+    Port: {name}.
+
+    {description}
+
+    This is a port (interface) that defines the contract for {name}.
+    Concrete implementations (adapters) will provide the actual functionality.
+
+    Design:
+        - Port defines WHAT needs to be done
+        - Adapters define HOW it's done
+        - Business logic depends on ports, not adapters
+
+    Example implementations:
+        - TODO: List potential adapter implementations
+    """
+
+    @abstractmethod
+    def example_operation(self, param: str) -> Any:
+        """
+        Example operation that adapters must implement.
+
+        :param param: Description of parameter
+        :type param: str
+        :return: Description of return value
+        :rtype: Any
+        :raises RuntimeError: When operation fails
+
+        Example::
+
+            result = port.example_operation("test")
+        """
+        pass
+
+    @abstractmethod
+    def another_operation(self) -> bool:
+        """
+        Another example operation.
+
+        :return: Operation success status
+        :rtype: bool
+        """
+        pass
