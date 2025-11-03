@@ -50,6 +50,8 @@ Thumbs.db
 htmlcov/
 .pytest_cache/
 .tox/
+.ruff_cache/
+.mypy_cache/
 
 # Configurações locais
 .env
