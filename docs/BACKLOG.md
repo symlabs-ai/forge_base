@@ -1628,37 +1628,7 @@ Week 4+: Extensions & Maintenance
 
 ---
 
-### 📋 TODO (44)
-
-#### FASE 1: Foundation & Core (0)
-*Todos os itens concluídos! ✅*
-
-#### FASE 2: Infrastructure (9)
-- [ ] **2.1.1** RepositoryBase (P1)
-- [ ] **2.1.2** JSONRepository (P1)
-- [ ] **2.1.3** SQLRepository (P2)
-- [ ] **2.2.1** ConfigLoader (P1)
-- [ ] **2.3.1** LoggerPort (P1)
-- [ ] **2.4.1** Sandbox (P2)
-
-#### FASE 3: Observability (5)
-- [ ] **3.1.1** LogService (P0)
-- [ ] **3.1.2** TrackMetrics (P0)
-- [ ] **3.1.3** TracerPort (P1)
-- [ ] **3.1.4** FeedbackManager (P1)
-- [ ] **3.2.1** @track_metrics Decorator (P1)
-
-#### FASE 4: Testing (6)
-- [ ] **4.1.1** ForgeTestCase (P1)
-- [ ] **4.2.1** FakeLogger (P1)
-- [ ] **4.2.2** FakeRepository (P1)
-- [ ] **4.2.3** FakeMetricsCollector (P1)
-- [ ] **4.2.4** Sample Data & Fixtures (P1)
-
-#### FASE 5: Adapters (3)
-- [ ] **5.1.1** CLIAdapter (P2)
-- [ ] **5.2.1** HTTPAdapter (P2)
-- [ ] **5.3.1** LLMAdapter (P3)
+### 📋 TODO (17)
 
 #### FASE 6: Core Init (1)
 - [ ] **6.1.1** core_init.py (P2)
@@ -1668,7 +1638,7 @@ Week 4+: Extensions & Maintenance
 - [ ] **7.2.1** YAML ↔ Code Sync (P3)
 - [ ] **7.2.2** Intent Tracking (P3)
 
-#### FASE 8: Documentation (12)
+#### FASE 8: Documentation (13)
 - [ ] **8.1.1** Docstrings reST (P1) — Ongoing
 - [ ] **8.1.2** ADR-001: Clean Architecture (P1)
 - [ ] **8.1.2** ADR-002: Hexagonal Ports/Adapters (P1)
@@ -1697,7 +1667,7 @@ Week 4+: Extensions & Maintenance
 
 ---
 
-### ✅ DONE (10)
+### ✅ DONE (29)
 
 #### FASE 1: Foundation & Core (10) ✅
 - [x] **1.1** Estrutura de Diretórios (P0)
@@ -1711,6 +1681,33 @@ Week 4+: Extensions & Maintenance
 - [x] **1.3.4** Error Handling (P1)
 - [x] **1.4.1** AdapterBase (P0)
 
+#### FASE 2: Infrastructure (6) ✅
+- [x] **2.1.1** RepositoryBase (P1)
+- [x] **2.1.2** JSONRepository (P1)
+- [x] **2.1.3** SQLRepository (P2)
+- [x] **2.2.1** ConfigLoader (P1)
+- [x] **2.3.1** LoggerPort (P1)
+- [x] **2.4.1** Sandbox (P2)
+
+#### FASE 3: Observability (5) ✅
+- [x] **3.1.1** LogService (P0) - 489 LOC
+- [x] **3.1.2** TrackMetrics (P0) - 447 LOC
+- [x] **3.1.3** TracerPort (P1) - 504 LOC
+- [x] **3.1.4** FeedbackManager (P1) - 455 LOC
+- [x] **3.2.1** @track_metrics Decorator (P1) - 283 LOC
+
+#### FASE 4: Testing (5) ✅
+- [x] **4.1.1** ForgeTestCase (P1) - 491 LOC, 7 testes
+- [x] **4.2.1** FakeLogger (P1) - 360 LOC
+- [x] **4.2.2** FakeRepository (P1) - 381 LOC
+- [x] **4.2.3** FakeMetricsCollector (P1) - 406 LOC
+- [x] **4.2.4** Sample Data & Fixtures (P1) - 427 LOC
+
+#### FASE 5: Adapters (3) ✅
+- [x] **5.1.1** CLIAdapter (P2) - 129 LOC
+- [x] **5.2.1** HTTPAdapter (P2) - 144 LOC
+- [x] **5.3.1** LLMAdapter (P3) - 98 LOC
+
 ---
 
 ## 📈 Métricas de Progresso
@@ -1718,32 +1715,30 @@ Week 4+: Extensions & Maintenance
 | Fase | Total | TODO | In Progress | In Review | Done | % Completo |
 |------|-------|------|-------------|-----------|------|------------|
 | **FASE 1** | 10 | 0 | 0 | 0 | 10 | 100% ✅ |
-| **FASE 2** | 6 | 6 | 0 | 0 | 0 | 0% |
-| **FASE 3** | 5 | 5 | 0 | 0 | 0 | 0% |
-| **FASE 4** | 5 | 5 | 0 | 0 | 0 | 0% |
-| **FASE 5** | 3 | 3 | 0 | 0 | 0 | 0% |
+| **FASE 2** | 6 | 0 | 0 | 0 | 6 | 100% ✅ |
+| **FASE 3** | 5 | 0 | 0 | 0 | 5 | 100% ✅ |
+| **FASE 4** | 5 | 0 | 0 | 0 | 5 | 100% ✅ |
+| **FASE 5** | 3 | 0 | 0 | 0 | 3 | 100% ✅ |
 | **FASE 6** | 1 | 1 | 0 | 0 | 0 | 0% |
 | **FASE 7** | 3 | 3 | 0 | 0 | 0 | 0% |
 | **FASE 8** | 13 | 13 | 0 | 0 | 0 | 0% |
-| **TOTAL** | **46** | **36** | **0** | **0** | **10** | **22%** |
+| **TOTAL** | **46** | **17** | **0** | **0** | **29** | **63%** |
 
 ---
 
 ## 🎯 Próximos Itens Priorizados
 
-**FASE 1 Completa! ✅ Próxima fase:**
+**FASES 1-5 Completas! ✅ (~7,865 LOC, 177 testes passando)**
 
-**FASE 2 - Infrastructure (P1 - Alto):**
+**Próxima fase: FASE 6 - Core Initialization & Bootstrap (P2 - Médio):**
 
-1. 🔨 **2.1.1 RepositoryBase** — Interface abstrata de persistência
-2. 🔨 **2.1.2 JSONRepository** — Implementação JSON
-3. 🔨 **2.2.1 ConfigLoader** — Gestão de configurações
-4. 🔨 **2.3.1 LoggerPort** — Interface de logging
-
-**FASE 3 - Observability (P0-P1 - Crítico/Alto):**
-
-5. ⚡ **3.1.1 LogService** — Logging estruturado
-6. ⚡ **3.1.2 TrackMetrics** — Coleta de métricas
+1. 🎯 **6.1.1 core_init.py** — Sistema de bootstrap e inicialização cognitiva
+   - Dependency injection setup
+   - Configuration loading
+   - Observability activation
+   - UseCase registry
+   - Adapter initialization
+   - Health checks e graceful shutdown
 
 ---
 
