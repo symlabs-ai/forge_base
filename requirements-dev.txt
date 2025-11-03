@@ -1,15 +1,21 @@
-# ForgeBase Development Dependencies
+# DEPRECATED: This file is kept for backward compatibility only.
+#
+# Please use pyproject.toml for dependency management (PEP 621 standard):
+#   pip install -e ".[dev]"    # Install with all dev dependencies
+#
+# This requirements-dev.txt will be removed in a future version.
+# See pyproject.toml for the canonical dependency list.
 
 # Include base requirements
 -r requirements.txt
 
 # Testing
-pytest>=7.4.0
-pytest-cov>=4.1.0
+pytest>=8.0.0
+pytest-cov>=4.0.0
+hypothesis>=6.0.0
 
-# Optional: SQL support for testing
-sqlalchemy>=2.0
-
-# Code quality
-ruff>=0.1.0  # Linter and formatter
-mypy>=1.7.0  # Type checking
+# Code quality & Architecture
+ruff>=0.14.0
+mypy>=1.7.0
+import-linter>=2.0.0
+deptry>=0.20.0
