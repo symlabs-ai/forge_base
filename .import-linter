@@ -1,0 +1,44 @@
+[importlinter]
+root_package = forgebase
+include_external_packages = False
+
+[importlinter:contract:layers]
+name = Clean Architecture Layer Boundaries
+type = layers
+layers =
+    adapters
+    infrastructure
+    application
+    domain
+containers =
+    forgebase
+
+[importlinter:contract:domain-independence]
+name = Domain Layer Independence
+type = forbidden
+source_modules =
+    forgebase.domain
+forbidden_modules =
+    forgebase.application
+    forgebase.infrastructure
+    forgebase.adapters
+    forgebase.core
+
+[importlinter:contract:application-boundaries]
+name = Application Layer Boundaries
+type = forbidden
+source_modules =
+    forgebase.application
+forbidden_modules =
+    forgebase.infrastructure
+    forgebase.adapters
+    forgebase.core
+
+[importlinter:contract:infrastructure-boundaries]
+name = Infrastructure Layer Boundaries
+type = forbidden
+source_modules =
+    forgebase.infrastructure
+forbidden_modules =
+    forgebase.adapters
+    forgebase.core
