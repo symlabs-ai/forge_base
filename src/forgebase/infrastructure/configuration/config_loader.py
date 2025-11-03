@@ -45,13 +45,13 @@ Example::
 :since: 2025-11-03
 """
 
-import os
 import json
-import yaml
-from pathlib import Path
-from typing import Any, Dict, Optional, Type, TypeVar, Union, List
+import os
 from abc import ABC, abstractmethod
+from pathlib import Path
+from typing import Any, TypeVar
 
+import yaml
 
 T = TypeVar('T')
 
@@ -64,7 +64,7 @@ class ConfigurationError(Exception):
     and schema validation failures.
     """
 
-    def __init__(self, message: str, key: Optional[str] = None, context: Optional[Dict[str, Any]] = None):
+    def __init__(self, message: str, key: str | None = None, context: dict[str, Any] | None = None):
         """
         Initialize configuration error.
 
@@ -115,7 +115,7 @@ class TypeValidator(ConfigValidator):
         validator.validate('port', '8080')  # Raises ConfigurationError
     """
 
-    def __init__(self, expected_type: Type):
+    def __init__(self, expected_type: type):
         """
         Initialize type validator.
 
@@ -146,7 +146,7 @@ class RangeValidator(ConfigValidator):
         validator.validate('port', 70000)  # Raises ConfigurationError
     """
 
-    def __init__(self, min_value: Optional[Union[int, float]] = None, max_value: Optional[Union[int, float]] = None):
+    def __init__(self, min_value: int | float | None = None, max_value: int | float | None = None):
         """
         Initialize range validator.
 
@@ -160,7 +160,7 @@ class RangeValidator(ConfigValidator):
 
     def validate(self, key: str, value: Any) -> bool:
         """Validate value is within range."""
-        if not isinstance(value, (int, float)):
+        if not isinstance(value, int | float):
             raise ConfigurationError(f"Range validation requires numeric value for key '{key}'", key=key)
 
         if self.min_value is not None and value < self.min_value:
@@ -230,18 +230,18 @@ class ConfigLoader:
     :vartype _validators: Dict[str, List[ConfigValidator]]
     """
 
-    def __init__(self, defaults: Optional[Dict[str, Any]] = None):
+    def __init__(self, defaults: dict[str, Any] | None = None):
         """
         Initialize configuration loader.
 
         :param defaults: Default configuration values
         :type defaults: Optional[Dict[str, Any]]
         """
-        self._config: Dict[str, Any] = defaults or {}
-        self._validators: Dict[str, List[ConfigValidator]] = {}
-        self._loaded_files: List[str] = []
+        self._config: dict[str, Any] = defaults or {}
+        self._validators: dict[str, list[ConfigValidator]] = {}
+        self._loaded_files: list[str] = []
 
-    def load_from_file(self, file_path: Union[str, Path]) -> None:
+    def load_from_file(self, file_path: str | Path) -> None:
         """
         Load configuration from a YAML or JSON file.
 
@@ -266,7 +266,7 @@ class ConfigLoader:
             )
 
         try:
-            with open(path, 'r', encoding='utf-8') as f:
+            with open(path, encoding='utf-8') as f:
                 if path.suffix in ['.yaml', '.yml']:
                     data = yaml.safe_load(f)
                 elif path.suffix == '.json':
@@ -286,7 +286,7 @@ class ConfigLoader:
             raise ConfigurationError(
                 f"Failed to parse configuration file: {path}",
                 context={'file_path': str(path), 'error': str(e)}
-            )
+            ) from e
 
     def load_from_env(self, prefix: str = 'FORGEBASE') -> None:
         """
@@ -326,7 +326,7 @@ class ConfigLoader:
 
                 self._config[config_key] = typed_value
 
-    def load_from_dict(self, data: Dict[str, Any], flatten: bool = True) -> None:
+    def load_from_dict(self, data: dict[str, Any], flatten: bool = True) -> None:
         """
         Load configuration from a dictionary.
 
@@ -348,7 +348,7 @@ class ConfigLoader:
 
         self._config.update(data)
 
-    def get(self, key: str, expected_type: Type[T], default: Optional[T] = None) -> Optional[T]:
+    def get(self, key: str, expected_type: type[T], default: T | None = None) -> T | None:
         """
         Get configuration value with type checking.
 
@@ -379,12 +379,12 @@ class ConfigLoader:
             try:
                 value = expected_type(value)
                 self._config[key] = value  # Cache converted value
-            except (ValueError, TypeError):
+            except (ValueError, TypeError) as e:
                 raise ConfigurationError(
                     f"Type mismatch for key '{key}': expected {expected_type.__name__}, got {type(value).__name__}",
                     key=key,
                     context={'expected_type': expected_type.__name__, 'actual_type': type(value).__name__}
-                )
+                ) from e
 
         # Validate if validators are registered
         if key in self._validators:
@@ -393,7 +393,7 @@ class ConfigLoader:
 
         return value
 
-    def get_required(self, key: str, expected_type: Type[T]) -> T:
+    def get_required(self, key: str, expected_type: type[T]) -> T:
         """
         Get required configuration value.
 
@@ -473,7 +473,7 @@ class ConfigLoader:
                 for validator in validators:
                     validator.validate(key, value)
 
-    def get_all(self) -> Dict[str, Any]:
+    def get_all(self) -> dict[str, Any]:
         """
         Get all configuration as a dictionary.
 
@@ -482,7 +482,7 @@ class ConfigLoader:
         """
         return self._config.copy()
 
-    def get_loaded_files(self) -> List[str]:
+    def get_loaded_files(self) -> list[str]:
         """
         Get list of configuration files that have been loaded.
 
@@ -491,7 +491,7 @@ class ConfigLoader:
         """
         return self._loaded_files.copy()
 
-    def _flatten_dict(self, data: Dict[str, Any], parent_key: str = '', separator: str = '.') -> Dict[str, Any]:
+    def _flatten_dict(self, data: dict[str, Any], parent_key: str = '', separator: str = '.') -> dict[str, Any]:
         """
         Flatten nested dictionary to dot notation.
 
@@ -507,7 +507,7 @@ class ConfigLoader:
                 items.append((new_key, value))
         return dict(items)
 
-    def _convert_env_value(self, value: str) -> Union[bool, int, float, str]:
+    def _convert_env_value(self, value: str) -> bool | int | float | str:
         """
         Convert environment variable string to appropriate Python type.
 
@@ -528,8 +528,7 @@ class ConfigLoader:
             # Try int first
             if '.' not in value:
                 return int(value)
-            else:
-                return float(value)
+            return float(value)
         except ValueError:
             pass
 

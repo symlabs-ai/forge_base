@@ -24,4 +24,3 @@ echo "[pre-commit] Rodando em todos os arquivos para baseline (pode levar um pou
 pre-commit run --config "$CFG" --all-files || true
 
 echo "[pre-commit] Pronto. Os hooks rodarão antes de cada commit."
-

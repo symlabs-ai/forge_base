@@ -85,6 +85,7 @@ Para entender a arquitetura completa, consulte:
 - [Documentation Guide](/docs/documentation_guide.md) — Padrões e práticas de docstrings extensivas
 - [ForgeBase Guide](/docs/guides/forgebase_guide.md) — Referência técnica completa
 - [ForgeBase PRD](/docs/guides/forgebase_PRD.md) — Requisitos e especificações
+- [Ambiente & Scripts](/docs/ambiente_e_scripts.md) — Setup de venv, lint (Ruff) e hooks de pre-commit
 
 ---
 ## 🛠️ AVISOS IMPORTANTES
@@ -101,4 +102,3 @@ Para entender a arquitetura completa, consulte:
 - **Test-Driven Development**
 
 ---
-

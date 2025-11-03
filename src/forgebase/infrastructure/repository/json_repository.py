@@ -9,12 +9,16 @@ Created: 2025-11-03
 """
 
 import json
-import os
 import threading
+from collections.abc import Callable
 from pathlib import Path
-from typing import Optional, List, TypeVar, Generic, Type, Callable
+from typing import Generic, TypeVar
+
 from forgebase.domain.entity_base import EntityBase
-from forgebase.infrastructure.repository.repository_base import RepositoryBase, RepositoryError
+from forgebase.infrastructure.repository.repository_base import (
+    RepositoryBase,
+    RepositoryError,
+)
 
 T = TypeVar('T', bound=EntityBase)
 
@@ -80,9 +84,9 @@ class JSONRepository(RepositoryBase[T], Generic[T]):
     def __init__(
         self,
         file_path: str,
-        entity_class: Type[T],
-        to_dict: Optional[Callable[[T], dict]] = None,
-        from_dict: Optional[Callable[[dict], T]] = None
+        entity_class: type[T],
+        to_dict: Callable[[T], dict] | None = None,
+        from_dict: Callable[[dict], T] | None = None
     ):
         """
         Initialize JSON repository.
@@ -108,17 +112,17 @@ class JSONRepository(RepositoryBase[T], Generic[T]):
             if not self.file_path.exists():
                 self._write_data({})
         except OSError as e:
-            raise RepositoryError(f"Failed to create file {self.file_path}: {e}")
+            raise RepositoryError(f"Failed to create file {self.file_path}: {e}") from e
 
     def _read_data(self) -> dict:
         """Read and parse JSON file."""
         try:
-            with open(self.file_path, 'r', encoding='utf-8') as f:
+            with open(self.file_path, encoding='utf-8') as f:
                 return json.load(f)
         except json.JSONDecodeError as e:
-            raise RepositoryError(f"Invalid JSON in {self.file_path}: {e}")
+            raise RepositoryError(f"Invalid JSON in {self.file_path}: {e}") from e
         except OSError as e:
-            raise RepositoryError(f"Failed to read {self.file_path}: {e}")
+            raise RepositoryError(f"Failed to read {self.file_path}: {e}") from e
 
     def _write_data(self, data: dict) -> None:
         """Write data to JSON file."""
@@ -126,7 +130,7 @@ class JSONRepository(RepositoryBase[T], Generic[T]):
             with open(self.file_path, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
         except OSError as e:
-            raise RepositoryError(f"Failed to write {self.file_path}: {e}")
+            raise RepositoryError(f"Failed to write {self.file_path}: {e}") from e
 
     def save(self, entity: T) -> None:
         """
@@ -147,7 +151,7 @@ class JSONRepository(RepositoryBase[T], Generic[T]):
             data[entity.id] = self._to_dict(entity)
             self._write_data(data)
 
-    def find_by_id(self, id: str) -> Optional[T]:
+    def find_by_id(self, id: str) -> T | None:
         """
         Find entity by ID.
 
@@ -160,7 +164,7 @@ class JSONRepository(RepositoryBase[T], Generic[T]):
             entity_data = data.get(id)
             return self._from_dict(entity_data) if entity_data else None
 
-    def find_all(self) -> List[T]:
+    def find_all(self) -> list[T]:
         """
         Retrieve all entities.
 

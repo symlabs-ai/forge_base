@@ -7,8 +7,10 @@ Author: Jorge, The Forge
 Created: 2025-11-03
 """
 
-from typing import Callable, Any, Optional, Type
+from collections.abc import Callable
 from functools import wraps
+from typing import Any
+
 from forgebase.domain.exceptions import DomainException
 
 
@@ -32,8 +34,8 @@ class InvalidInputError(ApplicationError):
     pass
 
 
-def handle_domain_errors(domain_exception: Type[DomainException],
-                        application_exception: Type[ApplicationError]):
+def handle_domain_errors(domain_exception: type[DomainException],
+                        application_exception: type[ApplicationError]):
     """
     Decorator to convert domain exceptions to application exceptions.
 
@@ -62,7 +64,7 @@ def handle_domain_errors(domain_exception: Type[DomainException],
     return decorator
 
 
-def guard_not_none(value: Optional[Any], error_message: str) -> Any:
+def guard_not_none(value: Any | None, error_message: str) -> Any:
     """
     Guard that ensures value is not None.
 

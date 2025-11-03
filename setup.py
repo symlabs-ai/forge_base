@@ -5,12 +5,12 @@ Author: Jorge, The Forge
 Created: 2025-11-03
 """
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
-with open("README.md", "r", encoding="utf-8") as fh:
+with open("README.md", encoding="utf-8") as fh:
     long_description = fh.read()
 
-with open("VERSION.MD", "r", encoding="utf-8") as fh:
+with open("VERSION.MD", encoding="utf-8") as fh:
     version = fh.read().strip().split()[-1]
 
 setup(

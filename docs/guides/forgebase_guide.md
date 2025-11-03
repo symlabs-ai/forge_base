@@ -332,7 +332,7 @@ Resultado final: OLÁ MUNDO
 
 ---
 
-## 🧭 8. Conclusão 
+## 🧭 8. Conclusão
 
 Este fluxo demonstra a filosofia central do ForgeBase:
 
@@ -345,7 +345,3 @@ O ForgeBase é o centro vital da engenharia do Forge Framework.
 Sua modularização garante que o sistema permaneça **limpo, coerente e evolutivo**, permitindo que ideias se tornem código sem perder o sentido original.
 
 > *“Forjar o núcleo é dar forma à consciência da engenharia.”*
-
-
-
-

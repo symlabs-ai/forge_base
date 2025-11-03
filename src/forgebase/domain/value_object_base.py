@@ -9,7 +9,7 @@ Created: 2025-11-03
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from typing import Any
 
 
 class ValueObjectBase(ABC):
@@ -77,7 +77,7 @@ class ValueObjectBase(ABC):
         """
         pass
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Convert value object to dictionary.
 

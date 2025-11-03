@@ -30,14 +30,14 @@ except ImportError:
 from src.forgebase.domain.entity_base import EntityBase
 
 if SQLALCHEMY_AVAILABLE:
-    from src.forgebase.infrastructure.repository.sql_repository import SQLRepository
     from src.forgebase.infrastructure.repository.repository_base import RepositoryError
+    from src.forgebase.infrastructure.repository.sql_repository import SQLRepository
 
 
 class MockEntity(EntityBase):
     """Mock entity for testing with SQL serialization."""
 
-    def __init__(self, id: Optional[str] = None, name: str = "", value: int = 0):
+    def __init__(self, id: str | None = None, name: str = "", value: int = 0):
         super().__init__(id)
         self.name = name
         self.value = value

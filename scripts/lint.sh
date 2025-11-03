@@ -23,4 +23,3 @@ else
   echo "[lint] Executando Ruff (somente checagem)"
   ruff check --config "$CONFIG" src tests "$@"
 fi
-

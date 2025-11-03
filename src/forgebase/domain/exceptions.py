@@ -9,7 +9,7 @@ Created: 2025-11-03
 """
 
 
-class DomainException(Exception):
+class DomainException(Exception):  # noqa: N818
     """
     Base exception for all domain-level errors.
 

@@ -9,7 +9,7 @@ Created: 2025-11-03
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, Any, TypeVar, Type
+from typing import Any, TypeVar
 
 T = TypeVar('T', bound='DTOBase')
 
@@ -72,7 +72,7 @@ class DTOBase(ABC):
         """
         pass
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Convert DTO to dictionary.
 
@@ -85,7 +85,7 @@ class DTOBase(ABC):
         return {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
 
     @classmethod
-    def from_dict(cls: Type[T], data: Dict[str, Any]) -> T:
+    def from_dict(cls: type[T], data: dict[str, Any]) -> T:
         """
         Create DTO from dictionary.
 

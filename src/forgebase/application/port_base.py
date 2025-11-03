@@ -9,7 +9,7 @@ Created: 2025-11-03
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, Any
+from typing import Any
 
 
 class PortBase(ABC):
@@ -47,7 +47,7 @@ class PortBase(ABC):
     """
 
     @abstractmethod
-    def info(self) -> Dict[str, Any]:
+    def info(self) -> dict[str, Any]:
         """
         Return metadata about this port for introspection.
 

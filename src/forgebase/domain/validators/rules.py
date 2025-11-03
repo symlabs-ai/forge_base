@@ -9,7 +9,8 @@ Created: 2025-11-03
 """
 
 import re
-from typing import Any, Optional, List
+from typing import Any
+
 from forgebase.domain.exceptions import ValidationError
 
 
@@ -25,7 +26,7 @@ def not_null(value: Any, field_name: str = "Value") -> None:
         raise ValidationError(f"{field_name} cannot be null")
 
 
-def not_empty(value: Optional[str], field_name: str = "Value") -> None:
+def not_empty(value: str | None, field_name: str = "Value") -> None:
     """
     Validate that string is not empty or whitespace only.
 
@@ -98,7 +99,7 @@ def max_length(value: str, length: int, field_name: str = "Value") -> None:
         )
 
 
-def one_of(value: Any, allowed_values: List[Any], field_name: str = "Value") -> None:
+def one_of(value: Any, allowed_values: list[Any], field_name: str = "Value") -> None:
     """
     Validate that value is one of allowed values.
 

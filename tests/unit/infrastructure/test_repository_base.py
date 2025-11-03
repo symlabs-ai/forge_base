@@ -9,15 +9,19 @@ to verify the contract and expected behavior.
 """
 
 import unittest
-from typing import Optional, List
+from typing import Optional
+
 from src.forgebase.domain.entity_base import EntityBase
-from src.forgebase.infrastructure.repository.repository_base import RepositoryBase, RepositoryError
+from src.forgebase.infrastructure.repository.repository_base import (
+    RepositoryBase,
+    RepositoryError,
+)
 
 
 class MockEntity(EntityBase):
     """Mock entity for testing."""
 
-    def __init__(self, id: Optional[str] = None, name: str = ""):
+    def __init__(self, id: str | None = None, name: str = ""):
         super().__init__(id)
         self.name = name
 
@@ -38,11 +42,11 @@ class InMemoryRepository(RepositoryBase[MockEntity]):
         entity.validate()
         self._storage[entity.id] = entity
 
-    def find_by_id(self, id: str) -> Optional[MockEntity]:
+    def find_by_id(self, id: str) -> MockEntity | None:
         """Find entity by ID."""
         return self._storage.get(id)
 
-    def find_all(self) -> List[MockEntity]:
+    def find_all(self) -> list[MockEntity]:
         """Find all entities."""
         return list(self._storage.values())
 

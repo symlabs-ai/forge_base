@@ -9,7 +9,8 @@ Created: 2025-11-03
 """
 
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar, Optional, List, Dict, Any
+from typing import Generic, TypeVar
+
 from forgebase.domain.entity_base import EntityBase
 
 T = TypeVar('T', bound=EntityBase)
@@ -83,7 +84,7 @@ class RepositoryBase(ABC, Generic[T]):
         pass
 
     @abstractmethod
-    def find_by_id(self, id: str) -> Optional[T]:
+    def find_by_id(self, id: str) -> T | None:
         """
         Find entity by ID.
 
@@ -107,7 +108,7 @@ class RepositoryBase(ABC, Generic[T]):
         pass
 
     @abstractmethod
-    def find_all(self) -> List[T]:
+    def find_all(self) -> list[T]:
         """
         Retrieve all entities.
 
@@ -170,7 +171,7 @@ class RepositoryError(Exception):
     :vartype context: dict
     """
 
-    def __init__(self, message: str, context: Optional[dict] = None):
+    def __init__(self, message: str, context: dict | None = None):
         """
         Initialize repository error.
 

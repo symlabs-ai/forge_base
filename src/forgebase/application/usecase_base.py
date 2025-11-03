@@ -53,6 +53,7 @@ class UseCaseBase(ABC):
         :class:`PortBase` - For external communication contracts
     """
 
+    @abstractmethod
     def _before_execute(self) -> None:
         """
         Hook called before execute().
@@ -70,6 +71,7 @@ class UseCaseBase(ABC):
         """
         pass
 
+    @abstractmethod
     def _after_execute(self) -> None:
         """
         Hook called after successful execute().
@@ -87,6 +89,7 @@ class UseCaseBase(ABC):
         """
         pass
 
+    @abstractmethod
     def _on_error(self, error: Exception) -> None:
         """
         Hook called when execute() raises an exception.

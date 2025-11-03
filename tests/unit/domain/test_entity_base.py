@@ -10,6 +10,7 @@ Created: 2025-11-03
 
 import unittest
 import uuid
+
 from forgebase.domain.entity_base import EntityBase
 
 
@@ -127,7 +128,7 @@ class TestEntityBase(unittest.TestCase):
         # EntityBase itself cannot be instantiated
         with self.assertRaises(TypeError):
             # This should fail because validate() is abstract
-            entity = EntityBase()  # type: ignore
+            EntityBase()  # type: ignore
 
     def test_validate_called_raises_on_invalid(self):
         """Test that validate() raises exception for invalid entity."""

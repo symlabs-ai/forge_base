@@ -10,7 +10,7 @@ Created: 2025-11-03
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, Any
+from typing import Any
 
 
 class AdapterBase(ABC):
@@ -88,7 +88,7 @@ class AdapterBase(ABC):
         """
         pass
 
-    def info(self) -> Dict[str, Any]:
+    def info(self) -> dict[str, Any]:
         """
         Return metadata about this adapter.
 
@@ -113,6 +113,7 @@ class AdapterBase(ABC):
             "type": "adapter"
         }
 
+    @abstractmethod
     def _instrument(self) -> None:
         """
         Hook for instrumentation and observability setup.

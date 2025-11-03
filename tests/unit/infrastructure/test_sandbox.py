@@ -16,15 +16,16 @@ The code tested here is NOT truly malicious - it's designed to test sandbox limi
 :since: 2025-11-03
 """
 
-import unittest
-import time
 import sys
+import time
+import unittest
+
 from src.forgebase.infrastructure.security.sandbox import (
-    Sandbox,
     ExecutionResult,
+    Sandbox,
     SandboxError,
+    SandboxExecutionError,
     SandboxTimeoutError,
-    SandboxExecutionError
 )
 
 

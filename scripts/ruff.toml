@@ -26,4 +26,3 @@ ignore = [
 [lint.per-file-ignores]
 "src/forgebase/**/__init__.py" = ["F401", "F403"]
 "tests/**" = ["E402", "F401"]
-

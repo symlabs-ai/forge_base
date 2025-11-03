@@ -11,14 +11,16 @@ Tests the JSON file-based repository implementation with focus on:
 :since: 2025-11-03
 """
 
-import unittest
-import tempfile
-import shutil
+import contextlib
 import json
+import shutil
+import tempfile
 import threading
 import time
+import unittest
 from pathlib import Path
 from typing import Optional
+
 from src.forgebase.domain.entity_base import EntityBase
 from src.forgebase.infrastructure.repository.json_repository import JSONRepository
 from src.forgebase.infrastructure.repository.repository_base import RepositoryError
@@ -27,7 +29,7 @@ from src.forgebase.infrastructure.repository.repository_base import RepositoryEr
 class MockEntity(EntityBase):
     """Mock entity for testing with JSON serialization."""
 
-    def __init__(self, id: Optional[str] = None, name: str = "", value: int = 0):
+    def __init__(self, id: str | None = None, name: str = "", value: int = 0):
         super().__init__(id)
         self.name = name
         self.value = value
@@ -80,7 +82,7 @@ class TestJSONRepository(unittest.TestCase):
         """Test that initialization creates an empty storage file."""
         self.assertTrue(self.storage_path.exists())
 
-        with open(self.storage_path, 'r') as f:
+        with open(self.storage_path) as f:
             data = json.load(f)
 
         self.assertEqual(data, {})
@@ -92,7 +94,7 @@ class TestJSONRepository(unittest.TestCase):
         self.repository.save(entity)
 
         # Read directly from file to verify persistence
-        with open(self.storage_path, 'r') as f:
+        with open(self.storage_path) as f:
             data = json.load(f)
 
         self.assertIn(entity.id, data)
@@ -166,7 +168,7 @@ class TestJSONRepository(unittest.TestCase):
         self.assertIsNone(self.repository.find_by_id(entity.id))
 
         # Verify deletion persisted to file
-        with open(self.storage_path, 'r') as f:
+        with open(self.storage_path) as f:
             data = json.load(f)
         self.assertNotIn(entity.id, data)
 
@@ -213,7 +215,7 @@ class TestJSONRepository(unittest.TestCase):
         self.assertEqual(len(self.repository.find_all()), 0)
 
         # Verify file is empty
-        with open(self.storage_path, 'r') as f:
+        with open(self.storage_path) as f:
             data = json.load(f)
         self.assertEqual(data, {})
 
@@ -327,8 +329,8 @@ class TestJSONRepository(unittest.TestCase):
         # Creating new repository with corrupted file should raise error
         # Note: Current implementation may handle this differently
         # This test documents the actual behavior
-        try:
-            repo = JSONRepository(
+        with contextlib.suppress(RepositoryError, json.JSONDecodeError):
+            JSONRepository(
                 file_path=str(self.storage_path),
                 entity_class=MockEntity,
                 to_dict=lambda e: e.to_dict(),
@@ -336,9 +338,6 @@ class TestJSONRepository(unittest.TestCase):
             )
             # If no exception is raised, repository may recreate the file
             # This is acceptable error recovery behavior
-        except (RepositoryError, json.JSONDecodeError):
-            # Either exception is acceptable for corrupted file
-            pass
 
     def test_custom_serialization(self):
         """Test custom serialization/deserialization functions."""

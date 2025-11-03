@@ -44,22 +44,26 @@ Example::
 """
 
 import json
-from typing import Optional, List, Type, Callable, Dict, Any
+from collections.abc import Callable
 from contextlib import contextmanager
+
 from sqlalchemy import (
-    create_engine,
-    Table,
-    Column,
-    String,
-    MetaData,
-    text,
     JSON,
-    Engine
+    Column,
+    Engine,
+    MetaData,
+    String,
+    Table,
+    text,
 )
-from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import sessionmaker
+
 from forgebase.domain.entity_base import EntityBase
-from forgebase.infrastructure.repository.repository_base import RepositoryBase, RepositoryError
+from forgebase.infrastructure.repository.repository_base import (
+    RepositoryBase,
+    RepositoryError,
+)
 
 
 class SQLRepository(RepositoryBase[EntityBase]):
@@ -129,10 +133,10 @@ class SQLRepository(RepositoryBase[EntityBase]):
     def __init__(
         self,
         engine: Engine,
-        entity_class: Type[EntityBase],
+        entity_class: type[EntityBase],
         table_name: str,
-        to_dict: Optional[Callable[[EntityBase], dict]] = None,
-        from_dict: Optional[Callable[[dict], EntityBase]] = None,
+        to_dict: Callable[[EntityBase], dict] | None = None,
+        from_dict: Callable[[dict], EntityBase] | None = None,
         create_table: bool = True
     ):
         """
@@ -201,7 +205,7 @@ class SQLRepository(RepositoryBase[EntityBase]):
             raise RepositoryError(
                 f"Failed to create table '{self.table_name}'",
                 context={'table': self.table_name, 'error': str(e)}
-            )
+            ) from e
 
     @contextmanager
     def _get_session(self):
@@ -303,9 +307,9 @@ class SQLRepository(RepositoryBase[EntityBase]):
             raise RepositoryError(
                 f"Failed to save entity with id '{entity.id}'",
                 context={'entity_id': entity.id, 'error': str(e)}
-            )
+            ) from e
 
-    def find_by_id(self, id: str) -> Optional[EntityBase]:
+    def find_by_id(self, id: str) -> EntityBase | None:
         """
         Find entity by ID.
 
@@ -343,9 +347,9 @@ class SQLRepository(RepositoryBase[EntityBase]):
             raise RepositoryError(
                 f"Failed to find entity with id '{id}'",
                 context={'entity_id': id, 'error': str(e)}
-            )
+            ) from e
 
-    def find_all(self) -> List[EntityBase]:
+    def find_all(self) -> list[EntityBase]:
         """
         Retrieve all entities.
 
@@ -379,7 +383,7 @@ class SQLRepository(RepositoryBase[EntityBase]):
             raise RepositoryError(
                 "Failed to retrieve all entities",
                 context={'error': str(e)}
-            )
+            ) from e
 
     def delete(self, id: str) -> None:
         """
@@ -405,7 +409,7 @@ class SQLRepository(RepositoryBase[EntityBase]):
             raise RepositoryError(
                 f"Failed to delete entity with id '{id}'",
                 context={'entity_id': id, 'error': str(e)}
-            )
+            ) from e
 
     def exists(self, id: str) -> bool:
         """
@@ -434,7 +438,7 @@ class SQLRepository(RepositoryBase[EntityBase]):
             raise RepositoryError(
                 f"Failed to check existence of entity with id '{id}'",
                 context={'entity_id': id, 'error': str(e)}
-            )
+            ) from e
 
     def count(self) -> int:
         """
@@ -461,7 +465,7 @@ class SQLRepository(RepositoryBase[EntityBase]):
             raise RepositoryError(
                 "Failed to count entities",
                 context={'error': str(e)}
-            )
+            ) from e
 
     def clear(self) -> None:
         """
@@ -483,7 +487,7 @@ class SQLRepository(RepositoryBase[EntityBase]):
             raise RepositoryError(
                 "Failed to clear all entities",
                 context={'error': str(e)}
-            )
+            ) from e
 
     def __repr__(self) -> str:
         """String representation of repository."""

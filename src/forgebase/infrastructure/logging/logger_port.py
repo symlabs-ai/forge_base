@@ -43,12 +43,12 @@ Example::
 :since: 2025-11-03
 """
 
-import sys
 import json
+import sys
 from abc import ABC, abstractmethod
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, Optional, TextIO
+from typing import Any, TextIO
 
 
 class LogLevel(Enum):
@@ -271,7 +271,7 @@ class StdoutLogger(LoggerPort):
         """Check if message at given level should be logged."""
         return level >= self.level
 
-    def _format_log(self, level: LogLevel, message: str, context: Dict[str, Any]) -> str:
+    def _format_log(self, level: LogLevel, message: str, context: dict[str, Any]) -> str:
         """
         Format log entry as JSON.
 
@@ -296,7 +296,7 @@ class StdoutLogger(LoggerPort):
 
         return json.dumps(log_entry, default=str)
 
-    def _write_log(self, level: LogLevel, message: str, context: Dict[str, Any]) -> None:
+    def _write_log(self, level: LogLevel, message: str, context: dict[str, Any]) -> None:
         """
         Write log entry to output stream.
 

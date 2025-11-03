@@ -45,7 +45,7 @@ Created: 2025-11-03
 
 import uuid
 from abc import ABC, abstractmethod
-from typing import Optional, Any
+from typing import Any
 
 
 class EntityBase(ABC):
@@ -110,7 +110,7 @@ class EntityBase(ABC):
         :class:`UseCaseBase` : Orchestration using entities
     """
 
-    def __init__(self, id: Optional[str] = None):
+    def __init__(self, id: str | None = None):
         """
         Initialize the entity with a unique ID.
 

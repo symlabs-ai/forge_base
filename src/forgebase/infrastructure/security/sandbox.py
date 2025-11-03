@@ -74,19 +74,18 @@ Example::
 :since: 2025-11-03
 """
 
-import sys
 import io
 import time
 import traceback
-from typing import Any, Dict, Optional, Callable
+from contextlib import redirect_stderr, redirect_stdout
 from dataclasses import dataclass
-from contextlib import redirect_stdout, redirect_stderr
+from typing import Any
 
 
 class SandboxError(Exception):
     """Base exception for sandbox-related errors."""
 
-    def __init__(self, message: str, context: Optional[Dict[str, Any]] = None):
+    def __init__(self, message: str, context: dict[str, Any] | None = None):
         """
         Initialize sandbox error.
 
@@ -126,7 +125,7 @@ class SandboxExecutionError(SandboxError):
     Contains details about the exception that occurred during execution.
     """
 
-    def __init__(self, message: str, original_exception: Optional[Exception] = None, context: Optional[Dict[str, Any]] = None):
+    def __init__(self, message: str, original_exception: Exception | None = None, context: dict[str, Any] | None = None):
         """
         Initialize execution error.
 
@@ -171,8 +170,8 @@ class ExecutionResult:
     output: str
     error_output: str
     return_value: Any = None
-    exception: Optional[Exception] = None
-    exception_traceback: Optional[str] = None
+    exception: Exception | None = None
+    exception_traceback: str | None = None
     execution_time: float = 0.0
     timeout: bool = False
 
@@ -180,9 +179,8 @@ class ExecutionResult:
         """String representation of execution result."""
         if self.success:
             return f"ExecutionResult(success=True, time={self.execution_time:.3f}s)"
-        else:
-            error_type = "Timeout" if self.timeout else type(self.exception).__name__ if self.exception else "Unknown"
-            return f"ExecutionResult(success=False, error={error_type}, time={self.execution_time:.3f}s)"
+        error_type = "Timeout" if self.timeout else type(self.exception).__name__ if self.exception else "Unknown"
+        return f"ExecutionResult(success=False, error={error_type}, time={self.execution_time:.3f}s)"
 
 
 class Sandbox:
@@ -252,7 +250,7 @@ class Sandbox:
         self,
         timeout: float = 10.0,
         memory_limit_mb: int = 100,
-        restricted_modules: Optional[set] = None
+        restricted_modules: set | None = None
     ):
         """
         Initialize sandbox with resource limits.
@@ -283,9 +281,9 @@ class Sandbox:
     def execute(
         self,
         code: str,
-        globals_dict: Optional[Dict[str, Any]] = None,
-        locals_dict: Optional[Dict[str, Any]] = None,
-        capture_result: Optional[str] = None
+        globals_dict: dict[str, Any] | None = None,
+        locals_dict: dict[str, Any] | None = None,
+        capture_result: str | None = None
     ) -> ExecutionResult:
         """
         Execute code in isolated environment.
@@ -390,8 +388,8 @@ class Sandbox:
         # Calculate execution time
         execution_time = time.time() - start_time
 
-        # Build result
-        result = ExecutionResult(
+        # Build and return result
+        return ExecutionResult(
             success=(exception is None),
             output=stdout_capture.getvalue(),
             error_output=stderr_capture.getvalue(),
@@ -402,9 +400,7 @@ class Sandbox:
             timeout=timeout_occurred
         )
 
-        return result
-
-    def _create_restricted_builtins(self) -> Dict[str, Any]:
+    def _create_restricted_builtins(self) -> dict[str, Any]:
         """
         Create restricted builtins dictionary.
 
