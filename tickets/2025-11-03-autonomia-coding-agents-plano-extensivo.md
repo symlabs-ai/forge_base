@@ -5,6 +5,17 @@ Status: Novo
 Data: 2025-11-03
 Prioridade: Alta (P1) — rollout incremental
 
+## Resposta ao Review Técnico (2025-11-03)
+
+Obrigado pela revisão cuidadosa (8/10). Incorporamos imediatamente os apontamentos:
+
+- Corrigido: configuração do import-linter para não permitir `infrastructure → domain` (mantém apenas `infrastructure → application`).
+- Ajustado: escopo do Mypy ampliado para `domain/ + application/` na Fase 1 e `infrastructure/` na Fase 2.
+- Reintroduzido: Contract Tests para `RepositoryBase` como item P1.
+- Removido: item redundante de exemplos end‑to‑end no backlog (ficará como documentação opcional nos guias).
+
+Detalhes estão refletidos nas seções de Guardrails, Tipagem e Backlog abaixo.
+
 ## Introdução — Racional
 
 Agentes de RIA operam melhor quando o ambiente oferece contratos fortes, feedback rápido e caminhos padronizados. No ForgeBase, isso se traduz em:
@@ -18,6 +29,24 @@ Agentes de RIA operam melhor quando o ambiente oferece contratos fortes, feedbac
 O objetivo deste plano é estabelecer esses pilares de modo incremental, priorizando impacto versus esforço, sem poluir a raiz do repositório (configs em `scripts/`), e mantendo coerência Clean + Hexagonal + Observável.
 
 ---
+
+## Estado Atual (revisado)
+
+Implementações já presentes no repositório (confirmado nesta revisão):
+- Observabilidade: `observability/track_metrics.py` (engine de métricas) e `application/decorators/track_metrics.py` (decorators) implementados com testes (tests/unit/observability/test_track_metrics.py).
+- Logging: `observability/log_service.py` básico.
+- Infraestrutura de repositórios: `infrastructure/repository/{repository_base,json_repository,sql_repository}.py` com suíte de testes.
+- Sandbox de execução: `infrastructure/security/sandbox.py` com testes.
+- Configuração: `infrastructure/configuration/config_loader.py` (multi‑fonte, validadores).
+- Adapters: esboços em `adapters/{cli,http,ai}`.
+- Testing: fakes, fixtures e `forge_test_case` presentes em `testing/`.
+- Qualidade local: pre-commit + Ruff ativos; dev‑requirements com mypy (ainda sem mypy.ini/hook dedicados).
+
+O que permanece como oportunidade de melhoria imediata:
+- Integração de Mypy (strict) aos hooks (mypy.ini em `scripts/` + hook no pre-commit).
+- Guardrails arquiteturais (import-linter) para camadas.
+- Scaffolding/descoberta/automação de fluxo (scripts de geração e `devtool.py`).
+- Dívidas de lint apontadas pelo Ruff (e.g., B027, B904, F841, SIM105, RET504) a serem resolvidas ou tratadas via configuração.
 
 ## 1) Tipagem Forte e Contratos Estáticos (Mypy strict + Protocols/Generics)
 
@@ -57,7 +86,7 @@ class CreateUserDTO:
             raise ValueError("Name is required")
 ```
 
-Exemplo — Config Mypy (scripts/mypy.ini):
+Exemplo — Config Mypy (scripts/mypy.ini) — Fase 1 (domain + application):
 ```ini
 [mypy]
 python_version = 3.12
@@ -67,7 +96,7 @@ no_implicit_optional = True
 warn_unused_ignores = True
 warn_redundant_casts = True
 strict_equality = True
-files = src/forgebase/domain
+files = src/forgebase/domain, src/forgebase/application
 ```
 
 Impacto: +Confiabilidade, +IDE assist, -Esforço inicial de anotações.
@@ -78,29 +107,24 @@ Impacto: +Confiabilidade, +IDE assist, -Esforço inicial de anotações.
 
 Objetivo: Fornecer sinais objetivos (tempo, sucesso/falha, contexto) para que agentes possam ajustar estratégias autonomamente.
 
-Exemplo — Decorator de métricas (`src/forgebase/application/decorators/track_metrics.py`):
+Exemplo — Decorators de métricas já existentes (`src/forgebase/application/decorators/track_metrics.py`):
 ```python
-import time
-from functools import wraps
-from typing import Callable, Any
+from forgebase.observability.track_metrics import TrackMetrics
+from forgebase.application.decorators.track_metrics import (
+    track_metrics, track_usecase, track_port, track_adapter
+)
 
-def track_metrics(name: str):
-    def deco(fn: Callable[..., Any]) -> Callable[..., Any]:
-        @wraps(fn)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
-            start = time.perf_counter()
-            success = True
-            try:
-                return fn(*args, **kwargs)
-            except Exception:
-                success = False
-                raise
-            finally:
-                duration_ms = (time.perf_counter() - start) * 1000
-                # Aqui integrar com LogService/FeedbackManager
-                print(f"[METRIC] {name} duration_ms={duration_ms:.2f} success={success}")
-        return wrapper
-    return deco
+metrics = TrackMetrics()
+
+# Uso genérico
+@track_metrics(metrics, name="process_order")
+def process_order(dto):
+    ...
+
+# Uso específico para UseCase
+@track_usecase(metrics, name="create_user")
+def execute(dto):
+    ...
 ```
 
 Exemplo — LogService simples (`src/forgebase/observability/log_service.py`):
@@ -114,14 +138,15 @@ class LogService:
 
 Exemplo — Uso em UseCase:
 ```python
-from forgebase.application.decorators.track_metrics import track_metrics
+from forgebase.application.decorators.track_metrics import track_usecase
+from forgebase.observability.track_metrics import TrackMetrics
 
 class CreateUserUseCase(UseCaseBase):
     def __init__(self, repo, logger):
         self.repo = repo
         self.logger = logger
 
-    @track_metrics("create_user")
+    @track_usecase(TrackMetrics(), name="create_user")
     def execute(self, dto: CreateUserDTO) -> None:
         self.logger.info("start", email=dto.email)
         dto.validate()
@@ -241,7 +266,7 @@ imports = forgebase.application
 
 [layers.infrastructure]
 modules = forgebase.infrastructure
-imports = forgebase.application, forgebase.domain
+imports = forgebase.application
 ```
 
 Impacto: +Coesão arquitetural, -Precisa ajuste fino de regras.
@@ -343,32 +368,34 @@ Impacto: +Facilidade de uso por agentes, -Muito baixo custo.
 
 ## Backlog Prioritizado
 
-P0 — Observabilidade e Contratos
-1. Implementar `track_metrics` e `LogService` básicos; integrar em `UseCaseBase` exemplos.
-   - Aceite: decorator disponível; logs/metrics visíveis em execuções de exemplo.
-2. Adotar Mypy (strict) em `domain/` (config em `scripts/mypy.ini`, hook no pre-commit).
-   - Aceite: `bash scripts/typecheck.sh` sem erros no domínio.
-3. Criar Contract Tests para `RepositoryBase` e aplicar em JSONRepository.
-   - Aceite: JSONRepository passa no suite de contrato.
+Concluídos
+- Observabilidade: engine + decorators implementados e testados.
+- Repositórios: RepositoryBase/JSON/SQL com testes funcionais.
+
+P0 — Qualidade & Contratos
+1. Resolver dívidas de lint do Ruff (B027 em métodos vazios abstratos; B904 em `raise ... from e`; F841, SIM105, RET504 nos testes/infra).
+   - Aceite: `pre-commit run --all-files` sem falhas de Ruff.
+2. Adotar Mypy (strict) em `domain/ + application/` (config em `scripts/mypy.ini`, hook no pre-commit). Fase 2: `infrastructure/`.
+   - Aceite: `bash scripts/typecheck.sh` sem erros em `domain/ + application/`; hook mypy ativo.
+3. Guardrails arquiteturais com import‑linter (sem permitir `infrastructure → domain`).
+   - Aceite: regras de camadas definidas e passando.
 
 P1 — Guardrails e Scaffolding
-4. Import-linter (config `scripts/importlinter.ini`) com regras de camadas.
-   - Aceite: `import-linter` passando nas camadas definidas.
+4. Contract Tests para `RepositoryBase` (mixin de contrato aplicado a JSON/SQL repo).
+   - Aceite: Repositórios JSON/SQL passam no suite de contrato.
 5. Scaffolds: `scripts/scaffold_usecase.py` e `scripts/scaffold_port_adapter.py`.
-   - Aceite: geração de arquivos com docstrings e testes mínimos.
+    - Aceite: geração de arquivos com docstrings e testes mínimos.
 6. Discovery: `scripts/discover.py` e comando no `devtool.py`.
-   - Aceite: lista JSON com UseCases/Ports.
+    - Aceite: lista JSON com UseCases/Ports.
 
 P2 — Cobertura e Saúde
 7. Property-based tests (Hypothesis) para validators/VO.
-   - Aceite: pelo menos 3 propriedades principais cobertas.
+    - Aceite: pelo menos 3 propriedades principais cobertas.
 8. Deptry para higiene de dependências.
-   - Aceite: relatório sem erros críticos.
-9. Exemplos end-to-end atualizados na pasta `examples/`.
-   - Aceite: execução demonstra logs + métricas.
+    - Aceite: relatório sem erros críticos.
 
 P3 — Automação
-10. `scripts/devtool.py` com tarefas (lint, fix, type, test, discover).
+9. `scripts/devtool.py` com tarefas (lint, fix, type, test, discover).
     - Aceite: comandos funcionam localmente e via pre-commit opcional.
 
 ---
