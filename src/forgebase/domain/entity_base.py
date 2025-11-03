@@ -142,7 +142,37 @@ class EntityBase(ABC):
             ID generation happens at construction time, not lazily. This ensures
             the entity always has a valid ID from the moment it's created.
         """
-        self.id: str = id or str(uuid.uuid4())
+        self._id: str = id or str(uuid.uuid4())
+
+    @property
+    def id(self) -> str:
+        """
+        Get entity ID (read-only).
+
+        The ID is immutable after entity creation to maintain identity integrity.
+        This prevents entities from breaking when used in sets or as dict keys.
+
+        :return: Entity identifier
+        :rtype: str
+        """
+        return self._id
+
+    @id.setter
+    def id(self, value: str) -> None:
+        """
+        Prevent ID modification after entity creation.
+
+        Entity identity must remain stable throughout the entity's lifetime.
+        Attempting to change the ID will raise an AttributeError.
+
+        :param value: Attempted new ID value
+        :raises AttributeError: Always - ID is immutable
+        """
+        raise AttributeError(
+            "Entity ID is immutable and cannot be changed after creation. "
+            "Entity identity must remain stable to ensure correct behavior "
+            "in sets, dictionaries, and equality comparisons."
+        )
 
     @abstractmethod
     def validate(self) -> None:
@@ -232,7 +262,7 @@ class EntityBase(ABC):
         """
         if not isinstance(other, EntityBase):
             return False
-        return self.id == other.id
+        return self._id == other._id
 
     def __hash__(self) -> int:
         """
@@ -274,7 +304,7 @@ class EntityBase(ABC):
             The hash is computed from the string ID, which is immutable.
             This ensures hash stability.
         """
-        return hash(self.id)
+        return hash(self._id)
 
     def __repr__(self) -> str:
         """

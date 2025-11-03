@@ -130,9 +130,21 @@ class TestEntityProperties(unittest.TestCase):
         expected_count = 1 if id1 == id2 else 2
         assert len(entity_set) == expected_count
 
-    # NOTE: ID immutability test removed - EntityBase currently allows ID modification
-    # This is a known limitation that could be addressed in future versions by making
-    # ID a read-only property. Property-based testing helped discover this!
+    @given(st.text(min_size=1, max_size=100))
+    def test_property_id_is_immutable(self, entity_id: str):
+        """
+        Property: Entity ID cannot be modified after creation.
+
+        Identity is fundamental and must remain stable. Attempting to change
+        the ID should raise AttributeError.
+        """
+        entity = MockEntity(id=entity_id)
+
+        with self.assertRaises(AttributeError) as context:
+            entity.id = "new-id"
+
+        # Verify error message is descriptive
+        assert "immutable" in str(context.exception).lower()
 
     @given(st.text(min_size=1, max_size=100))
     def test_property_str_representation_contains_id(self, entity_id: str):
