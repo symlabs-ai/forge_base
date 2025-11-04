@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forgebase"
-version = "0.1.0"
+version = "0.1.1"
 description = "Cognitive Architecture Framework - Clean + Hexagonal Architecture with native observability"
 readme = "README.md"
 requires-python = ">=3.11"
