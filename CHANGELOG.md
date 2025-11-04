@@ -5,6 +5,49 @@ All notable changes to ForgeBase will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2025-11-04
+
+### Added
+- **Python API for AI Agents** 🤖
+  - Created `forgebase.dev.api` package for programmatic access
+  - **QualityChecker API**: Structured code quality validation
+    - Returns dataclasses with file, line, error code, suggestions
+    - Supports Ruff, Mypy, import-linter, Deptry
+    - Machine-readable CheckResult format
+  - **ScaffoldGenerator API**: Programmatic code generation
+    - Generates UseCases, Entities with customizable templates
+    - Returns code as string for AI modification
+    - Includes metadata (imports, dependencies, file paths)
+  - **ComponentDiscovery API**: Codebase analysis and cataloging
+    - Scans project and identifies components (Entities, UseCases, Repositories)
+    - Returns structured component information
+    - Enables architectural analysis by AI
+  - **TestRunner API**: Test execution with structured results
+    - Supports unit, integration, property-based, contract tests
+    - Returns detailed failure information
+    - Includes timing and coverage data
+  - Comprehensive AI agent usage examples (`examples/ai_agent_usage.py`)
+  - Complete documentation for AI agents (`src/forgebase/dev/AI_AGENTS.md`)
+
+### Changed
+- APIs return dataclasses instead of formatted text
+- Error information now includes file, line, column, error code
+- All dev tools support both CLI and Python API interfaces
+
+### Technical Details
+- All APIs use dataclasses with `to_dict()` for JSON serialization
+- Type hints throughout for AI understanding
+- Cross-platform support via `find_executable()`
+- No subprocess overhead when using APIs directly
+- Structured data enables AI decision-making
+
+### Benefits for AI Agents
+- ✅ No text parsing required
+- ✅ Direct access to error codes and locations
+- ✅ Actionable suggestions in structured format
+- ✅ Programmatic component analysis
+- ✅ Ability to modify generated code before writing
+
 ## [0.1.2] - 2025-11-03
 
 ### Added
