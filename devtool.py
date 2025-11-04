@@ -24,8 +24,51 @@ Author: ForgeBase Development Team
 Created: 2025-11-03
 """
 
+import shutil
 import subprocess
 import sys
+from pathlib import Path
+
+
+def find_executable(name: str) -> str:
+    """
+    Find an executable in a cross-platform way.
+
+    Searches for the executable in the following order:
+    1. In PATH (using shutil.which)
+    2. In the current virtualenv's bin/Scripts directory
+    3. Falls back to just the name (letting subprocess handle errors)
+
+    This makes the tool work on Windows, macOS, Linux, and with
+    different virtualenv names (not just .venv).
+
+    :param name: Name of the executable (e.g., 'deptry', 'lint-imports')
+    :return: Path to the executable or the name itself
+    """
+    # Try to find in PATH first
+    found = shutil.which(name)
+    if found:
+        return found
+
+    # Try in the current virtualenv
+    venv_base = Path(sys.executable).parent
+
+    # Unix-like: bin/
+    unix_path = venv_base / name
+    if unix_path.exists():
+        return str(unix_path)
+
+    # Windows: Scripts/
+    windows_path = venv_base / "Scripts" / f"{name}.exe"
+    if windows_path.exists():
+        return str(windows_path)
+
+    windows_path_no_ext = venv_base / "Scripts" / name
+    if windows_path_no_ext.exists():
+        return str(windows_path_no_ext)
+
+    # Fallback: return name and let subprocess handle errors
+    return name
 
 
 def run_command(cmd: list[str], description: str) -> int:
@@ -94,7 +137,7 @@ def lint(args: list[str]) -> int:
 
     # Import-linter
     exit_code |= run_command(
-        [".venv/bin/lint-imports", "--config", ".import-linter"],
+        [find_executable("lint-imports"), "--config", ".import-linter"],
         "Checking architecture with import-linter"
     )
 
@@ -103,13 +146,13 @@ def lint(args: list[str]) -> int:
 
 def check_deps(args: list[str]) -> int:
     """Check dependency hygiene."""
-    cmd = [".venv/bin/deptry", "src/"]
+    cmd = [find_executable("deptry"), "src/"]
     return run_command(cmd, "Checking dependency hygiene")
 
 
 def check_arch(args: list[str]) -> int:
     """Check Clean Architecture boundaries."""
-    cmd = [".venv/bin/lint-imports", "--config", ".import-linter"]
+    cmd = [find_executable("lint-imports"), "--config", ".import-linter"]
     return run_command(cmd, "Validating Clean Architecture boundaries")
 
 
