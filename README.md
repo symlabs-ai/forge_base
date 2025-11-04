@@ -6,20 +6,28 @@
 
 ```
 forgebase/
-├── agents/          # Definições de agentes (personas de desenvolvimento)
-├── docs/            # Documentação técnica e guias de referência
-├── scripts/         # Scripts de manutenção do repositório
-├── src/             # Código-fonte do framework ForgeBase
-├── temp/            # Arquivos temporários e simulações (não versionados)
-└── README.md        # Este arquivo
+├── .claude/              # Configurações do Claude Code
+├── docs/                 # Documentação técnica e guias de referência
+├── examples/             # Exemplos de uso do framework
+├── scripts/              # Scripts de desenvolvimento (scaffolding, discovery)
+├── src/                  # Código-fonte do framework ForgeBase
+│   └── forgebase/
+│       ├── domain/           # Camada de Domínio
+│       ├── application/      # Camada de Aplicação
+│       ├── infrastructure/   # Camada de Infraestrutura
+│       ├── integration/      # Adaptadores e integrações
+│       └── observability/    # Sistema de observabilidade
+├── tests/                # Testes (unit, integration, property-based, contract)
+├── devtool.py           # CLI unificada para desenvolvimento
+├── pyproject.toml       # Configuração do projeto (PEP 621)
+├── setup.py             # Shim para backward compatibility
+├── CHANGELOG.md         # Histórico de mudanças
+├── CONTRIBUTING.md      # Guia de contribuição
+├── VERSION.MD           # Versão atual do projeto
+└── README.md            # Este arquivo
 ```
 
 ### 📂 Detalhamento das Pastas
-
-#### `agents/`
-Contém as definições de agentes especializados que atuam no desenvolvimento:
-- **jorge_theforge.md** — Arquiteto-desenvolvedor do núcleo ForgeBase
-- **bill_review.md** — Revisor crítico que revela falhas de pensamento
 
 #### `docs/`
 Documentação completa do projeto:
@@ -27,22 +35,84 @@ Documentação completa do projeto:
 - **documentation_guide.md** — Padrões e práticas de docstrings extensivas
 - **guides/forgebase_guide.md** — Guia fundacional da arquitetura
 - **guides/forgebase_PRD.md** — Product Requirements Document
+- **ambiente_e_scripts.md** — Setup de ambiente e ferramentas
+
+#### `examples/`
+Exemplos práticos de uso do framework:
+- **user_management/** — Sistema completo de gerenciamento de usuários
+  - Demonstra Clean Architecture na prática
+  - Inclui domínio (User, Email), aplicação (CreateUserUseCase) e infraestrutura (JSONUserRepository)
 
 #### `scripts/`
-Scripts de manutenção e automação do repositório.
-**Nota:** Estes scripts são para gerenciamento do repo, não fazem parte do framework ForgeBase.
+Ferramentas de desenvolvimento:
+- **scaffold.py** — Gerador de boilerplate (UseCases, Ports, Adapters)
+- **discover.py** — Descoberta e catalogação de componentes
+- **mypy.ini** — Configuração de type checking
 
-#### `src/`
-Código-fonte do framework ForgeBase seguindo arquitetura Clean + Hexagonal:
-- `domain/` — Entidades, objetos de valor, lógica de negócio
-- `application/` — Casos de uso, portas, DTOs
-- `adapters/` — Interfaces externas (CLI, HTTP, AI/LLM)
-- `infrastructure/` — Implementações concretas (logging, config, repos)
-- `observability/` — Sistema nativo de métricas e rastreamento
+#### `src/forgebase/`
+Código-fonte seguindo Clean + Hexagonal Architecture:
 
-#### `temp/`
-Workspace para arquivos temporários, experimentos e simulações.
-**Esta pasta não é versionada** e serve como área de testes descartáveis.
+**`domain/`** — Camada de Domínio (núcleo do negócio)
+- `entity_base.py` — Classe base para entidades com identidade imutável
+- `value_object_base.py` — Classe base para value objects imutáveis
+- `exceptions.py` — Exceções de negócio (BusinessRuleViolation, ValidationError)
+
+**`application/`** — Camada de Aplicação (orquestração)
+- `usecase_base.py` — Classe base genérica para casos de uso
+- `port_base.py` — Classe base para portas (abstrações de I/O)
+- `dto_base.py` — Classe base para DTOs (Data Transfer Objects)
+
+**`infrastructure/`** — Camada de Infraestrutura (implementações)
+- `config/` — Gerenciamento de configurações (YAML, environment)
+- `repository/` — Implementações do padrão Repository
+  - `repository_base.py` — Interface abstrata do Repository Pattern
+  - `json_repository.py` — Repository com armazenamento em JSON (dev/testing)
+  - `sql_repository.py` — Repository com SQLAlchemy (produção)
+
+**`integration/`** — Adaptadores externos
+- Adaptadores para sistemas externos, APIs, etc.
+
+**`observability/`** — Sistema de observabilidade nativo
+- Decoradores e utilitários para métricas, logging e tracing
+
+#### `tests/`
+Suíte de testes completa:
+- **unit/** — Testes unitários isolados
+- **integration/** — Testes de integração entre componentes
+- **property_based/** — Testes baseados em propriedades (Hypothesis)
+- **contract_tests/** — Testes de contratos entre camadas
+
+#### `devtool.py`
+CLI unificada para desenvolvimento:
+```bash
+python devtool.py scaffold      # Gerar boilerplate
+python devtool.py discover      # Catalogar componentes
+python devtool.py test          # Executar testes
+python devtool.py lint          # Linters (Ruff, Mypy)
+python devtool.py check-deps    # Validar dependências
+python devtool.py check-arch    # Validar arquitetura
+python devtool.py quality       # Suite completa de qualidade
+```
+
+### 📄 Arquivos de Configuração
+
+#### `pyproject.toml`
+Configuração moderna seguindo PEP 621:
+- Metadados do projeto e dependências
+- Configuração de ferramentas (pytest, mypy, ruff, coverage, deptry)
+- Fonte única de verdade para todo o projeto
+
+#### `.import-linter`
+Validação de boundaries da Clean Architecture:
+- Garante que camadas não violem dependências
+- Domain não pode importar Application/Infrastructure
+- Application não pode importar Infrastructure
+
+#### `VERSION.MD`
+Rastreamento da versão atual do projeto
+
+#### `CHANGELOG.md`
+Histórico detalhado de mudanças por versão
 
 ---
 
@@ -65,16 +135,57 @@ ForgeBase não é apenas um framework técnico — é uma **arquitetura cognitiv
 
 ## 🚀 Status do Projeto
 
-**Fase Atual:** Planejamento e Documentação ✓
+**Versão Atual:** v0.1.2 (Production-Ready)
 
-**Backlog de Desenvolvimento:**
-Consulte o [BACKLOG.md](/docs/BACKLOG.md) para o roadmap completo com 54 componentes organizados em 8 fases de desenvolvimento.
+### ✅ Completo (FASE 1 - Foundation)
 
-**Próximas Etapas:**
-1. FASE 1: Implementação das classes base (EntityBase, UseCaseBase, PortBase)
-2. FASE 2: Estruturação dos módulos core e infraestrutura
-3. FASE 3: Sistema de observabilidade nativo
-4. FASE 4: Framework de testes cognitivos
+**Domain Layer**
+- ✅ EntityBase com ID imutável (property-based)
+- ✅ ValueObjectBase com igualdade estrutural
+- ✅ Exceções de negócio (BusinessRuleViolation, ValidationError)
+
+**Application Layer**
+- ✅ UseCaseBase genérico (Generic[TInput, TOutput])
+- ✅ PortBase para abstrações de I/O
+- ✅ DTOBase para transferência de dados
+
+**Infrastructure Layer**
+- ✅ RepositoryBase (Repository Pattern do DDD)
+- ✅ JSONRepository (thread-safe, development/testing)
+- ✅ SQLRepository (SQLAlchemy, production-ready)
+- ✅ ConfigLoader (YAML + environment variables)
+
+**Developer Tooling**
+- ✅ devtool.py (CLI unificada)
+- ✅ Scaffolding (geração de boilerplate)
+- ✅ Discovery (catalogação de componentes)
+- ✅ Modern dependency management (pyproject.toml)
+- ✅ Import standardization (100% absolute imports)
+- ✅ Cross-platform support
+
+**Quality Assurance**
+- ✅ 84+ testes passing (unit + integration + property-based + contract)
+- ✅ Mypy strict type checking
+- ✅ Ruff linting + pre-commit hooks
+- ✅ Import-linter (architecture boundary validation)
+- ✅ Deptry (dependency hygiene)
+
+### 🚧 Em Desenvolvimento (FASE 2)
+
+**Observability**
+- 🚧 Métricas nativas
+- 🚧 Decoradores de observabilidade
+- 🚧 Sistema de logging estruturado
+
+**Integration Layer**
+- 🚧 Adaptadores para sistemas externos
+- 🚧 API adapters (REST, GraphQL)
+
+### 📋 Backlog
+
+Consulte o [CHANGELOG.md](/CHANGELOG.md) para histórico detalhado de mudanças.
+
+Consulte o [BACKLOG.md](/docs/BACKLOG.md) para o roadmap completo com 54 componentes organizados em 8 fases.
 
 ---
 
