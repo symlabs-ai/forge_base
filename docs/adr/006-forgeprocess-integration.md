@@ -3,12 +3,52 @@
 ## Status
 
 **Aceita** (2025-11-03)
+**Atualizada** (2025-11-04) - Adicionado contexto completo do ciclo cognitivo
 
 ## Context
 
-ForgeBase é o **núcleo de execução** do Forge Framework, mas não existe isoladamente. Ele é a **manifestação técnica** das intenções capturadas pelo ForgeProcess:
+ForgeBase é o **núcleo de execução** do Forge Framework, mas não existe isoladamente. Ele é a **manifestação técnica** das intenções capturadas pelo ForgeProcess.
 
-- **ForgeProcess**: Define **o quê** fazer (intent, YAML specs, processos)
+### O Ciclo Cognitivo Completo
+
+O ForgeProcess não é apenas sincronização YAML ↔ Code. É um **ciclo cognitivo** de 5 fases:
+
+```
+MDD (Valor) → BDD (Comportamento) → TDD (Prova) → CLI (Execução) → Feedback (Aprendizado)
+```
+
+**Fase 1 - MDD (Market Driven Development)**: Define **PORQUÊ** o sistema existe
+- Especifica valor de mercado em `forge.yaml`
+- Define ValueTracks e SupportTracks
+- Estabelece Value KPIs
+
+**Fase 2 - BDD (Behavior Driven Development)**: Define **O QUÊ** o sistema faz
+- Traduz valor em comportamento verificável (`.feature` files)
+- Especifica scenarios em Gherkin (Given/When/Then)
+- Documenta business rules
+
+**Transição MDD → BDD**: O momento crítico onde **intenção de valor** se transforma em **comportamento observável**.
+
+**Fase 3 - TDD (Test Driven Development)**: Prova **COMO** implementar
+- Cada behavior vira teste (Red-Green-Refactor)
+- Testes são memória técnica viva
+- Código nasce validado
+
+**Fase 4 - CLI (Interface Cognitiva)**: **Executar e observar**
+- Ambiente simbólico de teste
+- Humanos e IA podem explorar behaviors
+- Coleta logs, métricas, traces
+
+**Fase 5 - Feedback (Reflexão)**: **Aprender e ajustar**
+- Feedback Operacional: métricas, erros, performance
+- Feedback de Valor: KPIs, stakeholders, usuários
+- Loop de aprendizado fecha o ciclo
+
+### Integração ForgeBase ↔ ForgeProcess
+
+Dentro deste ciclo cognitivo, ForgeBase implementa:
+
+- **ForgeProcess**: Define **o quê** fazer (intent, YAML specs, behaviors)
 - **ForgeBase**: Implementa **como** fazer (code, execution, infrastructure)
 
 Para que o Forge Framework seja verdadeiramente **cognitivo**, precisa haver um **loop de feedback** entre intenção (ForgeProcess) e execução (ForgeBase):
@@ -642,7 +682,7 @@ integration:
 - **Behavior-Driven Development** by specification
 - **Domain-Specific Languages** by Martin Fowler
 - **Model-Driven Architecture** (MDA)
-- ForgeProcess documentation
+- **ForgeProcess Complete Documentation**: [docs/FORGE_PROCESS.md](../FORGE_PROCESS.md)
 - YAML specification: https://yaml.org/spec/
 
 ## Related ADRs
@@ -651,8 +691,18 @@ integration:
 - [ADR-003: Observability First](003-observability-first.md)
 - [ADR-004: Cognitive Testing](004-cognitive-testing.md)
 
+## Complete ForgeProcess Documentation
+
+Para entender o **ciclo cognitivo completo** (MDD → BDD → TDD → CLI → Feedback), consulte:
+
+📖 **[docs/FORGE_PROCESS.md](../FORGE_PROCESS.md)**
+
+Este ADR documenta a **integração técnica** (YAMLSync, IntentTracker, FeedbackManager).
+O documento completo explica o **contexto filosófico e arquitetural** de todas as 5 fases.
+
 ---
 
 **Author:** ForgeBase Development Team
 **Date:** 2025-11-03
-**Version:** 1.0
+**Updated:** 2025-11-04
+**Version:** 1.1

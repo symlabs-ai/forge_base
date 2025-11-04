@@ -6,6 +6,25 @@
 
 ForgeBase is designed for **AI coding agents as first-class users**. All developer tools expose **Python APIs with structured data**, enabling agents to reason about code quality, generate components, and fix issues autonomously.
 
+## 🧠 ForgeBase Within The ForgeProcess Cycle
+
+Before diving into the APIs, understand that ForgeBase is **part of a larger cognitive cycle**:
+
+```
+MDD (Market) → BDD (Behavior) → TDD (Test) → CLI (Execute) → Feedback
+                                    ▲
+                               ForgeBase
+                             implements this
+```
+
+ForgeBase provides the **execution layer** where:
+- **Behaviors** (from BDD) become **UseCases**
+- **Tests** (from TDD) validate **implementations**
+- **CLI** allows **observation** and **exploration**
+- **Feedback** enables **continuous learning**
+
+**For complete context**, see [docs/FORGE_PROCESS.md](docs/FORGE_PROCESS.md)
+
 ## 📊 Architecture Overview
 
 ```
@@ -409,10 +428,142 @@ print(f"Using {len(components.repositories)} repositories")
 
 **Agents can**: Develop features end-to-end with minimal human input
 
+## 🔄 ForgeProcess: The Full Cognitive Cycle
+
+### Understanding the Bigger Picture
+
+ForgeBase APIs are **part of a cognitive development cycle** called **ForgeProcess**. AI agents should understand this cycle to reason about **why** they're doing certain actions.
+
+```
+┌────────────────────────────────────────────────────┐
+│ 1. MDD (Market Driven Development)                 │
+│    PORQUÊ existir? → forge.yaml                    │
+│    Defines: ValueTracks, Value KPIs                │
+└────────────────┬───────────────────────────────────┘
+                 │ Translation: Value → Behavior
+                 ▼
+┌────────────────────────────────────────────────────┐
+│ 2. BDD (Behavior Driven Development)               │
+│    O QUÊ fazer? → .feature files                   │
+│    Defines: Scenarios (Given/When/Then)            │
+└────────────────┬───────────────────────────────────┘
+                 │ Implementation: Behavior → Code
+                 ▼
+┌────────────────────────────────────────────────────┐
+│ 3. TDD (Test Driven Development)                   │
+│    COMO implementar? → tests/                      │
+│    Proves: Code works as specified                 │
+└────────────────┬───────────────────────────────────┘
+                 │ Manifestation: Code → Execution
+                 ▼
+┌────────────────────────────────────────────────────┐
+│ 4. CLI (Interface Cognitiva)                       │
+│    Executar e observar → forgebase CLI             │
+│    ← AI AGENTS USE APIs HERE ←                     │
+│    Collects: Logs, Metrics, Traces                 │
+└────────────────┬───────────────────────────────────┘
+                 │ Collection: Evidence → Learning
+                 ▼
+┌────────────────────────────────────────────────────┐
+│ 5. Feedback (Reflexão)                             │
+│    Aprender e ajustar → feedback reports           │
+│    Informs: MDD improvements, BDD refinements      │
+└────────────────┬───────────────────────────────────┘
+                 │
+                 └─────> Loop back to MDD
+```
+
+### How AI Agents Fit In
+
+**AI agents using ForgeBase APIs operate at Phase 3-4:**
+
+1. **Phase 3 (TDD)**:
+   - Use `ScaffoldGenerator` to create test-driven code
+   - Use `QualityChecker` to validate implementation
+   - Ensure code passes tests
+
+2. **Phase 4 (CLI)**:
+   - Use `TestRunner` to execute and observe
+   - Use `ComponentDiscovery` to understand architecture
+   - Collect metrics and traces
+
+3. **Phase 5 (Feedback)**:
+   - Analyze quality results
+   - Compare against Value KPIs (from Phase 1)
+   - Suggest improvements
+
+### Agent Reasoning Example
+
+```python
+# AI Agent understands the FULL cycle
+
+# 1. Read MDD (context: WHY this system exists)
+with open("forge.yaml") as f:
+    mdd = yaml.load(f)
+    value_track = mdd["value_tracks"]["IssueInvoice"]
+    kpi = "0% errors in tax calculation"
+
+# 2. Read BDD (context: WHAT behaviors are expected)
+with open("features/issue_invoice.feature") as f:
+    bdd = f.read()
+    # AI understands: "Given order, When issue, Then ICMS correct"
+
+# 3. TDD (AI implements with proof)
+from forgebase.dev.api import ScaffoldGenerator, QualityChecker
+
+generator = ScaffoldGenerator()
+result = generator.create_usecase("IssueInvoice")
+
+# AI customizes based on BDD
+code = customize_for_behavior(result.code, bdd)
+write_file(result.file_path, code)
+
+# AI validates
+checker = QualityChecker()
+quality = checker.run_all()
+assert all(r.passed for r in quality.values())
+
+# 4. CLI (AI observes execution)
+from forgebase.dev.api import TestRunner
+
+runner = TestRunner()
+tests = runner.run_all()
+
+# 5. Feedback (AI reasons about results)
+if tests["unit"].passed:
+    # Check if KPI is met
+    kpi_met = check_kpi(kpi, tests)
+    if kpi_met:
+        print("✅ ValueTrack 'IssueInvoice' is delivering value!")
+    else:
+        print("⚠️ KPI not met, suggest improvements...")
+```
+
+### Key Insight for AI Agents
+
+**Don't just fix code blindly**. Understand:
+- **WHY** it exists (MDD / forge.yaml)
+- **WHAT** it should do (BDD / .feature)
+- **HOW** to prove it works (TDD / tests)
+- **OBSERVE** actual behavior (CLI / APIs)
+- **LEARN** from results (Feedback)
+
+This makes AI agents **context-aware** and **value-driven**, not just code generators.
+
+### ForgeProcess Documentation
+
+| Document | Purpose | For AI Agents |
+|----------|---------|---------------|
+| [FORGE_PROCESS.md](docs/FORGE_PROCESS.md) | Complete cycle explanation | Understand WHY |
+| [FORGE_PROCESS_VISUAL_GUIDE.md](docs/FORGE_PROCESS_VISUAL_GUIDE.md) | Diagrams and examples | Visual learning |
+| [ADR-006](docs/adr/006-forgeprocess-integration.md) | Technical integration | Deep dive |
+
 ## 🔗 Quick Links
 
 | Resource | Location | Use For |
 |----------|----------|---------|
+| **ForgeProcess Docs** | `/docs/FORGE_PROCESS.md` | Understanding the cycle |
+| **Visual Guide** | `/docs/FORGE_PROCESS_VISUAL_GUIDE.md` | Diagrams and examples |
 | Quick Reference | `/AI_AGENT_QUICK_START.md` | Fast API lookup |
 | Complete Docs | `/src/forgebase/dev/AI_AGENTS.md` | Detailed reference |
 | Claude Instructions | `/.claude/forgebase_instructions.md` | Claude Code config |
