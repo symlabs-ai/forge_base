@@ -44,10 +44,11 @@ Example::
 """
 
 import json
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
+from typing import Any
 
-from sqlalchemy import (
+from sqlalchemy import (  # type: ignore[import-not-found]
     JSON,
     Column,
     Engine,
@@ -56,8 +57,8 @@ from sqlalchemy import (
     Table,
     text,
 )
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import SQLAlchemyError  # type: ignore[import-not-found]
+from sqlalchemy.orm import Session, sessionmaker  # type: ignore[import-not-found]
 
 from forgebase.domain.entity_base import EntityBase
 from forgebase.infrastructure.repository.repository_base import (
@@ -135,8 +136,8 @@ class SQLRepository(RepositoryBase[EntityBase]):
         engine: Engine,
         entity_class: type[EntityBase],
         table_name: str,
-        to_dict: Callable[[EntityBase], dict] | None = None,
-        from_dict: Callable[[dict], EntityBase] | None = None,
+        to_dict: Callable[[EntityBase], dict[str, Any]] | None = None,
+        from_dict: Callable[[dict[str, Any]], EntityBase] | None = None,
         create_table: bool = True
     ):
         """
@@ -163,8 +164,8 @@ class SQLRepository(RepositoryBase[EntityBase]):
         self.engine = engine
         self.entity_class = entity_class
         self.table_name = table_name
-        self._to_dict = to_dict or (lambda e: e.to_dict())
-        self._from_dict = from_dict or entity_class.from_dict
+        self._to_dict = to_dict or (lambda e: e.to_dict())  # type: ignore[attr-defined]
+        self._from_dict = from_dict or entity_class.from_dict  # type: ignore[attr-defined]
 
         # Create session factory
         self._session_factory = sessionmaker(bind=engine)
@@ -208,7 +209,7 @@ class SQLRepository(RepositoryBase[EntityBase]):
             ) from e
 
     @contextmanager
-    def _get_session(self):
+    def _get_session(self) -> Iterator[Session]:
         """
         Context manager for database sessions.
 
@@ -233,7 +234,7 @@ class SQLRepository(RepositoryBase[EntityBase]):
             session.close()
 
     @contextmanager
-    def transaction(self):
+    def transaction(self) -> Iterator[None]:
         """
         Context manager for explicit transactions.
 

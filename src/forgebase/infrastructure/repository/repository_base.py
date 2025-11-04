@@ -9,7 +9,7 @@ Created: 2025-11-03
 """
 
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from forgebase.domain.entity_base import EntityBase
 
@@ -171,7 +171,7 @@ class RepositoryError(Exception):
     :vartype context: dict
     """
 
-    def __init__(self, message: str, context: dict | None = None):
+    def __init__(self, message: str, context: dict[str, Any] | None = None):
         """
         Initialize repository error.
 

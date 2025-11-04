@@ -12,7 +12,7 @@ import json
 import threading
 from collections.abc import Callable
 from pathlib import Path
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from forgebase.domain.entity_base import EntityBase
 from forgebase.infrastructure.repository.repository_base import (
@@ -85,8 +85,8 @@ class JSONRepository(RepositoryBase[T], Generic[T]):
         self,
         file_path: str,
         entity_class: type[T],
-        to_dict: Callable[[T], dict] | None = None,
-        from_dict: Callable[[dict], T] | None = None
+        to_dict: Callable[[T], dict[str, Any]] | None = None,
+        from_dict: Callable[[dict[str, Any]], T] | None = None
     ):
         """
         Initialize JSON repository.
@@ -100,8 +100,8 @@ class JSONRepository(RepositoryBase[T], Generic[T]):
         """
         self.file_path = Path(file_path)
         self.entity_class = entity_class
-        self._to_dict = to_dict or (lambda e: e.to_dict())
-        self._from_dict = from_dict or entity_class.from_dict
+        self._to_dict = to_dict or (lambda e: e.to_dict())  # type: ignore[attr-defined]
+        self._from_dict = from_dict or entity_class.from_dict  # type: ignore[attr-defined]
         self._lock = threading.Lock()
         self._ensure_file_exists()
 
@@ -114,17 +114,17 @@ class JSONRepository(RepositoryBase[T], Generic[T]):
         except OSError as e:
             raise RepositoryError(f"Failed to create file {self.file_path}: {e}") from e
 
-    def _read_data(self) -> dict:
+    def _read_data(self) -> dict[str, Any]:
         """Read and parse JSON file."""
         try:
             with open(self.file_path, encoding='utf-8') as f:
-                return json.load(f)
+                return json.load(f)  # type: ignore[no-any-return]
         except json.JSONDecodeError as e:
             raise RepositoryError(f"Invalid JSON in {self.file_path}: {e}") from e
         except OSError as e:
             raise RepositoryError(f"Failed to read {self.file_path}: {e}") from e
 
-    def _write_data(self, data: dict) -> None:
+    def _write_data(self, data: dict[str, Any]) -> None:
         """Write data to JSON file."""
         try:
             with open(self.file_path, 'w', encoding='utf-8') as f:

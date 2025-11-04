@@ -5,6 +5,30 @@ All notable changes to ForgeBase will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2025-11-03
+
+### Added
+- **Repository Infrastructure Layer**
+  - Added `RepositoryBase` abstract class implementing the Repository Pattern from DDD
+  - Added `JSONRepository` with thread-safe file-based persistence (development/testing)
+  - Added `SQLRepository` with SQLAlchemy support (production-ready, optional dependency)
+  - Generic typing with `Generic[T]` for type-safe repository operations
+  - Complete CRUD interface: save, find_by_id, find_all, delete, exists, count
+  - Custom `RepositoryError` exception for infrastructure failures
+  - 57 comprehensive tests (unit + contract + thread safety)
+
+### Changed
+- All repository files pass Ruff and Mypy strict type checking
+- Type annotations use `dict[str, Any]` instead of bare `dict`
+- SQLAlchemy imports properly annotated as optional dependency
+
+### Technical Details
+- **Test Coverage**: 57 repository tests passing (27 base + 30 JSON)
+- **Type Safety**: All repository code passes Mypy strict mode
+- **Code Quality**: Ruff checks passing with proper import sorting
+- **Thread Safety**: File locking in JSONRepository for concurrent access
+- **Production Ready**: SQLRepository supports PostgreSQL, MySQL, SQLite
+
 ## [0.1.1] - 2025-11-03
 
 ### Fixed (Critical)
