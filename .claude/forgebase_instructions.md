@@ -1,5 +1,31 @@
 # ForgeBase Development Instructions for Claude
 
+## 🚨 FIRST TIME HERE? START HERE! 🚨
+
+**If you've never worked with this ForgeBase project before:**
+
+```python
+# 1. Get the complete API documentation programmatically
+from forgebase.dev import get_agent_quickstart
+
+guide = get_agent_quickstart()
+print(guide)  # Full API reference with examples
+
+# This documentation is embedded in the package and works offline!
+# It contains all APIs, error codes, data structures, and workflows.
+```
+
+**Why this matters:**
+- ✅ Comprehensive API guide (9000+ chars)
+- ✅ Error code mappings (F401 → Remove import, etc.)
+- ✅ Data structure specs (CheckResult, ScaffoldResult, etc.)
+- ✅ Complete workflow examples
+- ✅ Always in sync with installed version
+
+**After reading the guide above, continue with the quick reference below.**
+
+---
+
 ## 🤖 Core Directive
 
 **ALWAYS use ForgeBase Python APIs instead of CLI commands or subprocess calls.**

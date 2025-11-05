@@ -2,6 +2,29 @@
 
 This directory contains instructions for Claude Code to work effectively with ForgeBase.
 
+## 🚨 NEW AI AGENT? START HERE!
+
+**If this is your first time in this ForgeBase project:**
+
+```python
+# Get complete API documentation programmatically
+from forgebase.dev import get_agent_quickstart
+
+guide = get_agent_quickstart()
+print(guide)  # 9000+ chars with full API reference
+```
+
+This embedded guide contains:
+- ✅ All available APIs (QualityChecker, ScaffoldGenerator, etc.)
+- ✅ Error code → fix action mappings (F401, E501, etc.)
+- ✅ Data structure specifications
+- ✅ Complete workflow examples
+- ✅ Best practices for AI agents
+
+**Then read:** `forgebase_instructions.md` (below) for project-specific guidelines.
+
+---
+
 ## 📁 Files in this Directory
 
 - **forgebase_instructions.md** - Complete instructions for Claude Code
