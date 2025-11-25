@@ -29,7 +29,7 @@ pip install forgebase
 
 ```bash
 # Clone o repositório
-git clone https://github.com/your-org/forgebase.git
+git clone https://github.com/symlabs-ai/forgebase.git
 cd forgebase
 
 # Instale em modo de desenvolvimento

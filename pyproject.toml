@@ -66,10 +66,10 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/forgeframework/forgebase"
-Documentation = "https://github.com/forgeframework/forgebase/blob/main/docs"
-Repository = "https://github.com/forgeframework/forgebase"
-Changelog = "https://github.com/forgeframework/forgebase/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/symlabs-ai/forgebase"
+Documentation = "https://github.com/symlabs-ai/forgebase/blob/main/docs"
+Repository = "https://github.com/symlabs-ai/forgebase"
+Changelog = "https://github.com/symlabs-ai/forgebase/blob/main/CHANGELOG.md"
 
 # Setuptools configuration
 [tool.setuptools]

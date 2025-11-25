@@ -7,15 +7,15 @@ Complete guide for installing ForgeBase in different scenarios.
 ### For Production Use
 
 ```bash
-# Install specific version (recommended)
-pip install git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
+# Install latest version from main
+pip install git+https://github.com/symlabs-ai/forgebase.git
 ```
 
 ### For Development
 
 ```bash
 # Clone and install in editable mode
-git clone https://github.com/palhanobrazil/forgebase.git
+git clone https://github.com/symlabs-ai/forgebase.git
 cd forgebase
 pip install -e ".[dev]"
 ```
@@ -23,8 +23,8 @@ pip install -e ".[dev]"
 ### For AI Agents
 
 ```bash
-# Install with all APIs
-pip install git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
+# Install with all APIs (latest)
+pip install git+https://github.com/symlabs-ai/forgebase.git
 
 # Verify installation
 python -c "from forgebase.dev.api import QualityChecker; print('✅ Ready!')"
@@ -36,46 +36,41 @@ python -c "from forgebase.dev.api import QualityChecker; print('✅ Ready!')"
 
 **Latest version from main branch:**
 ```bash
-pip install git+https://github.com/palhanobrazil/forgebase.git
+pip install git+https://github.com/symlabs-ai/forgebase.git
 ```
 
-**Specific version (recommended for production):**
+**Specific branch (optional):**
 ```bash
-pip install git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
+pip install git+https://github.com/symlabs-ai/forgebase.git@develop
 ```
 
-**Specific branch:**
+**Specific commit (optional, pinned):**
 ```bash
-pip install git+https://github.com/palhanobrazil/forgebase.git@develop
-```
-
-**Specific commit:**
-```bash
-pip install git+https://github.com/palhanobrazil/forgebase.git@5632a91
+pip install git+https://github.com/symlabs-ai/forgebase.git@5632a91
 ```
 
 ### Method 2: With Optional Dependencies
 
-**Development tools (pytest, ruff, mypy, etc.):**
+**Development tools (pytest, ruff, mypy, etc.) – latest:**
 ```bash
-pip install "forgebase[dev] @ git+https://github.com/palhanobrazil/forgebase.git@v0.1.3"
+pip install "forgebase[dev] @ git+https://github.com/symlabs-ai/forgebase.git"
 ```
 
-**SQL support (SQLAlchemy):**
+**SQL support (SQLAlchemy) – latest:**
 ```bash
-pip install "forgebase[sql] @ git+https://github.com/palhanobrazil/forgebase.git@v0.1.3"
+pip install "forgebase[sql] @ git+https://github.com/symlabs-ai/forgebase.git"
 ```
 
-**Everything:**
+**Everything – latest:**
 ```bash
-pip install "forgebase[all] @ git+https://github.com/palhanobrazil/forgebase.git@v0.1.3"
+pip install "forgebase[all] @ git+https://github.com/symlabs-ai/forgebase.git"
 ```
 
 ### Method 3: Editable Installation (Development)
 
 **Clone and install:**
 ```bash
-git clone https://github.com/palhanobrazil/forgebase.git
+git clone https://github.com/symlabs-ai/forgebase.git
 cd forgebase
 pip install -e ".[dev]"
 ```
@@ -92,14 +87,14 @@ pip install -e ".[dev]"
 ```txt
 # requirements.txt
 
-# Core package (production)
-forgebase @ git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
+# Core package (production, latest)
+forgebase @ git+https://github.com/symlabs-ai/forgebase.git
 
-# Or with dev dependencies
-forgebase[dev] @ git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
+# Or with dev dependencies (latest)
+forgebase[dev] @ git+https://github.com/symlabs-ai/forgebase.git
 
-# Or with all optional dependencies
-forgebase[all] @ git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
+# Or with all optional dependencies (latest)
+forgebase[all] @ git+https://github.com/symlabs-ai/forgebase.git
 ```
 
 Install:
@@ -113,12 +108,12 @@ pip install -r requirements.txt
 [project]
 name = "my-project"
 dependencies = [
-    "forgebase @ git+https://github.com/palhanobrazil/forgebase.git@v0.1.3"
+    "forgebase @ git+https://github.com/symlabs-ai/forgebase.git"
 ]
 
 [project.optional-dependencies]
 dev = [
-    "forgebase[dev] @ git+https://github.com/palhanobrazil/forgebase.git@v0.1.3"
+    "forgebase[dev] @ git+https://github.com/symlabs-ai/forgebase.git"
 ]
 ```
 
@@ -133,7 +128,7 @@ pip install -e ".[dev]"       # With dev dependencies
 ```toml
 [tool.poetry.dependencies]
 python = "^3.11"
-forgebase = {git = "https://github.com/palhanobrazil/forgebase.git", tag = "v0.1.3"}
+forgebase = {git = "https://github.com/symlabs-ai/forgebase.git"}
 
 [tool.poetry.group.dev.dependencies]
 # ForgeBase dev dependencies are included in the package
@@ -148,10 +143,10 @@ poetry install
 
 ```bash
 # Add to Pipfile
-pipenv install "forgebase @ git+https://github.com/palhanobrazil/forgebase.git@v0.1.3"
+pipenv install "forgebase @ git+https://github.com/symlabs-ai/forgebase.git"
 
 # Or directly via command
-pipenv install git+https://github.com/palhanobrazil/forgebase.git@v0.1.3#egg=forgebase
+pipenv install git+https://github.com/symlabs-ai/forgebase.git#egg=forgebase
 ```
 
 ## ✅ Verification
@@ -204,16 +199,16 @@ python -c "from forgebase.dev.api import TestRunner; print('✅ TestRunner avail
 
 ```bash
 # Update to latest main
-pip install --upgrade git+https://github.com/palhanobrazil/forgebase.git
+pip install --upgrade git+https://github.com/symlabs-ai/forgebase.git
 
-# Update to specific new version
-pip install --upgrade git+https://github.com/palhanobrazil/forgebase.git@v0.1.4
+# Update to specific tagged version (optional)
+pip install --upgrade git+https://github.com/symlabs-ai/forgebase.git@vX.Y.Z
 ```
 
-### Force Reinstall
+### Force Reinstall (latest)
 
 ```bash
-pip install --force-reinstall git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
+pip install --force-reinstall git+https://github.com/symlabs-ai/forgebase.git
 ```
 
 ## 🗑️ Uninstallation
@@ -230,8 +225,8 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install ForgeBase
-RUN pip install git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
+# Install ForgeBase (latest)
+RUN pip install git+https://github.com/symlabs-ai/forgebase.git
 
 # Copy your application
 COPY . .
@@ -268,8 +263,8 @@ source .venv/bin/activate
 # Activate (Windows)
 .venv\Scripts\activate
 
-# Install ForgeBase
-pip install git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
+# Install ForgeBase (latest)
+pip install git+https://github.com/symlabs-ai/forgebase.git
 ```
 
 ### conda
@@ -281,8 +276,8 @@ conda create -n forgebase python=3.11
 # Activate
 conda activate forgebase
 
-# Install ForgeBase
-pip install git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
+# Install ForgeBase (latest)
+pip install git+https://github.com/symlabs-ai/forgebase.git
 ```
 
 ## ⚙️ Configuration After Installation
@@ -294,7 +289,7 @@ After installing, agents should:
 1. **Read instructions:**
    ```bash
    # Clone docs if needed
-   git clone https://github.com/palhanobrazil/forgebase.git /tmp/forgebase
+   git clone https://github.com/symlabs-ai/forgebase.git /tmp/forgebase
    cat /tmp/forgebase/AI_AGENT_QUICK_START.md
    ```
 
@@ -345,8 +340,8 @@ After installing, developers should:
 # Verify installation
 pip list | grep forgebase
 
-# If not found, reinstall
-pip install git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
+# If not found, reinstall latest
+pip install git+https://github.com/symlabs-ai/forgebase.git
 ```
 
 ### Issue: "git: command not found"
@@ -368,21 +363,21 @@ brew install git
 
 **Solution:**
 ```bash
-# Install with dev dependencies
-pip install "forgebase[dev] @ git+https://github.com/palhanobrazil/forgebase.git@v0.1.3"
+# Install with dev dependencies (latest)
+pip install "forgebase[dev] @ git+https://github.com/symlabs-ai/forgebase.git"
 ```
 
 ### Issue: Permission denied
 
 **Solution:**
 ```bash
-# Use --user flag
-pip install --user git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
+# Use --user flag with latest
+pip install --user git+https://github.com/symlabs-ai/forgebase.git
 
 # Or use virtual environment (recommended)
 python -m venv .venv
 source .venv/bin/activate  # or .venv\Scripts\activate on Windows
-pip install git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
+pip install git+https://github.com/symlabs-ai/forgebase.git
 ```
 
 ### Issue: SSL certificate errors
@@ -390,7 +385,7 @@ pip install git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
 **Solution:**
 ```bash
 # Temporary workaround (not recommended for production)
-pip install --trusted-host github.com git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
+pip install --trusted-host github.com git+https://github.com/symlabs-ai/forgebase.git
 
 # Better: Fix SSL certificates
 pip install --upgrade certifi
@@ -400,12 +395,12 @@ pip install --upgrade certifi
 
 | Scenario | Command |
 |----------|---------|
-| **Production** | `pip install git+https://github.com/palhanobrazil/forgebase.git@v0.1.3` |
+| **Production** | `pip install git+https://github.com/symlabs-ai/forgebase.git` |
 | **Development** | `git clone ... && pip install -e ".[dev]"` |
-| **AI Agents** | `pip install git+https://github.com/palhanobrazil/forgebase.git@v0.1.3` |
+| **AI Agents** | `pip install git+https://github.com/symlabs-ai/forgebase.git` |
 | **With SQL** | `pip install "forgebase[sql] @ git+..."` |
 | **Everything** | `pip install "forgebase[all] @ git+..."` |
-| **Latest** | `pip install git+https://github.com/palhanobrazil/forgebase.git` |
+| **Latest** | `pip install git+https://github.com/symlabs-ai/forgebase.git` |
 | **Update** | `pip install --upgrade git+...` |
 
 ## 📚 Next Steps
@@ -419,13 +414,13 @@ After installation:
 
 ## 🔗 Resources
 
-- **Repository**: https://github.com/palhanobrazil/forgebase
-- **Documentation**: https://github.com/palhanobrazil/forgebase/blob/main/README.md
-- **AI Agent Guide**: https://github.com/palhanobrazil/forgebase/blob/main/AI_AGENT_QUICK_START.md
-- **Changelog**: https://github.com/palhanobrazil/forgebase/blob/main/CHANGELOG.md
+- **Repository**: https://github.com/symlabs-ai/forgebase
+- **Documentation**: https://github.com/symlabs-ai/forgebase/blob/main/README.md
+- **AI Agent Guide**: https://github.com/symlabs-ai/forgebase/blob/main/AI_AGENT_QUICK_START.md
+- **Changelog**: https://github.com/symlabs-ai/forgebase/blob/main/CHANGELOG.md
 
 ---
 
-**Version**: 0.1.3
+**Version**: 0.1.4
 **Last Updated**: 2025-11-04
 **Python**: 3.11+

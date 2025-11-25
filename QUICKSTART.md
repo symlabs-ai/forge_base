@@ -5,8 +5,8 @@ Get started with ForgeBase in 5 minutes.
 ## 🚀 Installation
 
 ```bash
-# Install from GitHub
-pip install git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
+# Install from GitHub (latest)
+pip install git+https://github.com/symlabs-ai/forgebase.git
 
 # Verify installation
 python -c "from forgebase.dev.api import QualityChecker; print('✅ ForgeBase ready!')"
@@ -227,9 +227,9 @@ if not results.passed:
 
 ## 💡 Pro Tips
 
-1. **Use specific versions in production:**
+1. **Use latest in development:**
    ```bash
-   pip install git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
+   pip install git+https://github.com/symlabs-ai/forgebase.git
    ```
 
 2. **Cache discovery results:**
@@ -258,15 +258,15 @@ if not results.passed:
 ### Import Error
 ```python
 # ❌ Error: No module named 'forgebase'
-# ✅ Solution: Install first
-pip install git+https://github.com/palhanobrazil/forgebase.git@v0.1.3
+# ✅ Solution: Install first (latest)
+pip install git+https://github.com/symlabs-ai/forgebase.git
 ```
 
 ### Dev APIs Not Found
 ```python
 # ❌ Error: No module named 'forgebase.dev.api'
-# ✅ Solution: Install with dev dependencies
-pip install "forgebase[dev] @ git+https://github.com/palhanobrazil/forgebase.git@v0.1.3"
+# ✅ Solution: Install with dev dependencies (latest)
+pip install "forgebase[dev] @ git+https://github.com/symlabs-ai/forgebase.git"
 ```
 
 ### Git Not Found
@@ -279,7 +279,7 @@ brew install git          # macOS
 
 ## 🔗 Resources
 
-- **GitHub**: https://github.com/palhanobrazil/forgebase
+- **GitHub**: https://github.com/symlabs-ai/forgebase
 - **AI Guide**: `AI_AGENT_QUICK_START.md`
 - **Installation**: `INSTALLATION.md`
 - **Examples**: `examples/`

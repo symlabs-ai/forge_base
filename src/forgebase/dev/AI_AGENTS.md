@@ -454,6 +454,6 @@ No more parsing text output or guessing formats!
 
 ---
 
-**Version**: 0.1.3 (Added in v0.1.3)
+**Version**: 0.1.4 (Added in v0.1.3)
 **Author**: ForgeBase Development Team
 **Date**: 2025-11-04

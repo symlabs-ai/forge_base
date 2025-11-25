@@ -157,5 +157,5 @@ making ForgeBase production-ready:
 
 ForgeBase 0.1.1 is recommended for production use.
 
-[0.1.1]: https://github.com/forgeframework/forgebase/compare/v0.1.0...v0.1.1
-[0.1.0]: https://github.com/forgeframework/forgebase/releases/tag/v0.1.0
+[0.1.1]: https://github.com/symlabs-ai/forgebase/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/symlabs-ai/forgebase/releases/tag/v0.1.0

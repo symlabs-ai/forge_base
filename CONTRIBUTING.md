@@ -23,7 +23,7 @@ ForgeBase adota princípios de **Reflexividade**, **Autonomia** e **Coerência C
 ### 1. Reportar Bugs
 
 **Antes de Reportar:**
-- Verifique se o bug já foi reportado em [Issues](https://github.com/your-org/forgebase/issues)
+- Verifique se o bug já foi reportado em [Issues](https://github.com/symlabs-ai/forgebase/issues)
 - Confirme que é um bug (não comportamento esperado)
 - Tente reproduzir em ambiente limpo
 
@@ -94,7 +94,7 @@ ForgeBase adota princípios de **Reflexividade**, **Autonomia** e **Coerência C
 
 ```bash
 # Clone o repositório
-git clone https://github.com/your-org/forgebase.git
+git clone https://github.com/symlabs-ai/forgebase.git
 cd forgebase
 
 # Crie um ambiente virtual

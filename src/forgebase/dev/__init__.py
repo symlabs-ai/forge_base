@@ -69,7 +69,7 @@ def get_agent_quickstart() -> str:
         return (
             "# AI Agent Quick Start\n\n"
             "Documentation not found in package. "
-            "Please visit: https://github.com/forgeframework/forgebase\n"
+            "Please visit: https://github.com/symlabs-ai/forgebase\n"
         )
 
 

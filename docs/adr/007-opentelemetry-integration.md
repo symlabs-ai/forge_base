@@ -851,7 +851,7 @@ observability:
 **Step 1: Continue usando builtin (nada muda)**
 ```bash
 # Seu código continua funcionando
-pip install forgebase==0.1.3
+pip install forgebase==0.1.4
 ```
 
 **Step 2: Experimente OTel localmente**

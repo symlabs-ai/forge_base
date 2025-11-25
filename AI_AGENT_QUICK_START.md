@@ -346,6 +346,6 @@ for failure in results["unit"].failures:
 
 ---
 
-**Version**: ForgeBase 0.1.3
+**Version**: ForgeBase 0.1.4
 **Updated**: 2025-11-04
 **For**: AI Coding Agents

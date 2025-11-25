@@ -4,7 +4,7 @@
 
   Tarefa: [Sua tarefa aqui]
 
-  IMPORTANTE: Use as APIs Python do ForgeBase (v0.1.3):
+  IMPORTANTE: Use as APIs Python do ForgeBase (v0.1.4):
   - Leia AI_AGENT_QUICK_START.md para referência rápida
   - Import: from forgebase.dev.api import QualityChecker, ScaffoldGenerator, ComponentDiscovery, TestRunner
   - Todas APIs retornam dataclasses estruturados

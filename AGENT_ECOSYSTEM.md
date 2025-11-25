@@ -36,7 +36,7 @@ ForgeBase provides the **execution layer** where:
                   │ Import & Call
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
-│            ForgeBase Python APIs (v0.1.3)                    │
+│            ForgeBase Python APIs (v0.1.4)                    │
 │                                                              │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
 │  │ Quality      │  │ Scaffold     │  │ Discovery    │     │
@@ -618,7 +618,7 @@ An AI agent is **successfully using ForgeBase APIs** when:
 
 ---
 
-**Version**: ForgeBase 0.1.3
+**Version**: ForgeBase 0.1.4
 **Created**: 2025-11-04
 **Status**: Production Ready
 **Audience**: AI Agents, Developers, Project Owners

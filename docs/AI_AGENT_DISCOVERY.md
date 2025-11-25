@@ -358,6 +358,6 @@ ForgeBase solves the "cold start" discovery problem through **defense in depth**
 
 ---
 
-**Version:** ForgeBase 0.1.3+
+**Version:** ForgeBase 0.1.4+
 **Updated:** 2025-11-05
 **Author:** ForgeBase Development Team

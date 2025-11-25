@@ -53,10 +53,10 @@ for tool, result in results.items():
 
 ```bash
 # Install from GitHub
-pip install git+https://github.com/forgeframework/forgebase.git
+pip install git+https://github.com/symlabs-ai/forgebase.git
 
 # Or clone for development
-git clone https://github.com/forgeframework/forgebase.git
+git clone https://github.com/symlabs-ai/forgebase.git
 cd forgebase
 python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate

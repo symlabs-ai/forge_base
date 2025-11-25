@@ -456,6 +456,6 @@ print(f"✅ Discovery in {elapsed*1000:.1f}ms")
 
 ---
 
-**Version:** ForgeBase 0.1.3+
+**Version:** ForgeBase 0.1.4+
 **Updated:** 2025-11-05
 **Author:** ForgeBase Development Team

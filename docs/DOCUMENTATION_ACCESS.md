@@ -6,7 +6,7 @@
 
 Quando você instala ForgeBase via pip:
 ```bash
-pip install git+https://github.com/forgeframework/forgebase.git
+pip install git+https://github.com/symlabs-ai/forgebase.git
 ```
 
 Por padrão, apenas código Python é incluído, **NÃO** arquivos markdown na raiz do projeto.
@@ -181,7 +181,7 @@ print(guide)
 
 ```bash
 # Em ambientes sem internet (air-gapped)
-pip install forgebase-0.1.3.whl
+pip install forgebase-0.1.4.whl
 
 # Documentação ainda acessível programaticamente
 python -c "from forgebase.dev import get_agent_quickstart; print(get_agent_quickstart())"
@@ -328,6 +328,6 @@ cp AI_AGENT_QUICK_START.md src/forgebase/_docs/
 
 ---
 
-**Version:** ForgeBase 0.1.3+
+**Version:** ForgeBase 0.1.4+
 **Updated:** 2025-11-05
 **Author:** ForgeBase Development Team
