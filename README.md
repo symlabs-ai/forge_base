@@ -43,7 +43,7 @@ for tool, result in results.items():
 - ✅ Auto-discovery of components and architecture
 - ✅ Integrated quality checking and code generation
 
-📚 **Complete guide:** See [AI_AGENT_QUICK_START.md](AI_AGENT_QUICK_START.md) for full documentation with error codes, data structures, and workflow examples.
+📚 **Complete guide:** See [docs/agentes-ia/](docs/agentes-ia/) for full documentation with error codes, data structures, and workflow examples.
 
 ---
 
@@ -92,8 +92,11 @@ python devtool.py test
 
 ```
 forgebase/
-├── .claude/              # Configurações do Claude Code
-├── docs/                 # Documentação técnica e guias de referência
+├── docs/                 # Documentação completa (reorganizada)
+│   ├── usuarios/         # Guias para desenvolvedores humanos
+│   ├── agentes-ia/       # Documentação para AI agents
+│   ├── referencia/       # Referência técnica e arquitetura
+│   └── adr/              # Architecture Decision Records
 ├── examples/             # Exemplos de uso do framework
 ├── scripts/              # Scripts de desenvolvimento (scaffolding, discovery)
 ├── src/                  # Código-fonte do framework ForgeBase
@@ -116,12 +119,11 @@ forgebase/
 ### 📂 Detalhamento das Pastas
 
 #### `docs/`
-Documentação completa do projeto:
-- **BACKLOG.md** — Roadmap de desenvolvimento (8 fases, 54 componentes)
-- **documentation_guide.md** — Padrões e práticas de docstrings extensivas
-- **guides/forgebase_guide.md** — Guia fundacional da arquitetura
-- **guides/forgebase_PRD.md** — Product Requirements Document
-- **ambiente_e_scripts.md** — Setup de ambiente e ferramentas
+Documentação completa do projeto, organizada por público-alvo:
+- **usuarios/** — Guias para desenvolvedores (início rápido, receitas, testes)
+- **agentes-ia/** — Documentação para AI agents (APIs, descoberta, ecossistema)
+- **referencia/** — Referência técnica (ForgeProcess, arquitetura, backlog)
+- **adr/** — Architecture Decision Records
 
 #### `examples/`
 Exemplos práticos de uso do framework:
@@ -271,18 +273,32 @@ ForgeBase não é apenas um framework técnico — é uma **arquitetura cognitiv
 
 Consulte o [CHANGELOG.md](/CHANGELOG.md) para histórico detalhado de mudanças.
 
-Consulte o [BACKLOG.md](/docs/BACKLOG.md) para o roadmap completo com 54 componentes organizados em 8 fases.
+Consulte o [docs/referencia/backlog.md](/docs/referencia/backlog.md) para o roadmap completo com 54 componentes organizados em 8 fases.
 
 ---
 
 ## 📖 Documentação
 
 Para entender a arquitetura completa, consulte:
-- [BACKLOG.md](/docs/BACKLOG.md) — Roadmap completo de desenvolvimento (8 fases, 54 componentes)
-- [Documentation Guide](/docs/documentation_guide.md) — Padrões e práticas de docstrings extensivas
-- [ForgeBase Guide](/docs/guides/forgebase_guide.md) — Referência técnica completa
-- [ForgeBase PRD](/docs/guides/forgebase_PRD.md) — Requisitos e especificações
-- [Ambiente & Scripts](/docs/ambiente_e_scripts.md) — Setup de venv, lint (Ruff) e hooks de pre-commit
+
+### Para Desenvolvedores
+- [Início Rápido](/docs/usuarios/inicio-rapido.md) — Instalação e primeiros passos
+- [Receitas](/docs/usuarios/receitas.md) — Exemplos práticos de uso
+- [Guia de Testes](/docs/usuarios/guia-de-testes.md) — Como executar e escrever testes
+- [Ambiente e Scripts](/docs/usuarios/ambiente_e_scripts.md) — Setup de ambiente e ferramentas
+- [Extensão](/docs/usuarios/extending-forgebase.md) — Como estender ForgeBase
+
+### Para AI Agents
+- [Início Rápido](/docs/agentes-ia/inicio-rapido.md) — Quick start para agentes de IA
+- [Guia Completo](/docs/agentes-ia/guia-completo.md) — Referência completa de APIs
+- [Descoberta](/docs/agentes-ia/descoberta.md) — Sistema de descoberta de APIs
+- [Ecossistema](/docs/agentes-ia/ecossistema.md) — Integração com ferramentas
+
+### Referência Técnica
+- [ForgeProcess](/docs/referencia/forge-process.md) — Ciclo cognitivo de desenvolvimento
+- [Arquitetura](/docs/referencia/arquitetura.md) — Modularização do núcleo
+- [Backlog](/docs/referencia/backlog.md) — Roadmap (8 fases, 54 componentes)
+- [Guia de Documentação](/docs/referencia/documentation_guide.md) — Padrões de docstrings
 
 ---
 ## 🛠️ AVISOS IMPORTANTES

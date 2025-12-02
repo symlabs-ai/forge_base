@@ -1,15 +1,15 @@
 #!/bin/bash
 #
-# Sync documentation from root to embedded package
+# Sync documentation from docs/ to embedded package
 #
-# This script ensures that the documentation files in the root of the
-# repository are synchronized with the embedded copies in src/forgebase/_docs/
+# This script ensures that the documentation files in the docs/ directory
+# are synchronized with the embedded copies in src/forgebase/_docs/
 # that get distributed with the package.
 #
 # Usage:
 #   ./scripts/sync_docs.sh
 #
-# Or use as pre-commit hook (see docs/DOCUMENTATION_ACCESS.md)
+# Or use as pre-commit hook (see docs/referencia/acesso-documentacao.md)
 
 set -e
 
@@ -22,12 +22,12 @@ echo "📚 Syncing embedded documentation..."
 # Create _docs directory if it doesn't exist
 mkdir -p "$DOCS_DIR"
 
-# Sync key documentation files
-cp "$PROJECT_ROOT/AI_AGENT_QUICK_START.md" "$DOCS_DIR/"
+# Sync key documentation files for AI agents
+cp "$PROJECT_ROOT/docs/agentes-ia/inicio-rapido.md" "$DOCS_DIR/AI_AGENT_QUICK_START.md"
 cp "$PROJECT_ROOT/README.md" "$DOCS_DIR/"
 
 echo "✅ Synced files:"
-echo "  - AI_AGENT_QUICK_START.md"
+echo "  - docs/agentes-ia/inicio-rapido.md -> AI_AGENT_QUICK_START.md"
 echo "  - README.md"
 
 # Verify

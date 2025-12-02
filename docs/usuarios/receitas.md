@@ -1,12 +1,12 @@
-# ForgeBase Cookbook
+# ForgeBase - Receitas Práticas
 
-> Receitas práticas para casos comuns de desenvolvimento
+> Soluções prontas para casos comuns de desenvolvimento
 
-Este cookbook fornece soluções prontas para casos de uso frequentes no ForgeBase. Cada receita é autocontida e pode ser copiada/adaptada para seu projeto.
+Este cookbook fornece soluções práticas para casos de uso frequentes no ForgeBase. Cada receita é autocontida e pode ser copiada/adaptada para seu projeto.
 
 ---
 
-## 📑 Índice
+## Índice
 
 1. [Como Criar uma Entity](#1-como-criar-uma-entity)
 2. [Como Criar um ValueObject](#2-como-criar-um-valueobject)
@@ -36,14 +36,14 @@ from datetime import datetime
 
 class Order(EntityBase):
     """
-    Order entity.
+    Entidade Order.
 
-    Represents a customer order with items, total, and status.
+    Representa um pedido com itens, total e status.
 
-    Business Rules:
-        - Order must have at least one item
-        - Total must be positive
-        - Once paid, order cannot be modified
+    Regras de Negócio:
+        - Pedido deve ter pelo menos um item
+        - Total deve ser positivo
+        - Uma vez pago, pedido não pode ser modificado
     """
 
     def __init__(
@@ -64,40 +64,40 @@ class Order(EntityBase):
         self.validate()
 
     def validate(self) -> None:
-        """Validate order invariants."""
+        """Validar invariantes do pedido."""
         if not self.customer_id:
-            raise ValidationError("Order must have a customer")
+            raise ValidationError("Pedido deve ter um cliente")
 
         if not self.items:
-            raise ValidationError("Order must have at least one item")
+            raise ValidationError("Pedido deve ter pelo menos um item")
 
         if self.total <= 0:
-            raise ValidationError("Order total must be positive")
+            raise ValidationError("Total do pedido deve ser positivo")
 
         if self.status not in ["pending", "paid", "shipped", "cancelled"]:
-            raise ValidationError(f"Invalid status: {self.status}")
+            raise ValidationError(f"Status inválido: {self.status}")
 
     def mark_as_paid(self) -> None:
-        """Mark order as paid."""
+        """Marcar pedido como pago."""
         if self.status == "cancelled":
-            raise BusinessRuleViolation("Cannot pay a cancelled order")
+            raise BusinessRuleViolation("Não é possível pagar pedido cancelado")
 
         if self.paid_at is not None:
-            raise BusinessRuleViolation("Order already paid")
+            raise BusinessRuleViolation("Pedido já foi pago")
 
         self.status = "paid"
         self.paid_at = datetime.now()
 
     def add_item(self, item: dict, price: float) -> None:
-        """Add an item to the order."""
+        """Adicionar item ao pedido."""
         if self.paid_at is not None:
-            raise BusinessRuleViolation("Cannot modify paid order")
+            raise BusinessRuleViolation("Não é possível modificar pedido pago")
 
         self.items.append(item)
         self.total += price
 
     def __str__(self) -> str:
-        return f"Order {self.id} ({self.status}) - ${self.total:.2f}"
+        return f"Order {self.id} ({self.status}) - R${self.total:.2f}"
 ```
 
 **Pontos-Chave**:
@@ -121,9 +121,9 @@ import re
 
 class EmailAddress(ValueObjectBase):
     """
-    Email address value object.
+    Value object para endereço de email.
 
-    Immutable value representing a validated email address.
+    Valor imutável representando um email validado.
     """
 
     def __init__(self, address: str):
@@ -133,13 +133,13 @@ class EmailAddress(ValueObjectBase):
         self._freeze()  # Torna imutável
 
     def validate(self) -> None:
-        """Validate email format."""
+        """Validar formato do email."""
         if not self.address:
-            raise ValidationError("Email address cannot be empty")
+            raise ValidationError("Endereço de email não pode ser vazio")
 
         pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         if not re.match(pattern, self.address):
-            raise ValidationError(f"Invalid email format: {self.address}")
+            raise ValidationError(f"Formato de email inválido: {self.address}")
 
     def to_dict(self) -> dict:
         return {"address": self.address}
@@ -161,9 +161,9 @@ class EmailAddress(ValueObjectBase):
 
 
 class Money(ValueObjectBase):
-    """Money value object."""
+    """Value object para valores monetários."""
 
-    def __init__(self, amount: float, currency: str = "USD"):
+    def __init__(self, amount: float, currency: str = "BRL"):
         super().__init__()
         self.amount = amount
         self.currency = currency
@@ -172,15 +172,15 @@ class Money(ValueObjectBase):
 
     def validate(self) -> None:
         if self.amount < 0:
-            raise ValidationError("Money amount cannot be negative")
+            raise ValidationError("Valor não pode ser negativo")
 
         if self.currency not in ["USD", "EUR", "BRL"]:
-            raise ValidationError(f"Unsupported currency: {self.currency}")
+            raise ValidationError(f"Moeda não suportada: {self.currency}")
 
     def add(self, other: 'Money') -> 'Money':
-        """Add two money objects."""
+        """Somar dois valores monetários."""
         if self.currency != other.currency:
-            raise ValueError("Cannot add different currencies")
+            raise ValueError("Não é possível somar moedas diferentes")
         return Money(self.amount + other.amount, self.currency)
 
     def __str__(self) -> str:
@@ -206,7 +206,7 @@ from forgebase.application import UseCaseBase, DTOBase
 
 
 class PlaceOrderInput(DTOBase):
-    """Input for placing an order."""
+    """Input para colocar um pedido."""
 
     def __init__(self, customer_id: str, items: list[dict]):
         self.customer_id = customer_id
@@ -214,9 +214,9 @@ class PlaceOrderInput(DTOBase):
 
     def validate(self) -> None:
         if not self.customer_id:
-            raise ValueError("Customer ID is required")
+            raise ValueError("ID do cliente é obrigatório")
         if not self.items:
-            raise ValueError("At least one item is required")
+            raise ValueError("Pelo menos um item é obrigatório")
 
     def to_dict(self) -> dict:
         return {"customer_id": self.customer_id, "items": self.items}
@@ -230,7 +230,7 @@ class PlaceOrderInput(DTOBase):
 
 
 class PlaceOrderOutput(DTOBase):
-    """Output from placing an order."""
+    """Output da criação do pedido."""
 
     def __init__(self, order_id: str, total: float, status: str):
         self.order_id = order_id
@@ -258,14 +258,14 @@ class PlaceOrderOutput(DTOBase):
 
 class PlaceOrderUseCase(UseCaseBase):
     """
-    Place a new order.
+    Colocar um novo pedido.
 
-    Orchestrates:
-        1. Validating customer exists
-        2. Calculating order total
-        3. Creating order entity
-        4. Persisting order
-        5. Sending confirmation notification
+    Orquestra:
+        1. Validar que cliente existe
+        2. Calcular total do pedido
+        3. Criar entidade de pedido
+        4. Persistir pedido
+        5. Enviar notificação de confirmação
     """
 
     def __init__(
@@ -279,41 +279,41 @@ class PlaceOrderUseCase(UseCaseBase):
         self.notification_service = notification_service
 
     def execute(self, input_dto: PlaceOrderInput) -> PlaceOrderOutput:
-        """Execute order placement."""
-        # 1. Validate input
+        """Executar criação do pedido."""
+        # 1. Validar input
         input_dto.validate()
 
-        # 2. Validate customer exists
+        # 2. Validar que cliente existe
         customer = self.customer_repository.find_by_id(input_dto.customer_id)
         if customer is None:
             raise BusinessRuleViolation(
-                f"Customer not found: {input_dto.customer_id}"
+                f"Cliente não encontrado: {input_dto.customer_id}"
             )
 
-        # 3. Calculate total
+        # 3. Calcular total
         total = sum(item["price"] * item["quantity"] for item in input_dto.items)
 
-        # 4. Create order entity
+        # 4. Criar entidade de pedido
         order = Order(
             customer_id=customer.id,
             items=input_dto.items,
             total=total
         )
 
-        # 5. Validate business rules
+        # 5. Validar regras de negócio
         order.validate()
 
-        # 6. Persist
+        # 6. Persistir
         self.order_repository.save(order)
 
-        # 7. Send notification
+        # 7. Enviar notificação
         self.notification_service.send(
             recipient=customer.email,
-            subject="Order Confirmation",
-            body=f"Your order {order.id} has been placed!"
+            subject="Confirmação de Pedido",
+            body=f"Seu pedido {order.id} foi realizado!"
         )
 
-        # 8. Return output
+        # 8. Retornar output
         return PlaceOrderOutput(
             order_id=order.id,
             total=order.total,
@@ -321,25 +321,23 @@ class PlaceOrderUseCase(UseCaseBase):
         )
 
     def _before_execute(self) -> None:
-        """Hook before execution."""
-        # Log, metrics, etc.
+        """Hook antes da execução."""
         pass
 
     def _after_execute(self) -> None:
-        """Hook after execution."""
+        """Hook após a execução."""
         pass
 
     def _on_error(self, error: Exception) -> None:
-        """Hook on error."""
-        # Error handling, rollback, etc.
+        """Hook em caso de erro."""
         pass
 ```
 
 **Pontos-Chave**:
 - Herda de `UseCaseBase`
 - Input/Output DTOs explícitos
-- Dependencies injetadas via construtor
-- Orquestração clara (steps numerados)
+- Dependências injetadas via construtor
+- Orquestração clara (passos numerados)
 - Hooks para observabilidade
 
 ---
@@ -356,9 +354,9 @@ from abc import ABC, abstractmethod
 
 class NotificationServicePort(ABC):
     """
-    Port for sending notifications.
+    Port para envio de notificações.
 
-    Implementations can use email, SMS, push notifications, etc.
+    Implementações podem usar email, SMS, push notifications, etc.
     """
 
     @abstractmethod
@@ -369,7 +367,7 @@ class NotificationServicePort(ABC):
         body: str,
         **options
     ) -> None:
-        """Send a notification."""
+        """Enviar uma notificação."""
         pass
 
     @abstractmethod
@@ -380,16 +378,16 @@ class NotificationServicePort(ABC):
         body: str
     ) -> dict[str, bool]:
         """
-        Send notification to multiple recipients.
+        Enviar notificação para múltiplos destinatários.
 
-        Returns:
-            Dict mapping recipient to success status
+        Retorna:
+            Dict mapeando destinatário para status de sucesso
         """
         pass
 
 
 class PaymentGatewayPort(ABC):
-    """Port for processing payments."""
+    """Port para processamento de pagamentos."""
 
     @abstractmethod
     def charge(
@@ -400,10 +398,10 @@ class PaymentGatewayPort(ABC):
         customer_id: str
     ) -> dict:
         """
-        Charge a payment.
+        Processar um pagamento.
 
-        Returns:
-            Dict with transaction_id, status, etc.
+        Retorna:
+            Dict com transaction_id, status, etc.
         """
         pass
 
@@ -413,7 +411,7 @@ class PaymentGatewayPort(ABC):
         transaction_id: str,
         amount: float
     ) -> dict:
-        """Issue a refund."""
+        """Processar um reembolso."""
         pass
 ```
 
@@ -439,9 +437,9 @@ from email.mime.text import MIMEText
 
 class EmailNotificationAdapter(NotificationServicePort):
     """
-    Email implementation of NotificationServicePort.
+    Implementação de email do NotificationServicePort.
 
-    Uses SMTP to send email notifications.
+    Usa SMTP para enviar notificações por email.
     """
 
     def __init__(
@@ -465,7 +463,7 @@ class EmailNotificationAdapter(NotificationServicePort):
         body: str,
         **options
     ) -> None:
-        """Send email notification."""
+        """Enviar notificação por email."""
         msg = MIMEText(body)
         msg["Subject"] = subject
         msg["From"] = self.from_address
@@ -482,7 +480,7 @@ class EmailNotificationAdapter(NotificationServicePort):
         subject: str,
         body: str
     ) -> dict[str, bool]:
-        """Send to multiple recipients."""
+        """Enviar para múltiplos destinatários."""
         results = {}
         for recipient in recipients:
             try:
@@ -495,9 +493,9 @@ class EmailNotificationAdapter(NotificationServicePort):
 
 class ConsoleNotificationAdapter(NotificationServicePort):
     """
-    Console implementation (for testing/dev).
+    Implementação de console (para testes/dev).
 
-    Prints notifications to stdout instead of sending.
+    Imprime notificações no stdout ao invés de enviar.
     """
 
     def send(
@@ -507,10 +505,10 @@ class ConsoleNotificationAdapter(NotificationServicePort):
         body: str,
         **options
     ) -> None:
-        print(f"[NOTIFICATION]")
-        print(f"  To: {recipient}")
-        print(f"  Subject: {subject}")
-        print(f"  Body: {body}")
+        print(f"[NOTIFICAÇÃO]")
+        print(f"  Para: {recipient}")
+        print(f"  Assunto: {subject}")
+        print(f"  Corpo: {body}")
 
     def send_bulk(
         self,
@@ -559,9 +557,9 @@ class PlaceOrderUseCase(UseCaseBase):
         track_errors=True
     )
     def execute(self, input_dto: PlaceOrderInput) -> PlaceOrderOutput:
-        # Log structured
+        # Log estruturado
         self.logger.info(
-            "Placing order",
+            "Criando pedido",
             customer_id=input_dto.customer_id,
             items_count=len(input_dto.items)
         )
@@ -574,7 +572,7 @@ class PlaceOrderUseCase(UseCaseBase):
             self.metrics.gauge("order.total", total, tags={"customer": input_dto.customer_id})
 
             self.logger.info(
-                "Order placed successfully",
+                "Pedido criado com sucesso",
                 order_id=order.id,
                 total=order.total
             )
@@ -583,7 +581,7 @@ class PlaceOrderUseCase(UseCaseBase):
 
         except Exception as e:
             self.logger.error(
-                "Failed to place order",
+                "Falha ao criar pedido",
                 error=str(e),
                 customer_id=input_dto.customer_id
             )
@@ -621,101 +619,7 @@ def execute(self, input_dto):
 
 ## 7. Como Escrever Testes Cognitivos
 
-**Problema**: Preciso validar não apenas comportamento, mas também intenção.
-
-**Solução**:
-
-```python
-from forgebase.testing import ForgeTestCase
-from forgebase.testing.fakes import FakeRepository, FakeLogger, FakeMetricsCollector
-
-
-class TestPlaceOrderUseCase(ForgeTestCase):
-    def setUp(self):
-        # Fakes
-        self.fake_order_repo = FakeRepository()
-        self.fake_customer_repo = FakeRepository()
-        self.fake_logger = FakeLogger()
-        self.fake_metrics = FakeMetricsCollector()
-
-        # UseCase
-        self.usecase = PlaceOrderUseCase(
-            order_repository=self.fake_order_repo,
-            customer_repository=self.fake_customer_repo,
-            logger=self.fake_logger,
-            metrics=self.fake_metrics
-        )
-
-        # Setup data
-        self.customer = Customer(id="cust-123", name="Alice")
-        self.fake_customer_repo.save(self.customer)
-
-    def test_places_order_cognitive_validation(self):
-        """Cognitive test: Validates intent, metrics, and performance."""
-        # Captura intenção
-        intent = "Place order for customer Alice with 2 items totaling $50"
-
-        # Execute
-        output = self.usecase.execute(PlaceOrderInput(
-            customer_id="cust-123",
-            items=[
-                {"name": "Item 1", "price": 20, "quantity": 1},
-                {"name": "Item 2", "price": 30, "quantity": 1}
-            ]
-        ))
-
-        # 1. Validações tradicionais
-        self.assertIsNotNone(output.order_id)
-        self.assertEqual(output.total, 50.0)
-        self.assertEqual(output.status, "pending")
-
-        # 2. Validação cognitiva: Intent matches
-        actual = f"Placed order {output.order_id} for customer Alice with total ${output.total}"
-        self.assert_intent_matches(expected=intent, actual=actual, threshold=0.75)
-
-        # 3. Validação de observabilidade: Métricas coletadas
-        self.assert_metrics_collected({
-            'place_order.duration': lambda v: v > 0,
-            'place_order.count': lambda v: v == 1,
-            'orders.placed': lambda v: v == 1
-        })
-
-        # 4. Validação de logs estruturados
-        logs = self.fake_logger.get_logs(level='info')
-        self.assertTrue(any('order placed' in log['message'].lower() for log in logs))
-        self.assertTrue(any('order_id' in log.get('context', {}) for log in logs))
-
-        # 5. Validação de performance
-        self.assert_performance_within(
-            lambda: self.usecase.execute(PlaceOrderInput(...)),
-            max_duration_ms=100.0
-        )
-
-        # 6. Validação de persistência
-        self.assertEqual(self.fake_order_repo.count(), 1)
-        order = self.fake_order_repo.find_by_id(output.order_id)
-        self.assertIsNotNone(order)
-        self.assertEqual(len(order.items), 2)
-
-    def test_rejects_invalid_customer(self):
-        """Test business rule validation."""
-        with self.assertRaises(BusinessRuleViolation) as ctx:
-            self.usecase.execute(PlaceOrderInput(
-                customer_id="invalid-id",
-                items=[{"name": "Item", "price": 10, "quantity": 1}]
-            ))
-
-        self.assertIn("Customer not found", str(ctx.exception))
-
-        # Validar métrica de erro
-        self.assertEqual(self.fake_metrics.get_metric('orders.errors').value, 1)
-```
-
-**Pontos-Chave**:
-- Herda de `ForgeTestCase`
-- Usa fakes (não mocks)
-- Validações em 6 níveis: behavior, intent, metrics, logs, performance, persistence
-- Assertions cognitivas explícitas
+Veja o [Guia de Testes](guia-de-testes.md) para documentação completa sobre testes cognitivos.
 
 ---
 
@@ -732,7 +636,7 @@ class TestPlaceOrderUseCase(ForgeTestCase):
 version: "1.0"
 usecase:
   name: PlaceOrder
-  description: Place a new customer order
+  description: Criar um novo pedido de cliente
 
   inputs:
     - name: customer_id
@@ -751,9 +655,9 @@ usecase:
       type: str
 
   business_rules:
-    - Customer must exist
-    - Order must have at least one item
-    - Total must be calculated correctly
+    - Cliente deve existir
+    - Pedido deve ter pelo menos um item
+    - Total deve ser calculado corretamente
 ```
 
 ### Passo 2: Gerar Código
@@ -766,10 +670,10 @@ sync = YAMLSync()
 # Parse YAML
 spec = sync.parse_yaml("specs/place_order.yaml")
 
-# Generate code skeleton
+# Gerar código skeleton
 code = sync.generate_code(spec)
 
-# Write to file
+# Escrever em arquivo
 with open("src/application/place_order_usecase.py", "w") as f:
     f.write(code)
 ```
@@ -777,51 +681,16 @@ with open("src/application/place_order_usecase.py", "w") as f:
 ### Passo 3: Validar Consistência
 
 ```python
-# Detect drift
+# Detectar drift
 drift = sync.detect_drift(PlaceOrderUseCase, spec)
 
 if drift:
-    print("⚠️  Drift detected:")
+    print("Drift detectado:")
     for issue in drift:
         print(f"  - {issue}")
 else:
-    print("✓ Code matches YAML spec")
+    print("Código corresponde à spec YAML")
 ```
-
-### Passo 4: Intent Tracking
-
-```python
-from forgebase.integration import IntentTracker
-
-tracker = IntentTracker()
-
-# Capture intent (from ForgeProcess)
-intent_id = tracker.capture_intent(
-    description="Place order for customer Alice",
-    expected_outcome="Order created successfully",
-    source="forgeprocess"
-)
-
-# Execute
-output = usecase.execute(input_dto)
-
-# Record execution
-tracker.record_execution(
-    intent_id=intent_id,
-    actual_outcome=f"Order {output.order_id} created",
-    success=True
-)
-
-# Validate coherence
-report = tracker.validate_coherence(intent_id)
-print(f"Coherence: {report.coherence_level.value} ({report.similarity_score:.1%})")
-```
-
-**Pontos-Chave**:
-- YAML define especificação
-- YAMLSync gera código e valida
-- IntentTracker valida coerência
-- Feedback loop para ForgeProcess
 
 ---
 
@@ -837,7 +706,7 @@ from pymongo import MongoClient
 
 
 class MongoDBRepository(RepositoryBase[T]):
-    """MongoDB implementation of RepositoryBase."""
+    """Implementação MongoDB do RepositoryBase."""
 
     def __init__(
         self,
@@ -883,11 +752,11 @@ class MongoDBRepository(RepositoryBase[T]):
         return self.collection.count_documents({"_id": id}) > 0
 
     def close(self):
-        """Cleanup connection."""
+        """Limpar conexão."""
         self.client.close()
 
 
-# Usage
+# Uso
 repository = MongoDBRepository(
     connection_string="mongodb://localhost:27017",
     database="my_app",
@@ -916,54 +785,54 @@ from forgebase.domain import ValidationError
 
 
 class DomainValidators:
-    """Reusable domain validators."""
+    """Validadores de domínio reutilizáveis."""
 
     @staticmethod
-    def not_empty(value: str, field_name: str = "Field") -> None:
-        """Validate string is not empty."""
+    def not_empty(value: str, field_name: str = "Campo") -> None:
+        """Validar que string não está vazia."""
         if not value or not value.strip():
-            raise ValidationError(f"{field_name} cannot be empty")
+            raise ValidationError(f"{field_name} não pode ser vazio")
 
     @staticmethod
-    def min_length(value: str, min_len: int, field_name: str = "Field") -> None:
-        """Validate minimum length."""
+    def min_length(value: str, min_len: int, field_name: str = "Campo") -> None:
+        """Validar tamanho mínimo."""
         if len(value) < min_len:
             raise ValidationError(
-                f"{field_name} must be at least {min_len} characters"
+                f"{field_name} deve ter pelo menos {min_len} caracteres"
             )
 
     @staticmethod
-    def max_length(value: str, max_len: int, field_name: str = "Field") -> None:
-        """Validate maximum length."""
+    def max_length(value: str, max_len: int, field_name: str = "Campo") -> None:
+        """Validar tamanho máximo."""
         if len(value) > max_len:
             raise ValidationError(
-                f"{field_name} must be at most {max_len} characters"
+                f"{field_name} deve ter no máximo {max_len} caracteres"
             )
 
     @staticmethod
-    def in_range(value: float, min_val: float, max_val: float, field_name: str = "Field") -> None:
-        """Validate value is in range."""
+    def in_range(value: float, min_val: float, max_val: float, field_name: str = "Campo") -> None:
+        """Validar que valor está no intervalo."""
         if not (min_val <= value <= max_val):
             raise ValidationError(
-                f"{field_name} must be between {min_val} and {max_val}"
+                f"{field_name} deve estar entre {min_val} e {max_val}"
             )
 
     @staticmethod
-    def positive(value: float, field_name: str = "Field") -> None:
-        """Validate value is positive."""
+    def positive(value: float, field_name: str = "Campo") -> None:
+        """Validar que valor é positivo."""
         if value <= 0:
-            raise ValidationError(f"{field_name} must be positive")
+            raise ValidationError(f"{field_name} deve ser positivo")
 
     @staticmethod
     def email_format(value: str, field_name: str = "Email") -> None:
-        """Validate email format."""
+        """Validar formato de email."""
         import re
         pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         if not re.match(pattern, value):
-            raise ValidationError(f"Invalid {field_name} format: {value}")
+            raise ValidationError(f"Formato de {field_name} inválido: {value}")
 
 
-# Usage in Entity
+# Uso em Entity
 class Product(EntityBase):
     def __init__(self, name: str, price: float, description: str = ""):
         super().__init__()
@@ -973,12 +842,12 @@ class Product(EntityBase):
         self.validate()
 
     def validate(self) -> None:
-        DomainValidators.not_empty(self.name, "Product name")
-        DomainValidators.max_length(self.name, 100, "Product name")
-        DomainValidators.positive(self.price, "Product price")
+        DomainValidators.not_empty(self.name, "Nome do produto")
+        DomainValidators.max_length(self.name, 100, "Nome do produto")
+        DomainValidators.positive(self.price, "Preço do produto")
 
         if self.description:
-            DomainValidators.max_length(self.description, 500, "Description")
+            DomainValidators.max_length(self.description, 500, "Descrição")
 ```
 
 **Pontos-Chave**:
@@ -991,118 +860,80 @@ class Product(EntityBase):
 
 ## 11. Como Usar Dependency Injection
 
-**Problema**: Preciso wirear dependências sem acoplamento.
+**Problema**: Preciso conectar dependências sem acoplamento.
 
 **Solução**:
 
 ```python
 # main.py com DI Container
-from forgebase.infrastructure.di_container import DIContainer
 from forgebase.infrastructure.configuration import ConfigLoader
 
 
-def setup_dependencies(config: dict) -> DIContainer:
-    """Setup DI container from configuration."""
-    container = DIContainer()
+def setup_dependencies(config: dict) -> dict:
+    """Configurar dependências a partir da configuração."""
 
-    # Register logger
-    container.register(
-        LogService,
-        lambda c: LogService(
-            name="my-app",
-            level=config.get("log_level", "INFO")
-        ),
-        singleton=True
+    # Logger
+    logger = LogService(
+        name="my-app",
+        level=config.get("log_level", "INFO")
     )
 
-    # Register metrics
-    container.register(
-        TrackMetrics,
-        lambda c: TrackMetrics(),
-        singleton=True
+    # Metrics
+    metrics = TrackMetrics()
+
+    # Repositories
+    order_repository = JSONRepository(
+        file_path=config.get("orders_file", "data/orders.json"),
+        entity_type=Order,
+        logger=logger
     )
 
-    # Register repositories
-    container.register(
-        OrderRepositoryPort,
-        lambda c: JSONRepository(
-            file_path=config.get("orders_file", "data/orders.json"),
-            entity_type=Order,
-            logger=c.resolve(LogService)
-        ),
-        singleton=True
+    customer_repository = JSONRepository(
+        file_path=config.get("customers_file", "data/customers.json"),
+        entity_type=Customer,
+        logger=logger
     )
 
-    container.register(
-        CustomerRepositoryPort,
-        lambda c: JSONRepository(
-            file_path=config.get("customers_file", "data/customers.json"),
-            entity_type=Customer,
-            logger=c.resolve(LogService)
-        ),
-        singleton=True
+    # Use cases
+    place_order_usecase = PlaceOrderUseCase(
+        order_repository=order_repository,
+        customer_repository=customer_repository,
+        logger=logger,
+        metrics=metrics
     )
 
-    # Register use cases
-    container.register(
-        PlaceOrderUseCase,
-        lambda c: PlaceOrderUseCase(
-            order_repository=c.resolve(OrderRepositoryPort),
-            customer_repository=c.resolve(CustomerRepositoryPort),
-            logger=c.resolve(LogService),
-            metrics=c.resolve(TrackMetrics)
-        )
-    )
-
-    return container
+    return {
+        "logger": logger,
+        "metrics": metrics,
+        "order_repository": order_repository,
+        "customer_repository": customer_repository,
+        "place_order_usecase": place_order_usecase
+    }
 
 
 def main():
-    # Load config
+    # Carregar config
     config = ConfigLoader.load("config.yaml")
 
-    # Setup DI
-    container = setup_dependencies(config)
+    # Configurar DI
+    deps = setup_dependencies(config)
 
-    # Resolve use case (dependencies auto-injected)
-    usecase = container.resolve(PlaceOrderUseCase)
+    # Usar use case
+    usecase = deps["place_order_usecase"]
 
-    # Execute
+    # Executar
     output = usecase.execute(PlaceOrderInput(...))
-    print(f"Order placed: {output.order_id}")
+    print(f"Pedido criado: {output.order_id}")
 
 
 if __name__ == "__main__":
     main()
 ```
 
-**Com Configuration-Based DI:**
-
-```yaml
-# config.yaml
-dependencies:
-  logger:
-    type: stdout
-    level: info
-
-  repositories:
-    orders:
-      type: json
-      path: data/orders.json
-    customers:
-      type: json
-      path: data/customers.json
-
-  metrics:
-    type: prometheus
-    endpoint: http://localhost:9090
-```
-
 **Pontos-Chave**:
 - Centraliza wiring em um lugar
-- Singleton para services compartilhados
-- Factories com resolução recursiva
 - Configuration-driven
+- Fácil trocar implementações
 
 ---
 
@@ -1121,9 +952,9 @@ from forgebase.adapters import AdapterBase
 
 class GRPCAdapter(AdapterBase):
     """
-    gRPC adapter for exposing UseCases via gRPC.
+    Adapter gRPC para expor UseCases via gRPC.
 
-    Maps gRPC service methods to UseCase executions.
+    Mapeia métodos de serviço gRPC para execuções de UseCase.
     """
 
     def __init__(
@@ -1150,22 +981,22 @@ class GRPCAdapter(AdapterBase):
         method_name: str,
         usecase: UseCaseBase
     ):
-        """Register a UseCase to be exposed via gRPC."""
+        """Registrar um UseCase para ser exposto via gRPC."""
         key = f"{service_name}.{method_name}"
         self._usecases[key] = usecase
 
     def start(self):
-        """Start gRPC server."""
+        """Iniciar servidor gRPC."""
         self.server.add_insecure_port(f"{self.host}:{self.port}")
         self.server.start()
-        print(f"gRPC server listening on {self.host}:{self.port}")
+        print(f"Servidor gRPC escutando em {self.host}:{self.port}")
 
     def stop(self):
-        """Stop gRPC server."""
+        """Parar servidor gRPC."""
         self.server.stop(grace=5)
 
 
-# Usage
+# Uso
 adapter = GRPCAdapter(port=50051)
 
 adapter.register_usecase(
@@ -1185,16 +1016,16 @@ adapter.start()
 
 ---
 
-## 🎯 Próximos Passos
+## Próximos Passos
 
 Explore mais:
-- **[Getting Started Guide](getting-started.md)** — Tutorial completo
-- **[Testing Guide](testing-guide.md)** — Testes cognitivos detalhados
-- **[ADRs](adr/)** — Decisões arquiteturais
-- **[Examples](../examples/)** — Exemplos completos executáveis
+- **[Início Rápido](inicio-rapido.md)** — Tutorial completo
+- **[Guia de Testes](guia-de-testes.md)** — Testes cognitivos detalhados
+- **[ADRs](../adr/)** — Decisões arquiteturais
+- **[Exemplos](../../examples/)** — Exemplos completos executáveis
 
 ---
 
-**Feliz Forjamento! 🔨**
+**Feliz Forjamento!**
 
 *"Cada receita é uma história de transformar pensamento em estrutura."*
