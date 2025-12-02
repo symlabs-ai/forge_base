@@ -282,9 +282,11 @@ Consulte o [docs/referencia/backlog.md](/docs/referencia/backlog.md) para o road
 Para entender a arquitetura completa, consulte:
 
 ### Para Desenvolvedores
+- [ForgeBase Rules](/docs/usuarios/forgebase-rules.md) — **Guia completo de regras e práticas**
 - [Início Rápido](/docs/usuarios/inicio-rapido.md) — Instalação e primeiros passos
 - [Receitas](/docs/usuarios/receitas.md) — Exemplos práticos de uso
 - [Guia de Testes](/docs/usuarios/guia-de-testes.md) — Como executar e escrever testes
+- [CLI First](/docs/usuarios/cli-first.md) — Filosofia de desenvolvimento CLI First
 - [Ambiente e Scripts](/docs/usuarios/ambiente_e_scripts.md) — Setup de ambiente e ferramentas
 - [Extensão](/docs/usuarios/extending-forgebase.md) — Como estender ForgeBase
 

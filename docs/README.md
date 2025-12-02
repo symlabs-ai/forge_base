@@ -13,9 +13,11 @@ Desenvolvedores que querem usar ForgeBase em seus projetos.
 
 | Documento | Descrição |
 |-----------|-----------|
+| [ForgeBase Rules](usuarios/forgebase-rules.md) | **Guia completo de regras e práticas** |
 | [Início Rápido](usuarios/inicio-rapido.md) | Instalação e primeiro uso |
 | [Receitas](usuarios/receitas.md) | Padrões e exemplos práticos |
 | [Guia de Testes](usuarios/guia-de-testes.md) | Como escrever testes cognitivos |
+| [CLI First](usuarios/cli-first.md) | Filosofia de desenvolvimento CLI First |
 | [Ambiente e Scripts](usuarios/ambiente_e_scripts.md) | Setup de ambiente e ferramentas |
 | [Extensão](usuarios/extending-forgebase.md) | Como estender ForgeBase |
 
