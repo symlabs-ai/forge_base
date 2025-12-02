@@ -74,7 +74,6 @@ A implementação segue 4 camadas concêntricas:
 # Adapters Layer (src/forgebase/adapters/)
 - CLIAdapter: Interface de linha de comando
 - HTTPAdapter: API REST
-- LLMAdapter: Integração com LLMs
 ```
 
 ### Enforcement

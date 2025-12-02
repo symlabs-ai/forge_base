@@ -127,7 +127,6 @@ class UseCaseBase(ABC):
 **Adapters que implementam:**
 - `CLIAdapter` — traduz comandos CLI → `execute()`
 - `HTTPAdapter` — traduz HTTP requests → `execute()`
-- `LLMAdapter` — traduz instruções AI → `execute()`
 
 #### Driven Ports (Secondary)
 
