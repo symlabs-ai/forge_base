@@ -1,1 +1,1 @@
-Versão atual do forgebase é 0.1.5
+Versão atual do forgebase é 0.1.6
