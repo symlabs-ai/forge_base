@@ -5,6 +5,59 @@ All notable changes to ForgeBase will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2025-12-02
+
+### Added
+- **Documentation Reorganization** 📚
+  - New structure: `docs/usuarios/`, `docs/agentes-ia/`, `docs/referencia/`
+  - Separated documentation by audience (developers vs AI agents)
+  - All documentation in Portuguese
+
+- **ForgeBase Rules Guide** (`docs/usuarios/forgebase-rules.md`)
+  - Comprehensive guide consolidating all development practices
+  - Architecture layers and dependency rules
+  - Domain exceptions hierarchy and when to use each
+  - Observability patterns (logging, metrics)
+  - Anti-patterns to avoid with examples
+  - Feature development checklist
+
+- **CLI First Philosophy** (`docs/usuarios/cli-first.md`)
+  - Documented CLI First development approach
+  - Every UseCase must be testable via CLI before HTTP
+  - Examples and workflow patterns
+
+- **INSTALLATION.md** - Quick installation guide in root
+
+### Changed
+- Reorganized 31 scattered markdown files into logical structure
+- Updated README.md with new documentation links
+- Updated `sync_docs.sh` for new paths
+- Updated `forgebase.dev` module to use new doc locations
+
+### Removed
+- **LLMAdapter** - Removed unused abstraction (out of scope for core)
+  - Deleted `src/forgebase/adapters/ai/` directory
+  - Updated ADR-001 and ADR-002 references
+- Removed `.claude/` directory
+- Removed duplicate/obsolete documentation files from root
+
+### Technical Details
+- 192 tests passing
+- Documentation reduced from scattered files to organized structure
+- No breaking changes to API
+
+## [0.1.4] - 2025-11-05
+
+### Added
+- **AI Agent Discovery System** 🤖
+  - Comprehensive documentation for AI agents
+  - Programmatic access to embedded documentation
+  - `get_agent_quickstart()` function for offline docs access
+
+### Changed
+- Documentation embedded in package for pip install
+- Updated install URLs to symlabs-ai/forgebase
+
 ## [0.1.3] - 2025-11-04
 
 ### Added
