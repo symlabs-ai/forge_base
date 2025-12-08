@@ -5,6 +5,15 @@ All notable changes to ForgeBase will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.7] - 2025-12-08
+
+### Added
+- Generalized `ComponentDiscovery` to support scanning arbitrary app packages via `package_name`, enabling apps that depend on ForgeBase to expose a standardized discovery API for their own components.
+- New user guide `docs/usuarios/apps-derivados-forgebase.md` documenting how to build ForgeBase-derived apps that are friendly to AI coding agents.
+
+### Changed
+- Updated embedded AI Agent Quick Start docs to show how agents can use `ComponentDiscovery(package_name="meu_app")` in apps built on top of ForgeBase.
+
 ## [0.1.6] - 2025-12-02
 
 ### Added

@@ -156,6 +156,22 @@ for usecase in result.usecases:
     print(f"  Imports: {usecase.imports}")
 ```
 
+### Descoberta em apps que usam ForgeBase
+
+Se você estiver trabalhando em um **app que depende de ForgeBase**, pode reutilizar o mesmo mecanismo de discovery para o pacote do app (instalado via `pip`):
+
+```python
+from forgebase.dev.api import ComponentDiscovery
+
+discovery = ComponentDiscovery(package_name="meu_app")  # nome do pacote instalado
+result = discovery.scan_project()
+```
+
+Boas práticas para apps derivados:
+
+- Crie um módulo `meu_app.dev.api` que expose sua própria `ComponentDiscovery` baseada nisso;
+- Documente para os agentes dos seus clientes que eles devem usar `from meu_app.dev import get_agent_quickstart` e `from meu_app.dev.api import ComponentDiscovery`.
+
 **Estrutura de Dados**:
 ```python
 ComponentInfo(

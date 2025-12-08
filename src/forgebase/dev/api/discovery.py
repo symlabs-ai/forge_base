@@ -22,6 +22,7 @@ Created: 2025-11-04
 """
 
 import ast
+import importlib
 import subprocess
 import sys
 from dataclasses import dataclass, field
@@ -118,15 +119,35 @@ class ComponentDiscovery:
                 print(f"Entity {entity.name} not used in any UseCase")
     """
 
-    def __init__(self, project_root: Path | None = None):
+    def __init__(
+        self,
+        project_root: Path | None = None,
+        src_dir: Path | None = None,
+        package_name: str | None = None,
+    ) -> None:
         """
         Initialize component discovery.
 
         Args:
             project_root: Project root directory. Defaults to current directory.
+                Used when scanning a source tree (e.g. a cloned repo).
+            src_dir: Optional explicit source directory to scan. If not
+                provided, defaults to ``project_root / "src" / "forgebase"``
+                when ``package_name`` is not set.
+            package_name: Optional installed package name to scan. When
+                provided, the discovery will resolve the package location via
+                ``importlib`` and scan only that package directory. This is
+                the recommended mode for apps that depend on ForgeBase and
+                want to expose their own discovery API for agents.
         """
-        self.project_root = project_root or Path.cwd()
-        self.src_dir = self.project_root / "src" / "forgebase"
+        if package_name is not None:
+            pkg = importlib.import_module(package_name)
+            package_path = Path(pkg.__file__).resolve().parent
+            self.project_root = package_path
+            self.src_dir = src_dir or package_path
+        else:
+            self.project_root = project_root or Path.cwd()
+            self.src_dir = src_dir or (self.project_root / "src" / "forgebase")
 
     def scan_project(self) -> DiscoveryResult:
         """

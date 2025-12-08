@@ -223,7 +223,7 @@ ForgeBase não é apenas um framework técnico — é uma **arquitetura cognitiv
 
 ## 🚀 Status do Projeto
 
-**Versão Atual:** v0.1.6 (Production-Ready)
+**Versão Atual:** v0.1.7 (Production-Ready)
 
 ### ✅ Completo (FASE 1 - Foundation)
 
