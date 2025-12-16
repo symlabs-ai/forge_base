@@ -5,6 +5,30 @@ All notable changes to ForgeBase will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-12-15
+
+### Added
+- **Composition Module** - New module for declarative object assembly
+  - `BuildSpecBase`: Declarative specification with YAML/JSON/TOML support
+  - `PluginRegistryBase`: Plugin registry mapping (kind, type_id) to classes
+  - `BuildContextBase`: Build context with caching and environment resolution
+  - `BuilderBase`: Abstract composition root for object assembly
+  - `LoggerProtocol` and `MetricsProtocol`: Low-coupling protocols for observability
+  - `ConfigurationError`: New domain exception for configuration errors
+
+- **Composition Discovery** - ComponentDiscovery now detects composition components
+  - Detects `PluginRegistryBase` subclasses (registries)
+  - Detects `BuilderBase` subclasses (builders)
+  - Detects `BuildSpecBase` subclasses (specs)
+
+- **Composition Guide** (`docs/usuarios/composition-guide.md`)
+  - Complete guide for using the composition module
+  - Examples for BuildSpec, PluginRegistry, BuildContext, Builder
+  - Best practices and patterns
+
+### Changed
+- Module renamed from `forgebase` to `forge_base`
+
 ## [0.1.7] - 2025-12-08
 
 ### Added

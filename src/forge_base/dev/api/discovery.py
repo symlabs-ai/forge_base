@@ -55,6 +55,9 @@ class DiscoveryResult:
         ports: List of discovered ports
         value_objects: List of discovered value objects
         adapters: List of discovered adapters
+        registries: List of discovered plugin registries (composition)
+        builders: List of discovered builders (composition)
+        specs: List of discovered build specs (composition)
         total_files_scanned: Number of files scanned
         scan_duration: Time taken for scan in seconds
     """
@@ -65,6 +68,9 @@ class DiscoveryResult:
     ports: list[ComponentInfo] = field(default_factory=list)
     value_objects: list[ComponentInfo] = field(default_factory=list)
     adapters: list[ComponentInfo] = field(default_factory=list)
+    registries: list[ComponentInfo] = field(default_factory=list)
+    builders: list[ComponentInfo] = field(default_factory=list)
+    specs: list[ComponentInfo] = field(default_factory=list)
     total_files_scanned: int = 0
     scan_duration: float = 0.0
 
@@ -77,6 +83,9 @@ class DiscoveryResult:
             "ports": [c.__dict__ for c in self.ports],
             "value_objects": [c.__dict__ for c in self.value_objects],
             "adapters": [c.__dict__ for c in self.adapters],
+            "registries": [c.__dict__ for c in self.registries],
+            "builders": [c.__dict__ for c in self.builders],
+            "specs": [c.__dict__ for c in self.specs],
             "total_files_scanned": self.total_files_scanned,
             "scan_duration": self.scan_duration,
         }
@@ -91,6 +100,9 @@ class DiscoveryResult:
             + len(self.ports)
             + len(self.value_objects)
             + len(self.adapters)
+            + len(self.registries)
+            + len(self.builders)
+            + len(self.specs)
         )
 
 
@@ -273,6 +285,15 @@ class ComponentDiscovery:
         elif base == "ValueObjectBase" or "ValueObject" in component.name:
             component.type = "value_object"
             result.value_objects.append(component)
+        elif base == "PluginRegistryBase" or "Registry" in component.name:
+            component.type = "registry"
+            result.registries.append(component)
+        elif base == "BuilderBase" or "Builder" in component.name:
+            component.type = "builder"
+            result.builders.append(component)
+        elif base == "BuildSpecBase" or "Spec" in component.name:
+            component.type = "spec"
+            result.specs.append(component)
         elif "Adapter" in component.name:
             component.type = "adapter"
             result.adapters.append(component)

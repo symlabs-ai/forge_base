@@ -18,6 +18,7 @@ Main Modules:
     - application: Use cases, ports, DTOs, orchestration
     - adapters: External interfaces (CLI, HTTP, AI/LLM)
     - infrastructure: Concrete implementations (repository, logging, config)
+    - composition: Plugin system and Composition Root pattern
     - observability: Native metrics and tracing system
     - testing: Cognitive testing infrastructure
 

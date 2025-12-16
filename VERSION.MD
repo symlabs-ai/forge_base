@@ -1,1 +1,1 @@
-Versão atual do forge_base é 0.1.7
+Versão atual do forge_base é 0.2.0

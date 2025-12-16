@@ -92,3 +92,21 @@ class DuplicateEntityError(DomainException):
             raise DuplicateEntityError(f"User with email {email} already exists")
     """
     pass
+
+
+class ConfigurationError(DomainException):
+    """
+    Raised when configuration is invalid or missing.
+
+    Use this for configuration-related errors such as missing
+    environment variables, invalid spec files, or malformed settings.
+
+    :Example:
+
+        if not config.get("api_key"):
+            raise ConfigurationError("API key is required")
+
+        if port < 1 or port > 65535:
+            raise ConfigurationError(f"Invalid port: {port}")
+    """
+    pass

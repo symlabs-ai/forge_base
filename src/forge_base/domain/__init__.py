@@ -11,5 +11,19 @@ Created: 2025-11-03
 """
 
 from forge_base.domain.entity_base import EntityBase
+from forge_base.domain.exceptions import (
+    ConfigurationError,
+    DomainException,
+    DuplicateEntityError,
+    EntityNotFoundError,
+    ValidationError,
+)
 
-__all__ = ["EntityBase"]
+__all__ = [
+    "EntityBase",
+    "ConfigurationError",
+    "DomainException",
+    "DuplicateEntityError",
+    "EntityNotFoundError",
+    "ValidationError",
+]
