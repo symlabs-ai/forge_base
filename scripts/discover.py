@@ -50,7 +50,7 @@ class ComponentDiscoverer:
         :param project_root: Project root directory
         """
         self.project_root = project_root
-        self.src_dir = project_root / "src" / "forgebase"
+        self.src_dir = project_root / "src" / "forge_base"
 
     def discover_all(self) -> dict[ComponentType, list[Component]]:
         """
@@ -353,7 +353,7 @@ def main() -> int:
     while current != current.parent:
         if (current / "pyproject.toml").exists() or \
            (current / "setup.py").exists() or \
-           (current / "src" / "forgebase").exists():
+           (current / "src" / "forge_base").exists():
             project_root = current
             break
         current = current.parent

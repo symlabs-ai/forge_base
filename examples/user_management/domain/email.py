@@ -9,8 +9,8 @@ Demonstrates a proper ValueObject implementation with validation.
 
 import re
 
-from forgebase.domain.exceptions import ValidationError
-from forgebase.domain.value_object_base import ValueObjectBase
+from forge_base.domain.exceptions import ValidationError
+from forge_base.domain.value_object_base import ValueObjectBase
 
 
 class Email(ValueObjectBase):

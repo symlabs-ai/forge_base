@@ -9,7 +9,7 @@
 **First time using ForgeBase?** Access complete API documentation programmatically:
 
 ```python
-from forgebase.dev import get_agent_quickstart
+from forge_base.dev import get_agent_quickstart
 
 # Get the full AI Agent Quick Start guide (embedded in package)
 guide = get_agent_quickstart()
@@ -19,7 +19,7 @@ print(guide)  # Full markdown with examples and API reference
 **Available APIs for AI Agents:**
 
 ```python
-from forgebase.dev.api import (
+from forge_base.dev.api import (
     QualityChecker,      # Code quality checks (ruff, mypy)
     ScaffoldGenerator,   # Generate boilerplate code
     ComponentDiscovery,  # Discover entities, usecases, ports
@@ -53,11 +53,11 @@ for tool, result in results.items():
 
 ```bash
 # Install from GitHub
-pip install git+https://github.com/symlabs-ai/forgebase.git
+pip install git+https://github.com/symlabs-ai/forge_base.git
 
 # Or clone for development
-git clone https://github.com/symlabs-ai/forgebase.git
-cd forgebase
+git clone https://github.com/symlabs-ai/forge_base.git
+cd forge_base
 python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
@@ -67,7 +67,7 @@ pip install -e ".[dev]"
 
 ```python
 # Documentation is embedded in the package - works offline!
-from forgebase.dev import get_agent_quickstart
+from forge_base.dev import get_agent_quickstart
 
 guide = get_agent_quickstart()  # Full API documentation
 # Parse and use to discover available APIs
@@ -91,7 +91,7 @@ python devtool.py test
 ## 🏗️ Estrutura do Repositório
 
 ```
-forgebase/
+forge_base/
 ├── docs/                 # Documentação completa (reorganizada)
 │   ├── usuarios/         # Guias para desenvolvedores humanos
 │   ├── agentes-ia/       # Documentação para AI agents
@@ -100,7 +100,7 @@ forgebase/
 ├── examples/             # Exemplos de uso do framework
 ├── scripts/              # Scripts de desenvolvimento (scaffolding, discovery)
 ├── src/                  # Código-fonte do framework ForgeBase
-│   └── forgebase/
+│   └── forge_base/
 │       ├── domain/           # Camada de Domínio
 │       ├── application/      # Camada de Aplicação
 │       ├── infrastructure/   # Camada de Infraestrutura
@@ -137,7 +137,7 @@ Ferramentas de desenvolvimento:
 - **discover.py** — Descoberta e catalogação de componentes
 - **mypy.ini** — Configuração de type checking
 
-#### `src/forgebase/`
+#### `src/forge_base/`
 Código-fonte seguindo Clean + Hexagonal Architecture:
 
 **`domain/`** — Camada de Domínio (núcleo do negócio)
@@ -306,7 +306,7 @@ Para entender a arquitetura completa, consulte:
 ## 🛠️ AVISOS IMPORTANTES
 - Nunca grave nada na raíz sem solitacao explicita do usuario
 - Nunca de push no repositorio remoto sem solitacao explicita do usuario
-- Nunca crie tags ou aumente versao do forgebase sem solitacao explicita do usuario
+- Nunca crie tags ou aumente versao do forge_base sem solitacao explicita do usuario
 - A fonte da verdade sobre a versao atual, bem como historico sintetico pode ser encontrada em VERSION.md
 
 ## 🛠️ Tecnologias

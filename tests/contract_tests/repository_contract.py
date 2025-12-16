@@ -27,8 +27,8 @@ Created: 2025-11-03
 
 from abc import ABC, abstractmethod
 
-from forgebase.domain.entity_base import EntityBase
-from forgebase.infrastructure.repository.repository_base import RepositoryBase
+from forge_base.domain.entity_base import EntityBase
+from forge_base.infrastructure.repository.repository_base import RepositoryBase
 
 
 class RepositoryContractTestMixin(ABC):

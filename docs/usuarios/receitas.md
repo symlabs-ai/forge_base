@@ -30,7 +30,7 @@ Este cookbook fornece soluções práticas para casos de uso frequentes no Forge
 **Solução**:
 
 ```python
-from forgebase.domain import EntityBase, ValidationError, BusinessRuleViolation
+from forge_base.domain import EntityBase, ValidationError, BusinessRuleViolation
 from datetime import datetime
 
 
@@ -115,7 +115,7 @@ class Order(EntityBase):
 **Solução**:
 
 ```python
-from forgebase.domain import ValueObjectBase, ValidationError
+from forge_base.domain import ValueObjectBase, ValidationError
 import re
 
 
@@ -202,7 +202,7 @@ class Money(ValueObjectBase):
 **Solução**:
 
 ```python
-from forgebase.application import UseCaseBase, DTOBase
+from forge_base.application import UseCaseBase, DTOBase
 
 
 class PlaceOrderInput(DTOBase):
@@ -536,8 +536,8 @@ class ConsoleNotificationAdapter(NotificationServicePort):
 **Solução**:
 
 ```python
-from forgebase.observability import LogService, TrackMetrics
-from forgebase.application.decorators import track_metrics
+from forge_base.observability import LogService, TrackMetrics
+from forge_base.application.decorators import track_metrics
 
 
 class PlaceOrderUseCase(UseCaseBase):
@@ -663,7 +663,7 @@ usecase:
 ### Passo 2: Gerar Código
 
 ```python
-from forgebase.integration import YAMLSync
+from forge_base.integration import YAMLSync
 
 sync = YAMLSync()
 
@@ -701,7 +701,7 @@ else:
 **Solução**:
 
 ```python
-from forgebase.infrastructure.repository import RepositoryBase
+from forge_base.infrastructure.repository import RepositoryBase
 from pymongo import MongoClient
 
 
@@ -781,7 +781,7 @@ repository = MongoDBRepository(
 
 ```python
 # src/domain/validators.py
-from forgebase.domain import ValidationError
+from forge_base.domain import ValidationError
 
 
 class DomainValidators:
@@ -866,7 +866,7 @@ class Product(EntityBase):
 
 ```python
 # main.py com DI Container
-from forgebase.infrastructure.configuration import ConfigLoader
+from forge_base.infrastructure.configuration import ConfigLoader
 
 
 def setup_dependencies(config: dict) -> dict:
@@ -947,7 +947,7 @@ if __name__ == "__main__":
 # src/adapters/grpc/grpc_adapter.py
 import grpc
 from concurrent import futures
-from forgebase.adapters import AdapterBase
+from forge_base.adapters import AdapterBase
 
 
 class GRPCAdapter(AdapterBase):
@@ -973,7 +973,7 @@ class GRPCAdapter(AdapterBase):
         return "GRPCAdapter"
 
     def module(self) -> str:
-        return "forgebase.adapters.grpc"
+        return "forge_base.adapters.grpc"
 
     def register_usecase(
         self,

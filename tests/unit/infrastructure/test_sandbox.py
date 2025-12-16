@@ -19,7 +19,7 @@ The code tested here is NOT truly malicious - it's designed to test sandbox limi
 import sys
 import unittest
 
-from src.forgebase.infrastructure.security.sandbox import (
+from src.forge_base.infrastructure.security.sandbox import (
     ExecutionResult,
     Sandbox,
 )

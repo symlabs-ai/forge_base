@@ -6,7 +6,7 @@
 
 Quando você instala ForgeBase via pip:
 ```bash
-pip install git+https://github.com/symlabs-ai/forgebase.git
+pip install git+https://github.com/symlabs-ai/forge_base.git
 ```
 
 Por padrão, apenas código Python é incluído, **NÃO** arquivos markdown na raiz do projeto.
@@ -18,12 +18,12 @@ ForgeBase agora embute documentação essencial **dentro do package** para acess
 ## 🎯 Estrutura
 
 ```
-forgebase/
+forge_base/
 ├── AI_AGENT_QUICK_START.md         # ← Arquivo original na raiz
 ├── README.md
 ├── MANIFEST.in                      # ← Criado: inclui docs no sdist
 │
-└── src/forgebase/
+└── src/forge_base/
     ├── _docs/                       # ← Novo: docs embutidos no package
     │   ├── __init__.py
     │   ├── AI_AGENT_QUICK_START.md  # ← Cópia para distribuição
@@ -38,7 +38,7 @@ forgebase/
 ### 1. Obter AI Agent Quick Start Guide
 
 ```python
-from forgebase.dev import get_agent_quickstart
+from forge_base.dev import get_agent_quickstart
 
 # Retorna o conteúdo completo do guia
 guide = get_agent_quickstart()
@@ -54,7 +54,7 @@ if "QualityChecker" in guide:
 **Uso por AI Agents:**
 ```python
 # Claude Code / Cursor / Aider podem fazer:
-from forgebase.dev import get_agent_quickstart
+from forge_base.dev import get_agent_quickstart
 
 guide = get_agent_quickstart()
 
@@ -65,11 +65,11 @@ guide = get_agent_quickstart()
 ### 2. Obter Caminho para Documentação
 
 ```python
-from forgebase.dev import get_documentation_path
+from forge_base.dev import get_documentation_path
 
 docs_path = get_documentation_path()
 print(docs_path)
-# Output: /path/to/site-packages/forgebase/docs (se instalado)
+# Output: /path/to/site-packages/forge_base/docs (se instalado)
 #         /path/to/project/docs (se dev mode)
 ```
 
@@ -103,7 +103,7 @@ recursive-include examples *.json
 
 ```toml
 [tool.setuptools.package-data]
-forgebase = [
+forge_base = [
     "_docs/*.md",     # Embedded documentation
 ]
 ```
@@ -120,10 +120,10 @@ forgebase = [
 
 ### Durante a Instalação
 
-Quando usuário faz `pip install forgebase`:
+Quando usuário faz `pip install forge_base`:
 
 ```python
-# Em site-packages/forgebase/_docs/
+# Em site-packages/forge_base/_docs/
 AI_AGENT_QUICK_START.md  # ✅ Incluído
 README.md                 # ✅ Incluído
 ```
@@ -131,10 +131,10 @@ README.md                 # ✅ Incluído
 ### Durante o Import
 
 ```python
-from forgebase.dev import get_agent_quickstart
+from forge_base.dev import get_agent_quickstart
 
 # Função tenta (em ordem):
-# 1. Ler de forgebase._docs/ (package data) - pip install
+# 1. Ler de forge_base._docs/ (package data) - pip install
 # 2. Ler de raiz do projeto - development mode
 # 3. Retornar fallback com link para GitHub
 ```
@@ -155,7 +155,7 @@ from forgebase.dev import get_agent_quickstart
 
 ```python
 # AI agent pode descobrir APIs sem internet
-from forgebase.dev import get_agent_quickstart
+from forge_base.dev import get_agent_quickstart
 
 guide = get_agent_quickstart()
 
@@ -170,8 +170,8 @@ guide = get_agent_quickstart()
 
 ```python
 # Documentação sempre disponível offline
-import forgebase.dev
-guide = forgebase.dev.get_agent_quickstart()
+import forge_base.dev
+guide = forge_base.dev.get_agent_quickstart()
 
 # Não precisa abrir browser ou GitHub
 print(guide)
@@ -181,10 +181,10 @@ print(guide)
 
 ```bash
 # Em ambientes sem internet (air-gapped)
-pip install forgebase-0.1.4.whl
+pip install forge_base-0.1.4.whl
 
 # Documentação ainda acessível programaticamente
-python -c "from forgebase.dev import get_agent_quickstart; print(get_agent_quickstart())"
+python -c "from forge_base.dev import get_agent_quickstart; print(get_agent_quickstart())"
 ```
 
 ## 🧪 Testes
@@ -196,10 +196,10 @@ python -c "from forgebase.dev import get_agent_quickstart; print(get_agent_quick
 python -m build
 
 # 2. Install in clean environment
-pip install dist/forgebase-*.whl
+pip install dist/forge_base-*.whl
 
 # 3. Test documentation access
-python -c "from forgebase.dev import get_agent_quickstart; print(len(get_agent_quickstart()))"
+python -c "from forge_base.dev import get_agent_quickstart; print(len(get_agent_quickstart()))"
 # Expected: > 8000 (characters)
 ```
 
@@ -209,7 +209,7 @@ python -c "from forgebase.dev import get_agent_quickstart; print(len(get_agent_q
 # tests/test_documentation_access.py
 def test_agent_quickstart_embedded():
     """Test AI Agent Quick Start is accessible."""
-    from forgebase.dev import get_agent_quickstart
+    from forge_base.dev import get_agent_quickstart
 
     guide = get_agent_quickstart()
 
@@ -229,10 +229,10 @@ Quando atualizar `AI_AGENT_QUICK_START.md`:
 vim AI_AGENT_QUICK_START.md
 
 # 2. Copiar para package
-cp AI_AGENT_QUICK_START.md src/forgebase/_docs/
+cp AI_AGENT_QUICK_START.md src/forge_base/_docs/
 
 # 3. Commit ambos
-git add AI_AGENT_QUICK_START.md src/forgebase/_docs/AI_AGENT_QUICK_START.md
+git add AI_AGENT_QUICK_START.md src/forge_base/_docs/AI_AGENT_QUICK_START.md
 git commit -m "docs: Update AI Agent Quick Start"
 ```
 
@@ -243,8 +243,8 @@ Criar `scripts/sync_docs.sh`:
 #!/bin/bash
 # Sync root docs to embedded _docs
 
-cp AI_AGENT_QUICK_START.md src/forgebase/_docs/
-cp README.md src/forgebase/_docs/
+cp AI_AGENT_QUICK_START.md src/forge_base/_docs/
+cp README.md src/forge_base/_docs/
 
 echo "✅ Docs synced"
 ```
@@ -269,7 +269,7 @@ repos:
 
 **Sintoma:**
 ```python
-from forgebase.dev import get_agent_quickstart
+from forge_base.dev import get_agent_quickstart
 guide = get_agent_quickstart()
 # Returns: "Documentation not found in package..."
 ```
@@ -286,8 +286,8 @@ rm -rf dist/ build/ *.egg-info
 python -m build
 
 # Verify contents
-unzip -l dist/forgebase-*.whl | grep _docs
-# Should show: forgebase/_docs/AI_AGENT_QUICK_START.md
+unzip -l dist/forge_base-*.whl | grep _docs
+# Should show: forge_base/_docs/AI_AGENT_QUICK_START.md
 ```
 
 ### Docs desincronizados
@@ -300,7 +300,7 @@ unzip -l dist/forgebase-*.whl | grep _docs
 ./scripts/sync_docs.sh
 
 # Ou manual
-cp AI_AGENT_QUICK_START.md src/forgebase/_docs/
+cp AI_AGENT_QUICK_START.md src/forge_base/_docs/
 ```
 
 ## 📚 Referências

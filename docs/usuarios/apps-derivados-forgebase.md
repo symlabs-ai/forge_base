@@ -93,7 +93,7 @@ Crie `src/meu_app/dev/api/discovery.py`:
 
 ```python
 # src/meu_app/dev/api/discovery.py
-from forgebase.dev.api import ComponentDiscovery as BaseComponentDiscovery
+from forge_base.dev.api import ComponentDiscovery as BaseComponentDiscovery
 
 
 class ComponentDiscovery(BaseComponentDiscovery):
@@ -147,7 +147,7 @@ Exemplo simples:
 
 ```python
 # src/meu_app/dev/api/__init__.py
-from forgebase.dev.api import QualityChecker, TestRunner
+from forge_base.dev.api import QualityChecker, TestRunner
 from .discovery import ComponentDiscovery
 
 __all__ = [
@@ -242,7 +242,7 @@ src/
 ### `orders_app/domain/order.py`
 
 ```python
-from forgebase.domain import EntityBase
+from forge_base.domain import EntityBase
 
 
 class Order(EntityBase):
@@ -263,7 +263,7 @@ class Order(EntityBase):
 ### `orders_app/application/create_order_usecase.py`
 
 ```python
-from forgebase.application import UseCaseBase
+from forge_base.application import UseCaseBase
 
 
 class CreateOrderInput:
@@ -324,7 +324,7 @@ def get_agent_quickstart() -> str:
 ### `orders_app/dev/api/discovery.py`
 
 ```python
-from forgebase.dev.api import ComponentDiscovery as BaseComponentDiscovery
+from forge_base.dev.api import ComponentDiscovery as BaseComponentDiscovery
 
 
 class ComponentDiscovery(BaseComponentDiscovery):
@@ -370,7 +370,7 @@ Com essa estrutura, qualquer agente consegue:
 
 ## Resumo
 
-- Use `forgebase.dev.api.ComponentDiscovery(package_name="meu_app")` como base para o discovery do seu app.
+- Use `forge_base.dev.api.ComponentDiscovery(package_name="meu_app")` como base para o discovery do seu app.
 - Sempre exponha um módulo `meu_app.dev` com `get_agent_quickstart()`.
 - Replique o padrão do README do ForgeBase para explicar isso aos agentes.
 - Assim, qualquer app derivado de ForgeBase oferece uma experiência consistente e previsível para agentes de IA, tanto em desenvolvimento quanto em produção.

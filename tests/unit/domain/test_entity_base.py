@@ -11,7 +11,7 @@ Created: 2025-11-03
 import unittest
 import uuid
 
-from forgebase.domain.entity_base import EntityBase
+from forge_base.domain.entity_base import EntityBase
 
 
 class ConcreteEntity(EntityBase):

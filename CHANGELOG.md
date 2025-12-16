@@ -65,13 +65,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Documentation embedded in package for pip install
-- Updated install URLs to symlabs-ai/forgebase
+- Updated install URLs to symlabs-ai/forge_base
 
 ## [0.1.3] - 2025-11-04
 
 ### Added
 - **Python API for AI Agents** 🤖
-  - Created `forgebase.dev.api` package for programmatic access
+  - Created `forge_base.dev.api` package for programmatic access
   - **QualityChecker API**: Structured code quality validation
     - Returns dataclasses with file, line, error code, suggestions
     - Supports Ruff, Mypy, import-linter, Deptry

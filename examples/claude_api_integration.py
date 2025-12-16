@@ -21,7 +21,7 @@ from typing import Any
 
 from anthropic import Anthropic
 
-from forgebase.dev.api import (
+from forge_base.dev.api import (
     ComponentDiscovery,
     QualityChecker,
     ScaffoldGenerator,

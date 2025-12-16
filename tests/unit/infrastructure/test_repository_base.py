@@ -10,8 +10,8 @@ to verify the contract and expected behavior.
 
 import unittest
 
-from src.forgebase.domain.entity_base import EntityBase
-from src.forgebase.infrastructure.repository.repository_base import (
+from src.forge_base.domain.entity_base import EntityBase
+from src.forge_base.infrastructure.repository.repository_base import (
     RepositoryBase,
     RepositoryError,
 )

@@ -83,11 +83,11 @@
 │  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━         │
 │  PERGUNTA: "Executar e observar?"                   │
 │                                                     │
-│  Artefato: forgebase CLI                            │
+│  Artefato: forge_base CLI                           │
 │  Output: Logs, Métricas, Traces                     │
 │                                                     │
 │  Exemplo:                                           │
-│    $ forgebase execute ProcessOrder                 │
+│    $ forge_base execute ProcessOrder                │
 │    ⏱️  Duration: 1.8 minutes ✅                      │
 │                                                     │
 └──────────────────────┬──────────────────────────────┘
@@ -463,7 +463,7 @@ Then deve rejeitar                        usecase.execute(product)
 Terminal                  CLI               ForgeBase
 ════════                  ═══               ═════════
 
-$ forgebase execute  ─────>  Parse command
+$ forge_base execute  ─────>  Parse command
   IssueInvoiceUseCase         │
   --input data.json           │
   --verbose                   ▼
@@ -500,7 +500,7 @@ $ forgebase execute  ─────>  Parse command
 ### Exemplo de Output CLI
 
 ```bash
-$ forgebase execute IssueInvoiceUseCase \
+$ forge_base execute IssueInvoiceUseCase \
     --input '{"order_value": 1000, "uf": "SP"}' \
     --verbose
 
@@ -680,7 +680,7 @@ SEMANA 3: TDD
 SEMANA 4: CLI
 ─────────────
 💻 Teste manual via CLI
-   $ forgebase execute IssueInvoice
+   $ forge_base execute IssueInvoice
    ✅ ICMS: R$ 180 (correto!)
    ⏱️  Duration: 1.2s
    ↓

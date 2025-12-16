@@ -10,7 +10,7 @@ Defines the contracts that external systems must implement.
 from abc import abstractmethod
 
 from examples.user_management.domain.user import User
-from forgebase.application.port_base import PortBase
+from forge_base.application.port_base import PortBase
 
 
 class UserRepositoryPort(PortBase):

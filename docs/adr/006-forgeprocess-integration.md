@@ -267,13 +267,13 @@ sync.export_to_yaml(CreateUserUseCase, "specs/create_user_exported.yaml")
 vim specs/create_user.yaml
 
 # 2. Gerar código skeleton
-forgebase generate usecase specs/create_user.yaml
+forge_base generate usecase specs/create_user.yaml
 
 # 3. Implementar lógica
 vim src/application/create_user_usecase.py
 
 # 4. Validar consistência
-forgebase validate usecase CreateUserUseCase --spec specs/create_user.yaml
+forge_base validate usecase CreateUserUseCase --spec specs/create_user.yaml
 ```
 
 **Opção B: Code-First**
@@ -282,7 +282,7 @@ forgebase validate usecase CreateUserUseCase --spec specs/create_user.yaml
 vim src/application/create_user_usecase.py
 
 # 2. Exportar para YAML
-forgebase export usecase CreateUserUseCase --output specs/create_user.yaml
+forge_base export usecase CreateUserUseCase --output specs/create_user.yaml
 
 # 3. Refinar YAML no ForgeProcess
 ```
@@ -293,7 +293,7 @@ forgebase export usecase CreateUserUseCase --output specs/create_user.yaml
 # .github/workflows/validate.yml
 - name: Validate YAML ↔ Code Sync
   run: |
-    forgebase validate all-usecases --fail-on-drift
+    forge_base validate all-usecases --fail-on-drift
     # Falha se qualquer UseCase tem drift
 ```
 
@@ -417,7 +417,7 @@ with open("/var/learning/coherence_data.jsonl", "w") as f:
 **Propósito**: Orquestrar feedback de ForgeBase → ForgeProcess.
 
 ```python
-# src/forgebase/observability/feedback_manager.py
+# src/forge_base/observability/feedback_manager.py
 class FeedbackManager:
     """
     Manages feedback loops between ForgeBase and ForgeProcess.
@@ -497,10 +497,10 @@ intent_tracker.record_execution(intent_id, ...)  # Opcional
 ✅ **Sincronização Automática**
 ```bash
 # Gerar código
-forgebase generate usecase specs/create_user.yaml
+forge_base generate usecase specs/create_user.yaml
 
 # Validar consistência
-forgebase validate usecase CreateUserUseCase
+forge_base validate usecase CreateUserUseCase
 ```
 
 ✅ **Coerência Validada Quantitativamente**
@@ -628,7 +628,7 @@ class CreateUserUseCase:
 
 2. **Gerar Skeleton**
    ```bash
-   forgebase generate usecase specs/my_usecase.yaml
+   forge_base generate usecase specs/my_usecase.yaml
    ```
 
 3. **Implementar Lógica**
@@ -642,7 +642,7 @@ class CreateUserUseCase:
 
 4. **Validar Consistência**
    ```bash
-   forgebase validate usecase MyUseCase --spec specs/my_usecase.yaml
+   forge_base validate usecase MyUseCase --spec specs/my_usecase.yaml
    ```
 
 5. **Testes com Intent Tracking**

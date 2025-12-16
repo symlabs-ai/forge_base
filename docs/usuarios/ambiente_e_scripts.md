@@ -104,7 +104,7 @@ pytest -q
 Com cobertura:
 
 ```bash
-pytest --cov=src/forgebase --cov-report=term-missing
+pytest --cov=src/forge_base --cov-report=term-missing
 ```
 
 Observação: alguns testes de infraestrutura SQL são condicionais (só rodam se `sqlalchemy` estiver instalado).

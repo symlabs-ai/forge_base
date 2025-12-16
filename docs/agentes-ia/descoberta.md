@@ -24,7 +24,7 @@ Este documento explica a **estratégia de descoberta em múltiplas camadas** imp
 **Primeira vez usando ForgeBase?** Acesse documentação completa programaticamente:
 
 ```python
-from forgebase.dev import get_agent_quickstart
+from forge_base.dev import get_agent_quickstart
 
 guide = get_agent_quickstart()  # Documentação completa de API
 ```
@@ -53,20 +53,20 @@ Descobre get_agent_quickstart() imediatamente
 
 ### 2. Docstring do Módulo (FALLBACK)
 
-**Localização:** `src/forgebase/dev/__init__.py`
+**Localização:** `src/forge_base/dev/__init__.py`
 
 **O que agentes de IA veem:**
 
 ```python
-import forgebase.dev
-help(forgebase.dev)
+import forge_base.dev
+help(forge_base.dev)
 
 # Output:
 """
 ForgeBase Developer Tools.
 
 Uso para Agentes de IA:
-    from forgebase.dev import get_agent_quickstart
+    from forge_base.dev import get_agent_quickstart
 
     # Acessar documentação programaticamente
     guide = get_agent_quickstart()
@@ -87,8 +87,8 @@ Uso para Agentes de IA:
 **O que agentes de IA veem:**
 
 ```python
-import forgebase.dev
-dir(forgebase.dev)
+import forge_base.dev
+dir(forge_base.dev)
 
 # Output:
 ['get_agent_quickstart', 'get_documentation_path', ...]
@@ -159,7 +159,7 @@ Claude Code:
 2. Procuro contexto na conversa
 3. Se tenho acesso, verifico README.md
 4. Vejo: "Para Agentes de Código de IA"
-5. Imediatamente sei: from forgebase.dev import get_agent_quickstart
+5. Imediatamente sei: from forge_base.dev import get_agent_quickstart
 ```
 
 ### Cenário 2: Cursor
@@ -169,7 +169,7 @@ Usuário: Instala ForgeBase e abre Cursor
 
 Cursor AI:
 1. Escaneia dependências do projeto
-2. Vê "forgebase" em requirements
+2. Vê "forge_base" em requirements
 3. Busca descrição PyPI: "AI agent-friendly"
 4. Lê README.md do cache/repo
 5. Vê "Para Agentes de Código de IA"
@@ -179,13 +179,13 @@ Cursor AI:
 ### Cenário 3: GitHub Copilot
 
 ```
-Desenvolvedor digita: from forgebase.dev import
+Desenvolvedor digita: from forge_base.dev import
 
 Copilot:
 1. Analisa exports disponíveis
 2. Vê: get_agent_quickstart, get_documentation_path
 3. Sugere completamento baseado na semântica do nome
-4. Desenvolvedor aceita: from forgebase.dev import get_agent_quickstart
+4. Desenvolvedor aceita: from forge_base.dev import get_agent_quickstart
 ```
 
 ### Cenário 4: Aider
@@ -194,10 +194,10 @@ Copilot:
 Sessão Aider: Usuário menciona "ForgeBase"
 
 Aider:
-1. import forgebase.dev
-2. dir(forgebase.dev)
+1. import forge_base.dev
+2. dir(forge_base.dev)
 3. Vê: ['get_agent_quickstart', ...]
-4. help(forgebase.dev.get_agent_quickstart)
+4. help(forge_base.dev.get_agent_quickstart)
 5. Lê docstring: "útil para agentes de IA"
 6. Usa API para descobrir ferramentas disponíveis
 ```
@@ -217,13 +217,13 @@ Aider:
 # SUCESSO em < 5 segundos
 
 # Passo 2: Introspecção (FALLBACK)
-import forgebase.dev
-help(forgebase.dev)
+import forge_base.dev
+help(forge_base.dev)
 # → Vê "Uso para Agentes de IA:"
 # SUCESSO em < 1 segundo
 
 # Passo 3: Listagem de diretório (FALLBACK)
-dir(forgebase.dev)
+dir(forge_base.dev)
 # → Vê ['get_agent_quickstart', ...]
 # SUCESSO em < 1 segundo
 ```
@@ -242,15 +242,15 @@ def test_readme_menciona_agentes_ia():
 
 def test_docstring_modulo_tem_uso():
     """Testar que docstring do módulo guia agentes de IA."""
-    import forgebase.dev
-    assert "Agentes" in forgebase.dev.__doc__
-    assert "get_agent_quickstart" in forgebase.dev.__doc__
+    import forge_base.dev
+    assert "Agentes" in forge_base.dev.__doc__
+    assert "get_agent_quickstart" in forge_base.dev.__doc__
 
 def test_funcao_exportada():
     """Testar que função é descobrível."""
-    import forgebase.dev
-    assert hasattr(forgebase.dev, 'get_agent_quickstart')
-    assert 'get_agent_quickstart' in dir(forgebase.dev)
+    import forge_base.dev
+    assert hasattr(forge_base.dev, 'get_agent_quickstart')
+    assert 'get_agent_quickstart' in dir(forge_base.dev)
 
 def test_nome_funcao_semantico():
     """Testar que nome da função é auto-explicativo."""

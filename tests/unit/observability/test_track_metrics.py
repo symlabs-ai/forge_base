@@ -8,7 +8,7 @@ Unit tests for TrackMetrics system.
 import time
 import unittest
 
-from src.forgebase.observability.track_metrics import (
+from src.forge_base.observability.track_metrics import (
     TrackMetrics,
 )
 

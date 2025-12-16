@@ -3,14 +3,14 @@
 ## Instalação Rápida
 
 ```bash
-pip install git+https://github.com/symlabs-ai/forgebase.git
+pip install git+https://github.com/symlabs-ai/forge_base.git
 ```
 
 ## Instalação para Desenvolvimento
 
 ```bash
-git clone https://github.com/symlabs-ai/forgebase.git
-cd forgebase
+git clone https://github.com/symlabs-ai/forge_base.git
+cd forge_base
 python3.12 -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"

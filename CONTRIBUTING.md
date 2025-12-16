@@ -23,7 +23,7 @@ ForgeBase adota princípios de **Reflexividade**, **Autonomia** e **Coerência C
 ### 1. Reportar Bugs
 
 **Antes de Reportar:**
-- Verifique se o bug já foi reportado em [Issues](https://github.com/symlabs-ai/forgebase/issues)
+- Verifique se o bug já foi reportado em [Issues](https://github.com/symlabs-ai/forge_base/issues)
 - Confirme que é um bug (não comportamento esperado)
 - Tente reproduzir em ambiente limpo
 
@@ -94,8 +94,8 @@ ForgeBase adota princípios de **Reflexividade**, **Autonomia** e **Coerência C
 
 ```bash
 # Clone o repositório
-git clone https://github.com/symlabs-ai/forgebase.git
-cd forgebase
+git clone https://github.com/symlabs-ai/forge_base.git
+cd forge_base
 
 # Crie um ambiente virtual
 python -m venv venv
@@ -137,7 +137,7 @@ vim tests/unit/domain/test_my_feature.py
 pytest tests/unit/domain/test_my_feature.py
 
 # 3. Implemente a feature
-vim src/forgebase/domain/my_feature.py
+vim src/forge_base/domain/my_feature.py
 
 # 4. Execute testes (deve passar)
 pytest tests/unit/domain/test_my_feature.py
@@ -188,7 +188,7 @@ ruff check .
 ruff format .
 
 # Type checking
-mypy src/forgebase
+mypy src/forge_base
 ```
 
 5. **Execute Testes Completos**
@@ -198,7 +198,7 @@ mypy src/forgebase
 pytest
 
 # Com coverage
-pytest --cov=forgebase --cov-report=html
+pytest --cov=forge_base --cov-report=html
 
 # Testes específicos
 pytest tests/unit/domain/
@@ -332,7 +332,7 @@ tests/
 
 ```python
 import unittest
-from forgebase.domain import ValidationError
+from forge_base.domain import ValidationError
 
 
 class TestUser(unittest.TestCase):
@@ -362,8 +362,8 @@ class TestUser(unittest.TestCase):
 ### Exemplo de Teste Cognitivo
 
 ```python
-from forgebase.testing import ForgeTestCase
-from forgebase.testing.fakes import FakeRepository, FakeLogger
+from forge_base.testing import ForgeTestCase
+from forge_base.testing.fakes import FakeRepository, FakeLogger
 
 
 class TestCreateUserCognitive(ForgeTestCase):
@@ -414,25 +414,25 @@ class TestCreateUserCognitive(ForgeTestCase):
 
 ```python
 # ✅ OK: Application → Domain
-from forgebase.domain import EntityBase
+from forge_base.domain import EntityBase
 
 class CreateUserUseCase(UseCaseBase):
     pass
 
 # ✅ OK: Infrastructure → Application
-from forgebase.application import PortBase
+from forge_base.application import PortBase
 
 class JSONRepository(PortBase):
     pass
 
 # ❌ ERRADO: Domain → Application
-from forgebase.application import UseCaseBase  # NÃO!
+from forge_base.application import UseCaseBase  # NÃO!
 
 class User(EntityBase):
     pass
 
 # ❌ ERRADO: Domain → Infrastructure
-from forgebase.infrastructure import JSONRepository  # NÃO!
+from forge_base.infrastructure import JSONRepository  # NÃO!
 
 class User(EntityBase):
     pass
@@ -493,7 +493,7 @@ class CreateUserOutput(DTOBase): pass
 
 ```python
 # Domain errors
-from forgebase.domain import ValidationError, BusinessRuleViolation
+from forge_base.domain import ValidationError, BusinessRuleViolation
 
 # ValidationError: Dados inválidos
 if not email:
@@ -504,7 +504,7 @@ if user_exists:
     raise BusinessRuleViolation(f"User with email {email} already exists")
 
 # Application errors
-from forgebase.application import UseCaseError
+from forge_base.application import UseCaseError
 
 # UseCaseError: Erro de orquestração
 if customer is None:
@@ -616,7 +616,7 @@ vim docs/adr/007-minha-decisao.md
 
 ```bash
 # Fazer mudanças solicitadas
-vim src/forgebase/domain/my_feature.py
+vim src/forge_base/domain/my_feature.py
 
 # Commit com referência ao PR
 git commit -m "fix: corrige validação conforme feedback do review

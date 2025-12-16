@@ -22,8 +22,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from user_management.application import CreateUserInput, CreateUserUseCase
 from user_management.infrastructure import InMemoryUserRepository
 
-from forgebase.integration.intent_tracker import IntentTracker
-from forgebase.integration.yaml_sync import YAMLSync
+from forge_base.integration.intent_tracker import IntentTracker
+from forge_base.integration.yaml_sync import YAMLSync
 
 
 def print_section(title: str) -> None:

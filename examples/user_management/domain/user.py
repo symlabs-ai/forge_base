@@ -11,8 +11,8 @@ import uuid
 from datetime import datetime
 
 from examples.user_management.domain.email import Email
-from forgebase.domain.entity_base import EntityBase
-from forgebase.domain.exceptions import BusinessRuleViolation, ValidationError
+from forge_base.domain.entity_base import EntityBase
+from forge_base.domain.exceptions import BusinessRuleViolation, ValidationError
 
 
 class User(EntityBase):

@@ -23,7 +23,7 @@ A modularização visa consolidar o ForgeBase como uma *infraestrutura cognitiva
 
 ### 🚧 Escopo Inicial
 
-* Modularização do diretório `forgebase/` (núcleo).
+* Modularização do diretório `forge_base/` (núcleo).
 * Definição das classes base (`EntityBase`, `UseCaseBase`, `PortBase`, `AdapterBase`).
 * Implementação das convenções de importação modular.
 * Introdução dos módulos `observability/` e `testing/` como componentes de primeiro nível.
@@ -47,7 +47,7 @@ O ForgeBase deve refletir os princípios cognitivos do Forge Framework:
 A seguir está a estrutura de referência para o núcleo do ForgeBase:
 
 ```
-forgebase/
+forge_base/
 ├─ __init__.py
 │
 ├─ domain/                          # Núcleo de entidades e invariantes
@@ -175,9 +175,9 @@ class AdapterBase:
    Sempre usar a sintaxe modular clara:
 
    ```python
-   from forgebase.domain import EntityBase
-   from forgebase.application import UseCaseBase, PortBase
-   from forgebase.adapters import AdapterBase
+   from forge_base.domain import EntityBase
+   from forge_base.application import UseCaseBase, PortBase
+   from forge_base.adapters import AdapterBase
    ```
 
 2. **Isolamento absoluto do domínio**
@@ -208,7 +208,7 @@ class AdapterBase:
 
 | Categoria           | Indicador                | Meta                                                       |
 | ------------------- | ------------------------ | ---------------------------------------------------------- |
-| **Modularização**   | Importação unificada     | 100% dos módulos compatíveis com `from forgebase.[module]` |
+| **Modularização**   | Importação unificada     | 100% dos módulos compatíveis com `from forge_base.[module]` |
 | **Testabilidade**   | Cobertura de testes      | ≥ 90% do núcleo                                            |
 | **Observabilidade** | Métricas automáticas     | 100% dos UseCases e Ports instrumentados                   |
 | **Desacoplamento**  | Dependências cruzadas    | 0 dependências proibidas entre camadas                     |

@@ -11,9 +11,9 @@ business logic, and observability.
 from examples.user_management.application.ports import UserRepositoryPort
 from examples.user_management.domain.email import Email
 from examples.user_management.domain.user import User
-from forgebase.application.dto_base import DTOBase
-from forgebase.application.usecase_base import UseCaseBase
-from forgebase.domain.exceptions import BusinessRuleViolation, ValidationError
+from forge_base.application.dto_base import DTOBase
+from forge_base.application.usecase_base import UseCaseBase
+from forge_base.domain.exceptions import BusinessRuleViolation, ValidationError
 
 
 class CreateUserInput(DTOBase):

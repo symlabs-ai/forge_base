@@ -60,7 +60,7 @@ Documentação de arquitetura e decisões de design.
 ## Acesso Programático (AI Agents)
 
 ```python
-from forgebase.dev import get_agent_quickstart
+from forge_base.dev import get_agent_quickstart
 
 # Obter guia completo de APIs para AI agents
 guia = get_agent_quickstart()

@@ -64,7 +64,7 @@ src/
 ### 3. Exceções de Domínio
 
 ```python
-from forgebase.domain.exceptions import (
+from forge_base.domain.exceptions import (
     DomainException,        # Base
     ValidationError,        # Dados inválidos
     InvariantViolation,     # Regra de negócio quebrada

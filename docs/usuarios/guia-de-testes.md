@@ -39,7 +39,7 @@ ForgeBase adota uma filosofia de testes em **três níveis**:
 
 ```python
 import unittest
-from forgebase.domain import EntityBase, ValidationError
+from forge_base.domain import EntityBase, ValidationError
 
 
 class TestUser(unittest.TestCase):
@@ -319,8 +319,8 @@ class TestCreateUserIntegration(unittest.TestCase):
 ### ForgeTestCase: Assertions Cognitivas
 
 ```python
-from forgebase.testing import ForgeTestCase
-from forgebase.testing.fakes import FakeRepository, FakeLogger, FakeMetricsCollector
+from forge_base.testing import ForgeTestCase
+from forge_base.testing.fakes import FakeRepository, FakeLogger, FakeMetricsCollector
 
 
 class TestCreateUserCognitive(ForgeTestCase):
@@ -390,7 +390,7 @@ class TestCreateUserCognitive(ForgeTestCase):
 ### Intent Tracking em Testes
 
 ```python
-from forgebase.integration import IntentTracker
+from forge_base.integration import IntentTracker
 
 
 class TestWithIntentTracking(ForgeTestCase):
@@ -487,7 +487,7 @@ def test_com_mocks(self):
 
 ```bash
 # Executar todos os testes com coverage
-pytest --cov=forgebase --cov-report=html
+pytest --cov=forge_base --cov-report=html
 
 # Abrir relatório
 open htmlcov/index.html

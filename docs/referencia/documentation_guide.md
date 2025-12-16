@@ -892,7 +892,7 @@ Validadores disponíveis:
 
 Example::
 
-    from forgebase.domain.validators import not_empty, in_range
+    from forge_base.domain.validators import not_empty, in_range
 
     class Product(EntityBase):
         def validate(self):
@@ -912,7 +912,7 @@ Created: 2025-11-03
 
 ```bash
 # Verificar docstrings presentes
-pydocstyle src/forgebase/
+pydocstyle src/forge_base/
 
 # Gerar documentação com Sphinx
 cd docs

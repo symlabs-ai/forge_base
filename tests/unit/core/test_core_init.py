@@ -10,8 +10,8 @@ Tests the bootstrap sequence, dependency injection, and lifecycle management.
 import unittest
 from unittest.mock import MagicMock, patch
 
-from forgebase.application.usecase_base import UseCaseBase
-from forgebase.core_init import DependencyContainer, ForgeBaseCore
+from forge_base.application.usecase_base import UseCaseBase
+from forge_base.core_init import DependencyContainer, ForgeBaseCore
 
 
 class TestDependencyContainer(unittest.TestCase):
@@ -95,8 +95,8 @@ class TestForgeBaseCore(unittest.TestCase):
         if self.core._initialized:
             self.core.shutdown()
 
-    @patch('forgebase.core_init.signal')
-    @patch('forgebase.core_init.atexit')
+    @patch('forge_base.core_init.signal')
+    @patch('forge_base.core_init.atexit')
     def test_bootstrap_success(self, mock_atexit, mock_signal):
         """Test successful bootstrap sequence."""
         self.core.bootstrap()
@@ -107,8 +107,8 @@ class TestForgeBaseCore(unittest.TestCase):
         self.assertTrue(self.core.container.has('metrics'))
         self.assertTrue(self.core.container.has('tracer'))
 
-    @patch('forgebase.core_init.signal')
-    @patch('forgebase.core_init.atexit')
+    @patch('forge_base.core_init.signal')
+    @patch('forge_base.core_init.atexit')
     def test_bootstrap_twice_raises_error(self, mock_atexit, mock_signal):
         """Test that bootstrapping twice raises RuntimeError."""
         self.core.bootstrap()
@@ -118,8 +118,8 @@ class TestForgeBaseCore(unittest.TestCase):
 
         self.assertIn('already initialized', str(context.exception))
 
-    @patch('forgebase.core_init.signal')
-    @patch('forgebase.core_init.atexit')
+    @patch('forge_base.core_init.signal')
+    @patch('forge_base.core_init.atexit')
     def test_register_and_get_usecase(self, mock_atexit, mock_signal):
         """Test registering and retrieving a UseCase."""
         self.core.bootstrap()
@@ -137,8 +137,8 @@ class TestForgeBaseCore(unittest.TestCase):
 
         self.assertIn('not found', str(context.exception))
 
-    @patch('forgebase.core_init.signal')
-    @patch('forgebase.core_init.atexit')
+    @patch('forge_base.core_init.signal')
+    @patch('forge_base.core_init.atexit')
     def test_list_usecases(self, mock_atexit, mock_signal):
         """Test listing all registered UseCases."""
         self.core.bootstrap()
@@ -155,8 +155,8 @@ class TestForgeBaseCore(unittest.TestCase):
         self.assertIn('usecase1', usecases)
         self.assertIn('usecase2', usecases)
 
-    @patch('forgebase.core_init.signal')
-    @patch('forgebase.core_init.atexit')
+    @patch('forge_base.core_init.signal')
+    @patch('forge_base.core_init.atexit')
     def test_register_and_get_adapter(self, mock_atexit, mock_signal):
         """Test registering and retrieving an adapter."""
         self.core.bootstrap()
@@ -174,8 +174,8 @@ class TestForgeBaseCore(unittest.TestCase):
 
         self.assertIn('not found', str(context.exception))
 
-    @patch('forgebase.core_init.signal')
-    @patch('forgebase.core_init.atexit')
+    @patch('forge_base.core_init.signal')
+    @patch('forge_base.core_init.atexit')
     def test_health_check_before_bootstrap(self, mock_atexit, mock_signal):
         """Test health check before bootstrap shows missing components."""
         health = self.core.health_check()
@@ -184,8 +184,8 @@ class TestForgeBaseCore(unittest.TestCase):
         self.assertEqual(health['components']['config']['status'], 'missing')
         self.assertEqual(health['components']['logging']['status'], 'missing')
 
-    @patch('forgebase.core_init.signal')
-    @patch('forgebase.core_init.atexit')
+    @patch('forge_base.core_init.signal')
+    @patch('forge_base.core_init.atexit')
     def test_health_check_after_bootstrap(self, mock_atexit, mock_signal):
         """Test health check after bootstrap shows healthy system."""
         self.core.bootstrap()
@@ -198,8 +198,8 @@ class TestForgeBaseCore(unittest.TestCase):
         self.assertEqual(health['components']['metrics']['status'], 'ok')
         self.assertEqual(health['components']['tracer']['status'], 'ok')
 
-    @patch('forgebase.core_init.signal')
-    @patch('forgebase.core_init.atexit')
+    @patch('forge_base.core_init.signal')
+    @patch('forge_base.core_init.atexit')
     def test_info_returns_system_information(self, mock_atexit, mock_signal):
         """Test that info() returns comprehensive system information."""
         self.core.bootstrap()
@@ -219,8 +219,8 @@ class TestForgeBaseCore(unittest.TestCase):
         self.assertIn('test_adapter', info['adapters']['names'])
         self.assertIn('logger', info['services']['registered'])
 
-    @patch('forgebase.core_init.signal')
-    @patch('forgebase.core_init.atexit')
+    @patch('forge_base.core_init.signal')
+    @patch('forge_base.core_init.atexit')
     def test_shutdown_handlers(self, mock_atexit, mock_signal):
         """Test custom shutdown handlers are executed."""
         self.core.bootstrap()
@@ -235,8 +235,8 @@ class TestForgeBaseCore(unittest.TestCase):
 
         self.assertTrue(handler_called)
 
-    @patch('forgebase.core_init.signal')
-    @patch('forgebase.core_init.atexit')
+    @patch('forge_base.core_init.signal')
+    @patch('forge_base.core_init.atexit')
     def test_shutdown_stops_adapters(self, mock_atexit, mock_signal):
         """Test that shutdown stops registered adapters."""
         self.core.bootstrap()
@@ -249,8 +249,8 @@ class TestForgeBaseCore(unittest.TestCase):
 
         adapter.stop.assert_called_once()
 
-    @patch('forgebase.core_init.signal')
-    @patch('forgebase.core_init.atexit')
+    @patch('forge_base.core_init.signal')
+    @patch('forge_base.core_init.atexit')
     def test_shutdown_when_not_initialized(self, mock_atexit, mock_signal):
         """Test that shutdown without initialization is safe."""
         # Should not raise any errors

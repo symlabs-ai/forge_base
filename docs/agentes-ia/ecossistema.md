@@ -108,7 +108,7 @@ Requisição do Usuário
     ↓
 Agente IA lê instruções (docs/agentes-ia/)
     ↓
-Agente importa APIs (from forgebase.dev.api import *)
+Agente importa APIs (from forge_base.dev.api import *)
     ↓
 Agente chama API com parâmetros
     ↓
@@ -133,7 +133,7 @@ Agente reporta ao usuário (com referências file:line)
 ```python
 # Usuário: "Corrija os erros de linting"
 
-from forgebase.dev.api import QualityChecker
+from forge_base.dev.api import QualityChecker
 
 checker = QualityChecker()
 results = checker.run_all()
@@ -171,7 +171,7 @@ Usuário destaca código → pergunta "melhore isso"
 **Workflow típico**:
 ```python
 # IA: Use ForgeBase QualityChecker API
-from forgebase.dev.api import QualityChecker
+from forge_base.dev.api import QualityChecker
 
 # Copilot sugere o resto do código...
 ```
@@ -400,7 +400,7 @@ print(f"Usando {len(components.repositories)} repositories")
 
 Um agente de IA está **usando ForgeBase APIs com sucesso** quando:
 
-- Importa de `forgebase.dev.api` (não usando CLI)
+- Importa de `forge_base.dev.api` (não usando CLI)
 - Acessa dicionários de erro diretamente (não parseando texto)
 - Usa códigos de erro para tomada de decisão (não adivinhando)
 - Modifica código gerado antes de escrever (não usando as-is)
@@ -417,7 +417,7 @@ Um agente de IA está **usando ForgeBase APIs com sucesso** quando:
 | Guia Completo | `docs/agentes-ia/guia-completo.md` | Referência detalhada |
 | Descoberta | `docs/agentes-ia/descoberta.md` | Como descobrir APIs |
 | Exemplos Python | `examples/ai_agent_usage.py` | Aprender por exemplo |
-| Código Fonte API | `src/forgebase/dev/api/*.py` | Entendimento profundo |
+| Código Fonte API | `src/forge_base/dev/api/*.py` | Entendimento profundo |
 
 ---
 

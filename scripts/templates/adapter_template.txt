@@ -10,7 +10,7 @@ Created: {date}
 from typing import Any
 
 # TODO: Import the port interface this adapter implements
-# from forgebase.application.ports.{port_name} import {port_class}
+# from forge_base.application.ports.{port_name} import {port_class}
 
 
 class {class_name}:

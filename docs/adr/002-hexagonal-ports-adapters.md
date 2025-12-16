@@ -113,7 +113,7 @@ O desafio era criar um padrão que:
 #### Driving Ports (Primary)
 
 ```python
-# src/forgebase/application/usecase_base.py
+# src/forge_base/application/usecase_base.py
 class UseCaseBase(ABC):
     """
     Driving Port — entrada para a aplicação.
@@ -131,14 +131,14 @@ class UseCaseBase(ABC):
 #### Driven Ports (Secondary)
 
 ```python
-# src/forgebase/application/port_base.py
+# src/forge_base/application/port_base.py
 class PortBase(ABC):
     """Base para todos os driven ports."""
     @abstractmethod
     def info(self) -> dict:
         pass
 
-# src/forgebase/infrastructure/repository/repository_base.py
+# src/forge_base/infrastructure/repository/repository_base.py
 class RepositoryBase(PortBase, Generic[T]):
     """
     Driven Port — persistência.
@@ -152,7 +152,7 @@ class RepositoryBase(PortBase, Generic[T]):
     def find_by_id(self, id: str) -> Optional[T]:
         pass
 
-# src/forgebase/infrastructure/logging/logger_port.py
+# src/forge_base/infrastructure/logging/logger_port.py
 class LoggerPort(PortBase):
     """
     Driven Port — logging.

@@ -7,7 +7,7 @@ Author: {author}
 Created: {date}
 """
 
-from forgebase.application.usecase_base import UseCaseBase
+from forge_base.application.usecase_base import UseCaseBase
 
 
 class {class_name}Input:

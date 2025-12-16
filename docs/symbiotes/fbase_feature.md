@@ -70,18 +70,18 @@ UseCase → CLIAdapter → Validado? → HTTPAdapter/WebUI
 
 | Componente | Camada | Base Class | Import |
 |------------|--------|------------|--------|
-| Entidade | Domain | `EntityBase` | `from forgebase.domain import EntityBase` |
-| Value Object | Domain | `ValueObjectBase` | `from forgebase.domain import ValueObjectBase` |
-| UseCase | Application | `UseCaseBase` | `from forgebase.application import UseCaseBase` |
-| Port | Application | `PortBase` | `from forgebase.application import PortBase` |
-| Adapter | Adapters | `AdapterBase` | `from forgebase.adapters import AdapterBase` |
+| Entidade | Domain | `EntityBase` | `from forge_base.domain import EntityBase` |
+| Value Object | Domain | `ValueObjectBase` | `from forge_base.domain import ValueObjectBase` |
+| UseCase | Application | `UseCaseBase` | `from forge_base.application import UseCaseBase` |
+| Port | Application | `PortBase` | `from forge_base.application import PortBase` |
+| Adapter | Adapters | `AdapterBase` | `from forge_base.adapters import AdapterBase` |
 
 ### 4. Exceções de Domínio
 
 Nunca usar `Exception` genérico. Sempre usar:
 
 ```python
-from forgebase.domain.exceptions import (
+from forge_base.domain.exceptions import (
     ValidationError,        # Dados inválidos
     InvariantViolation,     # Regra de negócio quebrada
     BusinessRuleViolation,  # Operação não permitida
@@ -150,8 +150,8 @@ Order entity.
 :since: [Date]
 """
 
-from forgebase.domain import EntityBase
-from forgebase.domain.exceptions import ValidationError
+from forge_base.domain import EntityBase
+from forge_base.domain.exceptions import ValidationError
 
 
 class Order(EntityBase):
@@ -215,10 +215,10 @@ CreateOrder use case.
 
 from dataclasses import dataclass
 
-from forgebase.application import UseCaseBase
-from forgebase.domain.exceptions import ValidationError, EntityNotFoundError
-from forgebase.observability.log_service import LogService
-from forgebase.observability.track_metrics import TrackMetrics
+from forge_base.application import UseCaseBase
+from forge_base.domain.exceptions import ValidationError, EntityNotFoundError
+from forge_base.observability.log_service import LogService
+from forge_base.observability.track_metrics import TrackMetrics
 
 from domain.entities.order import Order
 from application.ports.order_repository import OrderRepositoryPort
@@ -318,7 +318,7 @@ Order repository port.
 
 from abc import abstractmethod
 
-from forgebase.application import PortBase
+from forge_base.application import PortBase
 from domain.entities.order import Order
 
 
@@ -361,7 +361,7 @@ Order repository implementation.
 :since: [Date]
 """
 
-from forgebase.infrastructure.repository import JSONRepository
+from forge_base.infrastructure.repository import JSONRepository
 from domain.entities.order import Order
 from application.ports.order_repository import OrderRepositoryPort
 
@@ -388,7 +388,7 @@ Criar comando CLI para testar:
 
 ```python
 # src/cli.py
-from forgebase.adapters.cli import CLIAdapter
+from forge_base.adapters.cli import CLIAdapter
 
 cli = CLIAdapter(usecases={
     'create_order': CreateOrderUseCase(order_repo, customer_repo, log, metrics),
@@ -483,7 +483,7 @@ A feature requer:
 #### 1. Value Object: OrderStatus
 
 ```python
-from forgebase.domain import ValueObjectBase
+from forge_base.domain import ValueObjectBase
 
 class OrderStatus(ValueObjectBase):
     PENDING = "pending"

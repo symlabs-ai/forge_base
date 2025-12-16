@@ -55,23 +55,23 @@ A implementação segue 4 camadas concêntricas:
 ### Implementação no ForgeBase
 
 ```python
-# Domain Layer (src/forgebase/domain/)
+# Domain Layer (src/forge_base/domain/)
 - EntityBase: Entidades com identidade
 - ValueObjectBase: Objetos de valor imutáveis
 - Exceptions: ValidationError, BusinessRuleViolation
 - Validators: Regras reutilizáveis
 
-# Application Layer (src/forgebase/application/)
+# Application Layer (src/forge_base/application/)
 - UseCaseBase: Orquestração de lógica
 - PortBase: Contratos de comunicação
 - DTOBase: Data Transfer Objects
 
-# Infrastructure Layer (src/forgebase/infrastructure/)
+# Infrastructure Layer (src/forge_base/infrastructure/)
 - RepositoryBase: Persistência
 - ConfigLoader: Configurações
 - LoggerPort: Logging
 
-# Adapters Layer (src/forgebase/adapters/)
+# Adapters Layer (src/forge_base/adapters/)
 - CLIAdapter: Interface de linha de comando
 - HTTPAdapter: API REST
 ```

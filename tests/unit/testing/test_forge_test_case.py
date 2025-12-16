@@ -9,7 +9,7 @@ Meta-tests: testing the test infrastructure itself!
 
 import unittest
 
-from src.forgebase.testing.forge_test_case import ForgeTestCase
+from src.forge_base.testing.forge_test_case import ForgeTestCase
 
 
 class TestForgeTestCase(ForgeTestCase):

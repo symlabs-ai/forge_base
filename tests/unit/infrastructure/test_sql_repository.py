@@ -26,11 +26,11 @@ try:
 except ImportError:
     SQLALCHEMY_AVAILABLE = False
 
-from src.forgebase.domain.entity_base import EntityBase
+from src.forge_base.domain.entity_base import EntityBase
 
 if SQLALCHEMY_AVAILABLE:
-    from src.forgebase.infrastructure.repository.repository_base import RepositoryError
-    from src.forgebase.infrastructure.repository.sql_repository import SQLRepository
+    from src.forge_base.infrastructure.repository.repository_base import RepositoryError
+    from src.forge_base.infrastructure.repository.sql_repository import SQLRepository
 
 
 class MockEntity(EntityBase):

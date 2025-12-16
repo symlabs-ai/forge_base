@@ -32,8 +32,8 @@ from user_management.application import (
 from user_management.domain import Email, User
 from user_management.infrastructure import InMemoryUserRepository
 
-from forgebase.core_init import ForgeBaseCore
-from forgebase.domain.exceptions import BusinessRuleViolation, ValidationError
+from forge_base.core_init import ForgeBaseCore
+from forge_base.domain.exceptions import BusinessRuleViolation, ValidationError
 
 
 def print_section(title: str) -> None:

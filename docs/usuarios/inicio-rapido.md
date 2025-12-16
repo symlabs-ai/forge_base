@@ -21,18 +21,18 @@ Este guia vai levá-lo do zero até sua primeira aplicação funcional em ~30 mi
 
 ```bash
 # Instalar última versão do main
-pip install git+https://github.com/symlabs-ai/forgebase.git
+pip install git+https://github.com/symlabs-ai/forge_base.git
 
 # Verificar instalação
-python -c "from forgebase.dev.api import QualityChecker; print('ForgeBase instalado!')"
+python -c "from forge_base.dev.api import QualityChecker; print('ForgeBase instalado!')"
 ```
 
 ### Opção 2: Instalação para desenvolvimento
 
 ```bash
 # Clonar e instalar em modo editável
-git clone https://github.com/symlabs-ai/forgebase.git
-cd forgebase
+git clone https://github.com/symlabs-ai/forge_base.git
+cd forge_base
 
 # Criar ambiente virtual
 python -m venv .venv
@@ -47,10 +47,10 @@ pip install -e ".[dev]"
 
 ```bash
 # Com suporte a SQL (SQLAlchemy)
-pip install "forgebase[sql] @ git+https://github.com/symlabs-ai/forgebase.git"
+pip install "forge_base[sql] @ git+https://github.com/symlabs-ai/forge_base.git"
 
 # Com todas as dependências
-pip install "forgebase[all] @ git+https://github.com/symlabs-ai/forgebase.git"
+pip install "forge_base[all] @ git+https://github.com/symlabs-ai/forge_base.git"
 ```
 
 ---
@@ -84,7 +84,7 @@ touch src/infrastructure/__init__.py
 """Entidade de domínio: Task."""
 
 from datetime import datetime
-from forgebase.domain import EntityBase, ValidationError
+from forge_base.domain import EntityBase, ValidationError
 
 
 class Task(EntityBase):
@@ -137,7 +137,7 @@ class Task(EntityBase):
 # src/application/task_dtos.py
 """DTOs para gerenciamento de Task."""
 
-from forgebase.application import DTOBase
+from forge_base.application import DTOBase
 
 
 class CreateTaskInput(DTOBase):
@@ -240,7 +240,7 @@ class TaskRepositoryPort(ABC):
 # src/application/create_task_usecase.py
 """UseCase para criar uma nova tarefa."""
 
-from forgebase.application import UseCaseBase
+from forge_base.application import UseCaseBase
 from src.domain.task import Task
 from src.application.task_dtos import CreateTaskInput, CreateTaskOutput
 from src.application.task_repository_port import TaskRepositoryPort
@@ -447,7 +447,7 @@ python -m pytest tests/
 ForgeBase oferece APIs para automatização:
 
 ```python
-from forgebase.dev.api import (
+from forge_base.dev.api import (
     QualityChecker,
     ScaffoldGenerator,
     ComponentDiscovery,
@@ -493,11 +493,11 @@ results = runner.run_all()
 
 ## Problemas Comuns
 
-### Import Error: "No module named 'forgebase'"
+### Import Error: "No module named 'forge_base'"
 
 ```bash
 # Instale ForgeBase
-pip install git+https://github.com/symlabs-ai/forgebase.git
+pip install git+https://github.com/symlabs-ai/forge_base.git
 
 # Ou adicione ao PYTHONPATH
 export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"

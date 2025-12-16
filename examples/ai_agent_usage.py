@@ -11,7 +11,7 @@ Author: ForgeBase Development Team
 Created: 2025-11-04
 """
 
-from forgebase.dev.api import (
+from forge_base.dev.api import (
     ComponentDiscovery,
     QualityChecker,
     ScaffoldGenerator,

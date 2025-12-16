@@ -80,7 +80,7 @@ ForgeBase foi projetado com observabilidade nativa desde o início (ver [ADR-003
 ### Princípios da Integração
 
 1. **Opt-In, Not Mandatory**
-   - OTel é instalado via `pip install forgebase[otel]`
+   - OTel é instalado via `pip install forge_base[otel]`
    - Usuário sem OTel: funciona perfeitamente com implementações builtin
    - Usuário com OTel: ativa via configuração
 
@@ -103,7 +103,7 @@ ForgeBase foi projetado com observabilidade nativa desde o início (ver [ADR-003
 ### Arquitetura da Integração
 
 ```
-src/forgebase/observability/
+src/forge_base/observability/
 ├── tracer_port.py           # Interface abstrata (já existe)
 ├── logger_port.py           # Interface abstrata (já existe)
 ├── track_metrics.py         # Implementação builtin (já existe)
@@ -142,7 +142,7 @@ observability:
   tracing:
     provider: opentelemetry
     config:
-      service_name: forgebase-api
+      service_name: forge_base-api
       exporter: jaeger
       endpoint: http://localhost:14268/api/traces
       sampling_rate: 0.1  # 10%
@@ -173,9 +173,9 @@ observability:
 #### OtelTracer (implementa TracerPort)
 
 ```python
-# src/forgebase/observability/otel/otel_tracer.py
+# src/forge_base/observability/otel/otel_tracer.py
 
-from forgebase.observability.tracer_port import TracerPort, Span, SpanKind, SpanStatus
+from forge_base.observability.tracer_port import TracerPort, Span, SpanKind, SpanStatus
 
 try:
     from opentelemetry import trace
@@ -193,7 +193,7 @@ class OtelTracer(TracerPort):
     OpenTelemetry SDK, enabling export to any OTel-compatible backend
     (Jaeger, Zipkin, Tempo, DataDog, etc.).
 
-    **Optional dependency**: Install with `pip install forgebase[otel]`
+    **Optional dependency**: Install with `pip install forge_base[otel]`
 
     Why this exists:
     - Enterprises already have OTel infrastructure
@@ -223,7 +223,7 @@ class OtelTracer(TracerPort):
         if not HAS_OTEL:
             raise ImportError(
                 "OpenTelemetry not installed. "
-                "Install with: pip install forgebase[otel]"
+                "Install with: pip install forge_base[otel]"
             )
 
         self._service_name = service_name
@@ -261,7 +261,7 @@ class OtelTracer(TracerPort):
 #### Auto-Instrumentation
 
 ```python
-# src/forgebase/observability/otel/auto_instrument.py
+# src/forge_base/observability/otel/auto_instrument.py
 
 def auto_instrument(config: dict) -> None:
     """
@@ -319,7 +319,7 @@ def auto_instrument(config: dict) -> None:
 FeedbackManager e IntentTracker **integram** com OTel mas não são substituídos:
 
 ```python
-# src/forgebase/observability/feedback_manager.py
+# src/forge_base/observability/feedback_manager.py
 
 class FeedbackManager:
     def __init__(self, tracer: TracerPort):
@@ -354,22 +354,22 @@ Estes não existem no OTel padrão — são inovação do ForgeBase.
 #### Instalação Padrão (Lightweight)
 ```bash
 # Zero OTel dependencies
-pip install forgebase
+pip install forge_base
 ```
 
 #### Instalação com OTel
 ```bash
 # OTel SDK only
-pip install forgebase[otel]
+pip install forge_base[otel]
 
 # OTel + common exporters
-pip install forgebase[otel-exporters]
+pip install forge_base[otel-exporters]
 
 # OTel + auto-instrumentation
-pip install forgebase[otel-auto]
+pip install forge_base[otel-auto]
 
 # Everything
-pip install forgebase[all]
+pip install forge_base[all]
 ```
 
 #### pyproject.toml
@@ -383,7 +383,7 @@ otel = [
 
 # Common exporters
 otel-exporters = [
-    "forgebase[otel]",
+    "forge_base[otel]",
     "opentelemetry-exporter-jaeger>=1.20.0",
     "opentelemetry-exporter-prometheus>=0.41b0",
     "opentelemetry-exporter-otlp>=1.20.0",
@@ -391,7 +391,7 @@ otel-exporters = [
 
 # Auto-instrumentation for popular libraries
 otel-auto = [
-    "forgebase[otel]",
+    "forge_base[otel]",
     "opentelemetry-instrumentation-requests>=0.41b0",
     "opentelemetry-instrumentation-flask>=0.41b0",
     "opentelemetry-instrumentation-sqlalchemy>=0.41b0",
@@ -400,7 +400,7 @@ otel-auto = [
 
 # All optional features
 all = [
-    "forgebase[dev,sql,otel,otel-exporters,otel-auto]",
+    "forge_base[dev,sql,otel,otel-exporters,otel-auto]",
 ]
 ```
 
@@ -431,7 +431,7 @@ response = requests.get(url)  # Span criado automaticamente
   "message": "User created",
   "trace_id": "abc123",        // ← Correlação automática
   "span_id": "def456",
-  "service.name": "forgebase-api",
+  "service.name": "forge_base-api",
   "usecase.name": "CreateUser"
 }
 ```
@@ -605,7 +605,7 @@ def export_otlp(spans: List[Span]):
 
 ```bash
 # Criar estrutura de módulo OTel
-src/forgebase/observability/otel/
+src/forge_base/observability/otel/
 ├── __init__.py
 ├── otel_tracer.py      # Implementa TracerPort
 ├── otel_logger.py      # Implementa LoggerPort
@@ -747,7 +747,7 @@ def test_exporter_integration():
 ### ForgeBase Related
 
 - **ADR-003: Observability First** — Filosofia de observabilidade nativa
-- **TracerPort Implementation** — `src/forgebase/observability/tracer_port.py`
+- **TracerPort Implementation** — `src/forge_base/observability/tracer_port.py`
 - **FeedbackManager** — Sistema cognitivo único
 
 ## Related ADRs
@@ -802,7 +802,7 @@ observability:
   tracing:
     provider: opentelemetry
     config:
-      service_name: forgebase-staging
+      service_name: forge_base-staging
       exporter: jaeger
       endpoint: http://jaeger:14268/api/traces
       sampling_rate: 0.5  # 50%
@@ -818,7 +818,7 @@ observability:
   tracing:
     provider: opentelemetry
     config:
-      service_name: forgebase-prod
+      service_name: forge_base-prod
       exporter: otlp
       endpoint: http://otel-collector:4317
       sampling_rate: 0.1  # 10% (high traffic)
@@ -851,12 +851,12 @@ observability:
 **Step 1: Continue usando builtin (nada muda)**
 ```bash
 # Seu código continua funcionando
-pip install forgebase==0.1.4
+pip install forge_base==0.1.4
 ```
 
 **Step 2: Experimente OTel localmente**
 ```bash
-pip install forgebase[otel]
+pip install forge_base[otel]
 # Update config.yaml para usar OTel
 # Suba Jaeger local: docker run -p 16686:16686 jaegertracing/all-in-one
 ```

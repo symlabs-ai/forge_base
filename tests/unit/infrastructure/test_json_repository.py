@@ -19,9 +19,9 @@ import threading
 import unittest
 from pathlib import Path
 
-from src.forgebase.domain.entity_base import EntityBase
-from src.forgebase.infrastructure.repository.json_repository import JSONRepository
-from src.forgebase.infrastructure.repository.repository_base import (
+from src.forge_base.domain.entity_base import EntityBase
+from src.forge_base.infrastructure.repository.json_repository import JSONRepository
+from src.forge_base.infrastructure.repository.repository_base import (
     RepositoryBase,
     RepositoryError,
 )

@@ -97,7 +97,7 @@ def create_order(req):
 ### Hierarquia
 
 ```python
-from forgebase.domain.exceptions import (
+from forge_base.domain.exceptions import (
     DomainException,        # Base para todas
     ValidationError,        # Dados inválidos (formato, tipo)
     InvariantViolation,     # Regra de negócio quebrada
@@ -144,7 +144,7 @@ class CreateOrderUseCase(UseCaseBase):
 ### Logging Estruturado
 
 ```python
-from forgebase.observability.log_service import LogService
+from forge_base.observability.log_service import LogService
 
 log = LogService(service_name="meu-app", environment="production")
 log.add_console_handler()
@@ -162,7 +162,7 @@ with log.correlation_context("req-abc-123"):
 ### Métricas
 
 ```python
-from forgebase.observability.track_metrics import TrackMetrics
+from forge_base.observability.track_metrics import TrackMetrics
 
 metrics = TrackMetrics()
 

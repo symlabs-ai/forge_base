@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "forgebase"
+name = "forge_base"
 version = "0.1.7"
 description = "Cognitive Architecture Framework - Clean + Hexagonal Architecture with native observability. AI agent-friendly with programmatic API access."
 readme = "README.md"
@@ -62,14 +62,14 @@ sql = [
 
 # Complete development + optional features
 all = [
-    "forgebase[dev,sql]",
+    "forge_base[dev,sql]",
 ]
 
 [project.urls]
-Homepage = "https://github.com/symlabs-ai/forgebase"
-Documentation = "https://github.com/symlabs-ai/forgebase/blob/main/docs"
-Repository = "https://github.com/symlabs-ai/forgebase"
-Changelog = "https://github.com/symlabs-ai/forgebase/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/symlabs-ai/forge_base"
+Documentation = "https://github.com/symlabs-ai/forge_base/blob/main/docs"
+Repository = "https://github.com/symlabs-ai/forge_base"
+Changelog = "https://github.com/symlabs-ai/forge_base/blob/main/CHANGELOG.md"
 
 # Setuptools configuration
 [tool.setuptools]
@@ -77,12 +77,12 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["forgebase*"]
+include = ["forge_base*"]
 namespaces = false
 
 # Include documentation and examples in the package
 [tool.setuptools.package-data]
-forgebase = [
+forge_base = [
     "_docs/*.md",     # Embedded documentation
 ]
 
@@ -96,7 +96,7 @@ addopts = [
     "-v",
     "--strict-markers",
     "--tb=short",
-    "--cov=src/forgebase",
+    "--cov=src/forge_base",
     "--cov-report=term-missing",
     "--cov-report=html",
 ]
@@ -109,7 +109,7 @@ markers = [
 
 # Coverage configuration
 [tool.coverage.run]
-source = ["src/forgebase"]
+source = ["src/forge_base"]
 omit = [
     "*/tests/*",
     "*/__pycache__/*",
@@ -158,7 +158,7 @@ ban-relative-imports = "all"
 "tests/*" = ["B011"]      # Allow assert False in tests
 
 [tool.ruff.lint.isort]
-known-first-party = ["forgebase", "examples"]
+known-first-party = ["forge_base", "examples"]
 # Enforce absolute imports
 force-sort-within-sections = true
 # Group imports: stdlib, third-party, first-party, local
@@ -185,7 +185,7 @@ disallow_untyped_defs = false
 # Deptry configuration
 [tool.deptry]
 # Known first-party modules
-known_first_party = ["forgebase"]
+known_first_party = ["forge_base"]
 
 [tool.deptry.per_rule_ignores]
 # DEP002: Ignore development tools - they're CLI-only, not imported in src/

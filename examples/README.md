@@ -7,7 +7,7 @@ This directory contains complete examples demonstrating the ForgeBase cognitive 
 Run the complete flow demonstration:
 
 ```bash
-# From the forgebase root directory
+# From the forge_base root directory
 python examples/complete_flow.py
 ```
 
@@ -104,7 +104,7 @@ repository = InMemoryUserRepository()
 
 **Example:**
 ```python
-from forgebase.core_init import ForgeBaseCore
+from forge_base.core_init import ForgeBaseCore
 
 core = ForgeBaseCore()
 core.bootstrap()
@@ -218,7 +218,7 @@ This framework embodies three core principles:
 ## Further Reading
 
 - `docs/BACKLOG.md` - Full development roadmap
-- `src/forgebase/` - Core framework implementation
+- `src/forge_base/` - Core framework implementation
 - `tests/` - Test examples and patterns
 
 ---

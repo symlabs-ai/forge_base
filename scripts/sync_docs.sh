@@ -3,7 +3,7 @@
 # Sync documentation from docs/ to embedded package
 #
 # This script ensures that the documentation files in the docs/ directory
-# are synchronized with the embedded copies in src/forgebase/_docs/
+# are synchronized with the embedded copies in src/forge_base/_docs/
 # that get distributed with the package.
 #
 # Usage:
@@ -15,7 +15,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-DOCS_DIR="$PROJECT_ROOT/src/forgebase/_docs"
+DOCS_DIR="$PROJECT_ROOT/src/forge_base/_docs"
 
 echo "📚 Syncing embedded documentation..."
 
@@ -44,4 +44,4 @@ fi
 echo ""
 echo "✅ Documentation sync complete!"
 echo ""
-echo "Don't forget to commit the changes in src/forgebase/_docs/"
+echo "Don't forget to commit the changes in src/forge_base/_docs/"

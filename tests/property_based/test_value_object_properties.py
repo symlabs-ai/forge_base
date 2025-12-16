@@ -16,7 +16,7 @@ import unittest
 from hypothesis import given
 from hypothesis import strategies as st
 
-from src.forgebase.domain.value_object_base import ValueObjectBase
+from src.forge_base.domain.value_object_base import ValueObjectBase
 
 
 class MockValueObject(ValueObjectBase):

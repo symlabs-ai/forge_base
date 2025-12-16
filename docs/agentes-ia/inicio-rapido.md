@@ -7,7 +7,7 @@
 ### Importar Tudo que Você Precisa
 
 ```python
-from forgebase.dev.api import (
+from forge_base.dev.api import (
     QualityChecker,
     ScaffoldGenerator,
     ComponentDiscovery,
@@ -19,7 +19,7 @@ from forgebase.dev.api import (
 
 ```python
 # Agentes de IA podem carregar este guia programaticamente (mesmo após pip install)
-from forgebase.dev import get_agent_quickstart
+from forge_base.dev import get_agent_quickstart
 
 guide = get_agent_quickstart()
 print(guide)  # Conteúdo markdown completo deste arquivo
@@ -164,7 +164,7 @@ ComponentInfo(
     file_path="src/domain/order.py",
     line_number=15,
     base_class="EntityBase",
-    imports=["from forgebase.domain.entity_base import EntityBase"],
+    imports=["from forge_base.domain.entity_base import EntityBase"],
     docstring="Entidade de domínio Order"
 )
 ```
@@ -221,7 +221,7 @@ TestResult(
 ## Exemplo de Workflow Completo
 
 ```python
-from forgebase.dev.api import *
+from forge_base.dev.api import *
 
 # 1. Descobrir o que existe
 discovery = ComponentDiscovery()

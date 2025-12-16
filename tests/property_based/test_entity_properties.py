@@ -16,7 +16,7 @@ import unittest
 from hypothesis import given
 from hypothesis import strategies as st
 
-from src.forgebase.domain.entity_base import EntityBase
+from src.forge_base.domain.entity_base import EntityBase
 
 
 class MockEntity(EntityBase):

@@ -9,7 +9,7 @@ from pathlib import Path
 # Add src to path for testing
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from forgebase.dev import get_agent_quickstart, get_documentation_path
+from forge_base.dev import get_agent_quickstart, get_documentation_path
 
 
 def test_agent_quickstart():

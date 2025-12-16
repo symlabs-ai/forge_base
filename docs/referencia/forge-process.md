@@ -455,7 +455,7 @@ Scenario: Emissão bem-sucedida de nota fiscal
 ```python
 # tests/unit/test_issue_invoice_usecase.py
 import pytest
-from forgebase.application.issue_invoice_usecase import IssueInvoiceUseCase
+from forge_base.application.issue_invoice_usecase import IssueInvoiceUseCase
 
 def test_should_calculate_icms_correctly():
     # Arrange
@@ -471,8 +471,8 @@ def test_should_calculate_icms_correctly():
 
 **TDD Implementation (Green)**:
 ```python
-# src/forgebase/application/issue_invoice_usecase.py
-from forgebase.application.usecase_base import UseCaseBase
+# src/forge_base/application/issue_invoice_usecase.py
+from forge_base.application.usecase_base import UseCaseBase
 
 class IssueInvoiceUseCase(UseCaseBase[IssueInvoiceInput, IssueInvoiceOutput]):
     """Emitir nota fiscal com cálculo automático de impostos."""
@@ -531,7 +531,7 @@ O CLI não é apenas uma ferramenta de linha de comando, mas um **espaço cognit
 
 ```bash
 # Executar UseCase via CLI
-forgebase execute IssueInvoiceUseCase \
+forge_base execute IssueInvoiceUseCase \
   --input '{"order_id": "12345", "value": 1000.00, "uf": "SP"}' \
   --output invoice.json \
   --verbose
@@ -569,7 +569,7 @@ forgebase execute IssueInvoiceUseCase \
 
 ```python
 # IA explorando via CLI
-from forgebase.dev.api import ComponentDiscovery, TestRunner
+from forge_base.dev.api import ComponentDiscovery, TestRunner
 
 # 1. IA descobre componentes
 discovery = ComponentDiscovery()
@@ -579,7 +579,7 @@ print(f"Found {len(components.usecases)} UseCases")
 # 2. IA executa cada UseCase via CLI
 for usecase in components.usecases:
     result = subprocess.run([
-        "forgebase", "execute", usecase.name,
+        "forge_base", "execute", usecase.name,
         "--input", "sample_input.json"
     ])
 
@@ -667,7 +667,7 @@ if kpi_result.current_value > 0:
 #### Feedback Loop Completo
 
 ```python
-# src/forgebase/observability/feedback_manager.py
+# src/forge_base/observability/feedback_manager.py
 class FeedbackManager:
     """Gerencia feedback loops entre ForgeBase e ForgeProcess."""
 
@@ -762,7 +762,7 @@ def test_icms_calculation():
 #### Fase 4: CLI
 
 ```bash
-forgebase execute IssueInvoiceUseCase \
+forge_base execute IssueInvoiceUseCase \
   --input '{"order_value": 1000, "uf": "SP"}' \
   --verbose
 

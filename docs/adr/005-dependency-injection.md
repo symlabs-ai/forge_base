@@ -148,7 +148,7 @@ class SQLRepository(RepositoryBase[T]):
 Para aplicações complexas, fornecemos um **DI Container simples**:
 
 ```python
-# src/forgebase/infrastructure/di_container.py
+# src/forge_base/infrastructure/di_container.py
 class DIContainer:
     """
     Simple dependency injection container.
@@ -326,7 +326,7 @@ with DIContainer() as container:
 ### core_init.py Integration
 
 ```python
-# src/forgebase/core_init.py
+# src/forge_base/core_init.py
 class ForgeBaseCore:
     def __init__(self, config_path: Optional[str] = None):
         self.config = ConfigLoader.load(config_path)
@@ -460,7 +460,7 @@ def __init__(self, dep1, dep2, dep3, dep4, dep5):
 
 4. **Generators**
    ```bash
-   forgebase generate usecase CreateUser --with-di
+   forge_base generate usecase CreateUser --with-di
    # Gera UseCase com DI correto
    ```
 

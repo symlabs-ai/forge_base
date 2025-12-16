@@ -23,7 +23,7 @@ if "passed" in output:
 
 ### Método Novo (API)
 ```python
-from forgebase.dev.api import QualityChecker
+from forge_base.dev.api import QualityChecker
 
 # IA obtém dados estruturados
 checker = QualityChecker()
@@ -47,7 +47,7 @@ if not result.passed:
 **Retorna**: `CheckResult` com erros estruturados
 
 ```python
-from forgebase.dev.api import QualityChecker
+from forge_base.dev.api import QualityChecker
 
 checker = QualityChecker()
 
@@ -104,7 +104,7 @@ class CheckResult:
 **Retorna**: `ScaffoldResult` com código gerado como string
 
 ```python
-from forgebase.dev.api import ScaffoldGenerator
+from forge_base.dev.api import ScaffoldGenerator
 
 generator = ScaffoldGenerator()
 
@@ -153,7 +153,7 @@ class ScaffoldResult:
 **Retorna**: `DiscoveryResult` com todos componentes encontrados
 
 ```python
-from forgebase.dev.api import ComponentDiscovery
+from forge_base.dev.api import ComponentDiscovery
 
 discovery = ComponentDiscovery()
 result = discovery.scan_project()
@@ -209,7 +209,7 @@ class ComponentInfo:
 **Retorna**: `TestResult` com informações detalhadas de teste
 
 ```python
-from forgebase.dev.api import TestRunner
+from forge_base.dev.api import TestRunner
 
 runner = TestRunner()
 
@@ -267,7 +267,7 @@ class TestFailure:
 ## Exemplo de Workflow Completo para Agente de IA
 
 ```python
-from forgebase.dev.api import (
+from forge_base.dev.api import (
     QualityChecker,
     ComponentDiscovery,
     TestRunner,
@@ -349,7 +349,7 @@ pip install -e ".[dev]"
 ### Uso Básico
 ```python
 # Importar APIs
-from forgebase.dev.api import (
+from forge_base.dev.api import (
     QualityChecker,
     ScaffoldGenerator,
     ComponentDiscovery,
@@ -389,10 +389,10 @@ Mas agentes de IA devem usar as APIs Python para:
 ## Referência de API
 
 Para documentação completa de API, veja:
-- `forgebase/dev/api/quality.py` - QualityChecker
-- `forgebase/dev/api/scaffold.py` - ScaffoldGenerator
-- `forgebase/dev/api/discovery.py` - ComponentDiscovery
-- `forgebase/dev/api/testing.py` - TestRunner
+- `forge_base/dev/api/quality.py` - QualityChecker
+- `forge_base/dev/api/scaffold.py` - ScaffoldGenerator
+- `forge_base/dev/api/discovery.py` - ComponentDiscovery
+- `forge_base/dev/api/testing.py` - TestRunner
 
 Todas as classes têm docstrings abrangentes com type hints.
 
@@ -445,7 +445,7 @@ Claude Code (e outros assistentes de IA) podem usar estas APIs diretamente:
 
 ```python
 # Claude Code pode fazer isso:
-from forgebase.dev.api import QualityChecker
+from forge_base.dev.api import QualityChecker
 
 checker = QualityChecker()
 result = checker.run_ruff()

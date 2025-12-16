@@ -36,15 +36,15 @@ Adapters que **disparam** a aplicação (CLI, HTTP, gRPC, GraphQL, etc.)
 #### Exemplo: WebSocket Adapter
 
 ```python
-# src/forgebase/adapters/websocket/websocket_adapter.py
+# src/forge_base/adapters/websocket/websocket_adapter.py
 """
 WebSocket adapter for real-time ForgeBase interactions.
 """
 
 import asyncio
 import websockets
-from forgebase.adapters import AdapterBase
-from forgebase.application import UseCaseBase
+from forge_base.adapters import AdapterBase
+from forge_base.application import UseCaseBase
 
 
 class WebSocketAdapter(AdapterBase):
@@ -63,7 +63,7 @@ class WebSocketAdapter(AdapterBase):
         return "WebSocketAdapter"
 
     def module(self) -> str:
-        return "forgebase.adapters.websocket"
+        return "forge_base.adapters.websocket"
 
     def register_usecase(self, command: str, usecase: UseCaseBase):
         """Register a UseCase to be called via WebSocket."""
@@ -241,7 +241,7 @@ Redis-based repository implementation.
 
 import json
 import redis
-from forgebase.infrastructure.repository import RepositoryBase
+from forge_base.infrastructure.repository import RepositoryBase
 from typing import Type, TypeVar, Optional
 
 T = TypeVar('T')
@@ -346,7 +346,7 @@ usecase = CreateUserUseCase(user_repository=user_repo)
 Custom business validators.
 """
 
-from forgebase.domain import ValidationError
+from forge_base.domain import ValidationError
 import re
 
 
@@ -445,7 +445,7 @@ Custom logger implementation.
 """
 
 import logging
-from forgebase.infrastructure.logging import LoggerPort
+from forge_base.infrastructure.logging import LoggerPort
 
 
 class ElasticsearchLogger(LoggerPort):
@@ -496,13 +496,13 @@ DataDog metrics exporter.
 """
 
 from datadog import statsd
-from forgebase.observability import TrackMetrics
+from forge_base.observability import TrackMetrics
 
 
 class DataDogMetricsExporter:
     """Export ForgeBase metrics to DataDog."""
 
-    def __init__(self, metrics: TrackMetrics, prefix: str = "forgebase"):
+    def __init__(self, metrics: TrackMetrics, prefix: str = "forge_base"):
         self.metrics = metrics
         self.prefix = prefix
 
@@ -642,7 +642,7 @@ class GetUserUseCase(UseCaseBase):
 Para extensibilidade máxima, crie um sistema de plugins:
 
 ```python
-# src/forgebase/plugins/plugin_manager.py
+# src/forge_base/plugins/plugin_manager.py
 """
 Plugin system for ForgeBase.
 """
@@ -708,7 +708,7 @@ class PluginManager:
 Analytics plugin for tracking UseCase execution.
 """
 
-from forgebase.plugins import Plugin
+from forge_base.plugins import Plugin
 
 
 class AnalyticsPlugin(Plugin):

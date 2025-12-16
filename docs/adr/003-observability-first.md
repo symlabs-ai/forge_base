@@ -75,7 +75,7 @@ logger.info(
 - Machine-readable para análise
 
 **Implementação**:
-- `src/forgebase/observability/log_service.py` (~489 LOC)
+- `src/forge_base/observability/log_service.py` (~489 LOC)
 - Handlers: stdout, file, remote (Elasticsearch, CloudWatch)
 - Níveis: DEBUG, INFO, WARNING, ERROR, CRITICAL
 - Sampling para high-volume scenarios
@@ -107,7 +107,7 @@ track_metrics.histogram("usecase.execution.duration", value=42.5, usecase="Creat
 - `adapter.request.count` — Requests por adapter
 
 **Implementação**:
-- `src/forgebase/observability/track_metrics.py` (~447 LOC)
+- `src/forge_base/observability/track_metrics.py` (~447 LOC)
 - Export formats: Prometheus, JSON, StatsD
 - Aggregation em memória
 - Overhead < 1ms per metric
@@ -128,7 +128,7 @@ Trace: CreateUser (correlation_id: abc-123)
 ```
 
 **Implementação**:
-- `src/forgebase/observability/tracer_port.py` (~504 LOC)
+- `src/forge_base/observability/tracer_port.py` (~504 LOC)
 - OpenTelemetry-compatible interface
 - Context propagation automática
 - Adapters: Jaeger, Zipkin, DataDog
@@ -170,8 +170,8 @@ Trace: CreateUser (correlation_id: abc-123)
    ```
 
 **Implementação**:
-- `src/forgebase/observability/feedback_manager.py` (~455 LOC)
-- `src/forgebase/integration/intent_tracker.py` (~450 LOC)
+- `src/forge_base/observability/feedback_manager.py` (~455 LOC)
+- `src/forge_base/integration/intent_tracker.py` (~450 LOC)
 - Similarity analysis usando difflib
 - Learning data export para ML
 
@@ -182,7 +182,7 @@ Trace: CreateUser (correlation_id: abc-123)
 **Decisão**: UseCases podem ser instrumentados com um decorator.
 
 ```python
-from forgebase.application.decorators import track_metrics
+from forge_base.application.decorators import track_metrics
 
 class CreateUserUseCase(UseCaseBase):
     @track_metrics(
@@ -199,7 +199,7 @@ class CreateUserUseCase(UseCaseBase):
 ```
 
 **Implementação**:
-- `src/forgebase/application/decorators/track_metrics.py` (~283 LOC)
+- `src/forge_base/application/decorators/track_metrics.py` (~283 LOC)
 - Zero overhead quando desabilitado
 - Async-compatible
 - Context propagation
@@ -233,7 +233,7 @@ observability:
   logging:
     handlers:
       - stdout
-      - file: /var/log/forgebase.log
+    - file: /var/log/forge_base.log
     format: json
     correlation_id: true
 
@@ -241,7 +241,7 @@ observability:
     enabled: true
     export:
       - prometheus: http://localhost:9090
-      - json: /var/metrics/forgebase.json
+      - json: /var/metrics/forge_base.json
     collection_interval: 60  # seconds
 
   tracing:

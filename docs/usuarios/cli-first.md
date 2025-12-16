@@ -38,7 +38,7 @@ UseCase → CLIAdapter → Validado? → HTTPAdapter/WebUI
 
 ```python
 # src/application/usecases/create_order.py
-from forgebase.application import UseCaseBase
+from forge_base.application import UseCaseBase
 from dataclasses import dataclass
 
 @dataclass
@@ -79,7 +79,7 @@ class CreateOrderUseCase(UseCaseBase[CreateOrderInput, CreateOrderOutput]):
 
 ```python
 # src/cli.py
-from forgebase.adapters.cli import CLIAdapter
+from forge_base.adapters.cli import CLIAdapter
 from application.usecases.create_order import CreateOrderUseCase
 from infrastructure.repositories import OrderRepository, ProductRepository
 

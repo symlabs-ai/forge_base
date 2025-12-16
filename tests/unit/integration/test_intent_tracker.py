@@ -9,7 +9,7 @@ Tests cognitive coherence tracking and validation.
 
 import unittest
 
-from forgebase.integration.intent_tracker import (
+from forge_base.integration.intent_tracker import (
     CoherenceLevel,
     IntentTracker,
 )

@@ -34,7 +34,7 @@ class Scaffolder:
         """
         self.project_root = project_root
         self.templates_dir = project_root / "scripts" / "templates"
-        self.src_dir = project_root / "src" / "forgebase"
+        self.src_dir = project_root / "src" / "forge_base"
 
     def generate(
         self,
@@ -216,12 +216,12 @@ Examples:
 
     args = parser.parse_args()
 
-    # Find project root (directory containing pyproject.toml, setup.py, or src/forgebase)
+    # Find project root (directory containing pyproject.toml, setup.py, or src/forge_base)
     current = Path.cwd()
     while current != current.parent:
         if (current / "pyproject.toml").exists() or \
            (current / "setup.py").exists() or \
-           (current / "src" / "forgebase").exists():
+           (current / "src" / "forge_base").exists():
             project_root = current
             break
         current = current.parent
