@@ -3,6 +3,7 @@ from typing import Any, Generic, TypeVar
 from forge_base.application.usecase_base import UseCaseBase
 from forge_base.pulse.collector import NoOpCollector, PulseCollector
 from forge_base.pulse.context import ExecutionContext, _current_context, set_context
+from forge_base.pulse.heuristic import infer_context
 from forge_base.pulse.level import MonitoringLevel
 
 TInput = TypeVar("TInput")
@@ -10,7 +11,7 @@ TOutput = TypeVar("TOutput")
 
 
 class UseCaseRunner(Generic[TInput, TOutput]):
-    __slots__ = ("_use_case", "_level", "_off", "_collector", "_execute")
+    __slots__ = ("_use_case", "_level", "_off", "_collector", "_execute", "_inferred")
 
     def __init__(
         self,
@@ -24,6 +25,7 @@ class UseCaseRunner(Generic[TInput, TOutput]):
         self._collector: PulseCollector = collector or NoOpCollector()
         # Bound method ref avoids attribute lookup on hot path (~30ns saving)
         self._execute = use_case.execute
+        self._inferred: dict[str, str] = infer_context(use_case) if not self._off else {}
 
     def run(self, input_dto: TInput, **ctx_overrides: Any) -> TOutput:
         if self._off:
@@ -31,8 +33,7 @@ class UseCaseRunner(Generic[TInput, TOutput]):
 
         ctx = ExecutionContext.build(
             level=self._level,
-            use_case_name=type(self._use_case).__name__,
-            **ctx_overrides,
+            **{**self._inferred, **ctx_overrides},
         )
         token = set_context(ctx)
         try:

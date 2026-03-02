@@ -13,6 +13,10 @@ class ExecutionContext:
     correlation_id: str
     level: MonitoringLevel = MonitoringLevel.OFF
     use_case_name: str = ""
+    value_track: str = "legacy"
+    subtrack: str = ""
+    feature: str = ""
+    mapping_source: str = "legacy"
     extra: MappingProxyType[str, Any] = field(default_factory=lambda: MappingProxyType({}))
 
     @classmethod

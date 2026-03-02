@@ -24,3 +24,9 @@ class PulseFieldNames:
     EXEC_DURATION_MS = "exec.duration_ms"
     EXEC_STATUS = "exec.status"
     EXEC_ERROR_TYPE = "exec.error_type"
+
+    # Pulse execution metrics (Fase 1)
+    PULSE_EXEC_COUNT = "pulse.execution.count"
+    PULSE_EXEC_DURATION_MS = "pulse.execution.duration_ms"
+    PULSE_EXEC_ERRORS = "pulse.execution.errors"
+    PULSE_EXEC_SUCCESS = "pulse.execution.success"
