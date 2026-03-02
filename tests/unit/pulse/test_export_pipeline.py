@@ -1,4 +1,5 @@
 import time
+from types import MappingProxyType
 
 import pytest
 
@@ -69,6 +70,39 @@ class TestRecordToDict:
 
 
 @pytest.mark.pulse
+class TestRecordToDictNewFields:
+    def test_tags_included_when_present(self):
+        record = _make_record(tags=MappingProxyType({"tier": "premium"}))
+        d = _record_to_dict(record)
+        assert d["tags"] == {"tier": "premium"}
+
+    def test_tags_absent_when_empty(self):
+        record = _make_record()
+        d = _record_to_dict(record)
+        assert "tags" not in d
+
+    def test_extra_included_when_present(self):
+        record = _make_record(extra=MappingProxyType({"debug": "1"}))
+        d = _record_to_dict(record)
+        assert d["extra"] == {"debug": "1"}
+
+    def test_mapping_source_included_when_present(self):
+        record = _make_record(mapping_source="spec")
+        d = _record_to_dict(record)
+        assert d["mapping_source"] == "spec"
+
+    def test_mapping_source_absent_when_empty(self):
+        record = _make_record()
+        d = _record_to_dict(record)
+        assert "mapping_source" not in d
+
+    def test_dropped_spans_included_when_nonzero(self):
+        record = _make_record(dropped_spans=5)
+        d = _record_to_dict(record)
+        assert d["dropped_spans"] == 5
+
+
+@pytest.mark.pulse
 class TestRecordToContext:
     def test_creates_context(self):
         record = _make_record(
@@ -85,6 +119,16 @@ class TestRecordToContext:
         assert ctx.value_track == "premium"
         assert ctx.subtrack == "fast"
         assert ctx.feature == "search"
+
+    def test_context_propagates_tags(self):
+        record = _make_record(tags=MappingProxyType({"tier": "premium"}))
+        ctx = _record_to_context(record)
+        assert ctx.tags["tier"] == "premium"
+
+    def test_context_propagates_mapping_source(self):
+        record = _make_record(mapping_source="spec")
+        ctx = _record_to_context(record)
+        assert ctx.mapping_source == "spec"
 
 
 @pytest.mark.pulse

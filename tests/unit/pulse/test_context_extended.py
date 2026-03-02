@@ -1,6 +1,8 @@
+from types import MappingProxyType
+
 import pytest
 
-from forge_base.pulse.context import ExecutionContext
+from forge_base.pulse.context import _EMPTY_TAGS, ExecutionContext
 from forge_base.pulse.level import MonitoringLevel
 
 
@@ -52,3 +54,32 @@ class TestExecutionContextNewFields:
         assert ctx.correlation_id == "abc"
         assert ctx.level == MonitoringLevel.BASIC
         assert ctx.value_track == "legacy"
+
+
+@pytest.mark.pulse
+class TestExecutionContextTags:
+    def test_default_tags_empty(self):
+        ctx = ExecutionContext(correlation_id="abc")
+        assert ctx.tags == _EMPTY_TAGS
+        assert len(ctx.tags) == 0
+
+    def test_build_with_tags(self):
+        ctx = ExecutionContext.build(
+            level=MonitoringLevel.BASIC,
+            tags={"tier": "premium", "region": "us"},
+        )
+        assert ctx.tags["tier"] == "premium"
+        assert ctx.tags["region"] == "us"
+        assert isinstance(ctx.tags, MappingProxyType)
+
+    def test_build_tags_none(self):
+        ctx = ExecutionContext.build(level=MonitoringLevel.BASIC, tags=None)
+        assert ctx.tags == _EMPTY_TAGS
+
+    def test_tags_immutable(self):
+        ctx = ExecutionContext.build(
+            level=MonitoringLevel.BASIC,
+            tags={"key": "val"},
+        )
+        with pytest.raises(TypeError):
+            ctx.tags["key"] = "new"  # type: ignore[index]

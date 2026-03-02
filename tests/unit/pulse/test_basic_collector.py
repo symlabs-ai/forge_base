@@ -1,6 +1,8 @@
+from types import MappingProxyType
+
 import pytest
 
-from forge_base.pulse.basic_collector import BasicCollector, ExecutionRecord
+from forge_base.pulse.basic_collector import _EMPTY_TAGS, BasicCollector, ExecutionRecord
 from forge_base.pulse.context import ExecutionContext
 from forge_base.pulse.field_names import PulseFieldNames
 from forge_base.pulse.level import MonitoringLevel
@@ -171,6 +173,139 @@ class TestBasicCollectorStandardLevel:
 
 
 @pytest.mark.pulse
+class TestBasicCollectorDetailedLevel:
+    def test_detailed_emits_feature_labels(self):
+        metrics = FakeMetricsCollector()
+        collector = BasicCollector(metrics, level=MonitoringLevel.DETAILED)
+        ctx = _make_ctx()
+        collector.on_start(ctx)
+
+        assert metrics.was_incremented(
+            PulseFieldNames.PULSE_EXEC_COUNT,
+            use_case="TestUseCase",
+            value_track="legacy",
+            subtrack="billing",
+            feature="create_invoice",
+        )
+
+    def test_detailed_emits_basic_and_standard_too(self):
+        metrics = FakeMetricsCollector()
+        collector = BasicCollector(metrics, level=MonitoringLevel.DETAILED)
+        ctx = _make_ctx()
+        collector.on_start(ctx)
+
+        assert metrics.was_incremented(
+            PulseFieldNames.PULSE_EXEC_COUNT,
+            use_case="TestUseCase",
+            value_track="legacy",
+        )
+        assert metrics.was_incremented(
+            PulseFieldNames.PULSE_EXEC_COUNT,
+            use_case="TestUseCase",
+            value_track="legacy",
+            subtrack="billing",
+        )
+
+    def test_detailed_success_feature_labels(self):
+        metrics = FakeMetricsCollector()
+        collector = BasicCollector(metrics, level=MonitoringLevel.DETAILED)
+        ctx = _make_ctx()
+        collector.on_start(ctx)
+        collector.on_success(ctx, "ok")
+
+        assert metrics.was_incremented(
+            PulseFieldNames.PULSE_EXEC_SUCCESS,
+            use_case="TestUseCase",
+            value_track="legacy",
+            subtrack="billing",
+            feature="create_invoice",
+        )
+
+    def test_detailed_error_feature_labels(self):
+        metrics = FakeMetricsCollector()
+        collector = BasicCollector(metrics, level=MonitoringLevel.DETAILED)
+        ctx = _make_ctx()
+        collector.on_start(ctx)
+        collector.on_error(ctx, ValueError("boom"))
+
+        assert metrics.was_incremented(
+            PulseFieldNames.PULSE_EXEC_ERRORS,
+            use_case="TestUseCase",
+            value_track="legacy",
+            subtrack="billing",
+            feature="create_invoice",
+        )
+
+    def test_detailed_duration_feature_labels(self):
+        metrics = FakeMetricsCollector()
+        collector = BasicCollector(metrics, level=MonitoringLevel.DETAILED)
+        ctx = _make_ctx()
+        collector.on_start(ctx)
+        collector.on_success(ctx, "ok")
+        collector.on_finish(ctx)
+
+        assert metrics.was_recorded(
+            PulseFieldNames.PULSE_EXEC_DURATION_MS,
+            use_case="TestUseCase",
+            value_track="legacy",
+            subtrack="billing",
+            feature="create_invoice",
+        )
+
+    def test_detailed_record_has_tags(self):
+        metrics = FakeMetricsCollector()
+        collector = BasicCollector(metrics, level=MonitoringLevel.DETAILED)
+        ctx = ExecutionContext.build(
+            correlation_id="t1",
+            level=MonitoringLevel.DETAILED,
+            use_case_name="Test",
+            tags={"tier": "premium"},
+        )
+        collector.on_start(ctx)
+        collector.on_success(ctx, "ok")
+        collector.on_finish(ctx)
+
+        snap = collector.snapshot()
+        assert snap.executions[0]["tags"]["tier"] == "premium"
+
+    def test_basic_record_no_tags(self):
+        metrics = FakeMetricsCollector()
+        collector = BasicCollector(metrics, level=MonitoringLevel.BASIC)
+        ctx = ExecutionContext.build(
+            correlation_id="t1",
+            level=MonitoringLevel.BASIC,
+            use_case_name="Test",
+            tags={"tier": "premium"},
+        )
+        collector.on_start(ctx)
+        collector.on_success(ctx, "ok")
+        collector.on_finish(ctx)
+
+        snap = collector.snapshot()
+        assert "tags" not in snap.executions[0]
+
+    def test_diagnostic_record_has_extra(self):
+        metrics = FakeMetricsCollector()
+        collector = BasicCollector(metrics, level=MonitoringLevel.DIAGNOSTIC)
+        ctx = ExecutionContext.build(
+            correlation_id="t1",
+            level=MonitoringLevel.DIAGNOSTIC,
+            use_case_name="Test",
+            extra={"debug": "1"},
+            mapping_source="spec",
+        )
+        collector.on_start(ctx)
+        collector.on_success(ctx, "ok")
+        collector.on_finish(ctx)
+
+        snap = collector.snapshot()
+        exec_dict = snap.executions[0]
+        assert "extra" in exec_dict
+        assert exec_dict["extra"]["debug"] == "1"
+        assert exec_dict["mapping_source"] == "spec"
+
+
+@pytest.mark.pulse
 class TestExecutionRecord:
     def test_dataclass_fields(self):
         rec = ExecutionRecord(
@@ -187,3 +322,39 @@ class TestExecutionRecord:
         assert rec.duration_ms == 1.5
         assert rec.success is True
         assert rec.timestamp > 0
+
+    def test_new_fields_defaults(self):
+        rec = ExecutionRecord(
+            correlation_id="abc",
+            use_case_name="Test",
+            value_track="legacy",
+            subtrack="",
+            feature="",
+            duration_ms=1.0,
+            success=True,
+            error_type="",
+        )
+        assert rec.tags == _EMPTY_TAGS
+        assert len(rec.extra) == 0
+        assert rec.mapping_source == ""
+        assert rec.dropped_spans == 0
+
+    def test_new_fields_populated(self):
+        rec = ExecutionRecord(
+            correlation_id="abc",
+            use_case_name="Test",
+            value_track="legacy",
+            subtrack="",
+            feature="",
+            duration_ms=1.0,
+            success=True,
+            error_type="",
+            tags=MappingProxyType({"tier": "premium"}),
+            extra=MappingProxyType({"debug": "1"}),
+            mapping_source="spec",
+            dropped_spans=3,
+        )
+        assert rec.tags["tier"] == "premium"
+        assert rec.extra["debug"] == "1"
+        assert rec.mapping_source == "spec"
+        assert rec.dropped_spans == 3

@@ -192,7 +192,7 @@ class TestRunnerWithMeta:
         assert meta.tags["tier"] == "premium"
 
     def test_tags_not_propagated_to_ctx_extra(self):
-        """Tags are NOT propagated to ExecutionContext.extra (Fase 4)."""
+        """Tags go to ctx.tags, NOT ctx.extra."""
         uc = _TaggedCapture()
         runner = UseCaseRunner(uc, level=MonitoringLevel.BASIC)
         runner.run("x")
@@ -200,6 +200,16 @@ class TestRunnerWithMeta:
         ctx = _TaggedCapture.captured
         assert ctx is not None
         assert "tier" not in ctx.extra
+
+    def test_tags_propagated_to_ctx_tags(self):
+        """Tags from decorator propagate to ctx.tags."""
+        uc = _TaggedCapture()
+        runner = UseCaseRunner(uc, level=MonitoringLevel.BASIC)
+        runner.run("x")
+
+        ctx = _TaggedCapture.captured
+        assert ctx is not None
+        assert ctx.tags["tier"] == "premium"
 
     def test_schema_version_unchanged(self):
         """Schema version stays 0.3 — wire format unchanged."""

@@ -7,6 +7,8 @@ import uuid
 from forge_base.pulse.level import MonitoringLevel
 from forge_base.pulse.redaction import redact_keys
 
+_EMPTY_TAGS: MappingProxyType[str, str] = MappingProxyType({})
+
 
 @dataclass(frozen=True)
 class ExecutionContext:
@@ -17,6 +19,7 @@ class ExecutionContext:
     subtrack: str = ""
     feature: str = ""
     mapping_source: str = "legacy"
+    tags: MappingProxyType[str, str] = field(default_factory=lambda: _EMPTY_TAGS)
     extra: MappingProxyType[str, Any] = field(default_factory=lambda: MappingProxyType({}))
 
     @classmethod
@@ -24,12 +27,14 @@ class ExecutionContext:
         cls,
         correlation_id: str | None = None,
         *,
+        tags: dict[str, str] | None = None,
         extra: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> "ExecutionContext":
         cid = correlation_id or str(uuid.uuid4())
+        safe_tags = MappingProxyType(dict(tags)) if tags else _EMPTY_TAGS
         safe_extra = redact_keys(extra) if extra else {}
-        return cls(correlation_id=cid, extra=MappingProxyType(safe_extra), **kwargs)
+        return cls(correlation_id=cid, tags=safe_tags, extra=MappingProxyType(safe_extra), **kwargs)
 
 
 _current_context: ContextVar[ExecutionContext | None] = ContextVar(

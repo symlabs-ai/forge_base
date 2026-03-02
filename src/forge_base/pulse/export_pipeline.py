@@ -38,6 +38,14 @@ def _record_to_dict(record: ExecutionRecord) -> dict[str, Any]:
         "error_type": record.error_type,
         "timestamp": record.timestamp,
     }
+    if record.mapping_source:
+        d["mapping_source"] = record.mapping_source
+    if record.tags:
+        d["tags"] = dict(record.tags)
+    if record.extra:
+        d["extra"] = dict(record.extra)
+    if record.dropped_spans:
+        d["dropped_spans"] = record.dropped_spans
     if record.spans:
         d["spans"] = [_span_to_dict(s) for s in record.spans]
     return d
@@ -50,6 +58,8 @@ def _record_to_context(record: ExecutionRecord) -> ExecutionContext:
         value_track=record.value_track,
         subtrack=record.subtrack,
         feature=record.feature,
+        tags=dict(record.tags) if record.tags else None,
+        mapping_source=record.mapping_source,
     )
 
 

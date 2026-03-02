@@ -3,9 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import threading
 import time
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Any
 
-from forge_base.pulse.context import ExecutionContext
+from forge_base.pulse.context import _EMPTY_TAGS, ExecutionContext
 from forge_base.pulse.field_names import PulseFieldNames
 from forge_base.pulse.level import MonitoringLevel
 from forge_base.pulse.protocols import PulseMetricsProtocol
@@ -13,6 +14,9 @@ from forge_base.pulse.span import SpanRecord, _span_accumulator
 
 if TYPE_CHECKING:
     from forge_base.pulse.report import PulseSnapshot
+
+
+_EMPTY_EXTRA: MappingProxyType[str, Any] = MappingProxyType({})
 
 
 @dataclass
@@ -27,6 +31,10 @@ class ExecutionRecord:
     error_type: str
     timestamp: float = field(default_factory=time.time)
     spans: list[SpanRecord] = field(default_factory=list)
+    tags: MappingProxyType[str, str] = field(default_factory=lambda: _EMPTY_TAGS)
+    extra: MappingProxyType[str, Any] = field(default_factory=lambda: _EMPTY_EXTRA)
+    mapping_source: str = ""
+    dropped_spans: int = 0
 
 
 class BasicCollector:
@@ -57,6 +65,14 @@ class BasicCollector:
             "subtrack": ctx.subtrack,
         }
 
+    def _detailed_labels(self, ctx: ExecutionContext) -> dict[str, str]:
+        return {
+            "use_case": ctx.use_case_name,
+            "value_track": ctx.value_track,
+            "subtrack": ctx.subtrack,
+            "feature": ctx.feature,
+        }
+
     def on_start(self, context: ExecutionContext) -> None:
         cid = context.correlation_id
         start_ns = time.perf_counter_ns()
@@ -69,6 +85,10 @@ class BasicCollector:
             self._metrics.increment(
                 PulseFieldNames.PULSE_EXEC_COUNT, 1, **self._standard_labels(context)
             )
+        if self._level >= MonitoringLevel.DETAILED:
+            self._metrics.increment(
+                PulseFieldNames.PULSE_EXEC_COUNT, 1, **self._detailed_labels(context)
+            )
 
     def on_success(self, context: ExecutionContext, result: Any) -> None:
         labels = self._basic_labels(context)
@@ -76,6 +96,10 @@ class BasicCollector:
         if self._level >= MonitoringLevel.STANDARD:
             self._metrics.increment(
                 PulseFieldNames.PULSE_EXEC_SUCCESS, 1, **self._standard_labels(context)
+            )
+        if self._level >= MonitoringLevel.DETAILED:
+            self._metrics.increment(
+                PulseFieldNames.PULSE_EXEC_SUCCESS, 1, **self._detailed_labels(context)
             )
 
     def on_error(self, context: ExecutionContext, error: Exception) -> None:
@@ -88,6 +112,10 @@ class BasicCollector:
         if self._level >= MonitoringLevel.STANDARD:
             self._metrics.increment(
                 PulseFieldNames.PULSE_EXEC_ERRORS, 1, **self._standard_labels(context)
+            )
+        if self._level >= MonitoringLevel.DETAILED:
+            self._metrics.increment(
+                PulseFieldNames.PULSE_EXEC_ERRORS, 1, **self._detailed_labels(context)
             )
 
     def on_finish(self, context: ExecutionContext) -> None:
@@ -107,9 +135,16 @@ class BasicCollector:
                 duration_ms,
                 **self._standard_labels(context),
             )
+        if self._level >= MonitoringLevel.DETAILED:
+            self._metrics.histogram(
+                PulseFieldNames.PULSE_EXEC_DURATION_MS,
+                duration_ms,
+                **self._detailed_labels(context),
+            )
 
         acc = _span_accumulator.get()
         spans = acc.harvest() if acc is not None else []
+        dropped = acc.dropped_count if acc is not None else 0
 
         record = ExecutionRecord(
             correlation_id=cid,
@@ -121,6 +156,10 @@ class BasicCollector:
             success=(error_type == ""),
             error_type=error_type,
             spans=spans,
+            tags=context.tags if self._level >= MonitoringLevel.DETAILED else _EMPTY_TAGS,
+            extra=context.extra if self._level >= MonitoringLevel.DIAGNOSTIC else _EMPTY_EXTRA,
+            mapping_source=context.mapping_source if self._level >= MonitoringLevel.DIAGNOSTIC else "",
+            dropped_spans=dropped if self._level >= MonitoringLevel.DIAGNOSTIC else 0,
         )
         with self._lock:
             self._records.append(record)

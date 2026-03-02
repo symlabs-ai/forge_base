@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from forge_base.application.usecase_base import UseCaseBase
 from forge_base.pulse.collector import NoOpCollector, PulseCollector
-from forge_base.pulse.context import ExecutionContext, _current_context, set_context
+from forge_base.pulse.context import _EMPTY_TAGS, ExecutionContext, _current_context, set_context
 from forge_base.pulse.heuristic import infer_context
 from forge_base.pulse.level import MonitoringLevel
 from forge_base.pulse.meta import read_pulse_meta
@@ -21,7 +22,7 @@ TOutput = TypeVar("TOutput")
 class UseCaseRunner(Generic[TInput, TOutput]):
     __slots__ = (
         "_use_case", "_level", "_off", "_collector", "_execute", "_inferred", "_registry",
-        "_policy", "_budget",
+        "_policy", "_budget", "_meta_tags",
     )
 
     def __init__(
@@ -40,6 +41,7 @@ class UseCaseRunner(Generic[TInput, TOutput]):
         self._registry = registry
         self._policy = policy
         self._budget = budget
+        self._meta_tags: MappingProxyType[str, str] = _EMPTY_TAGS
         # Bound method ref avoids attribute lookup on hot path (~30ns saving)
         self._execute = use_case.execute
         self._inferred: dict[str, str] = infer_context(use_case) if not self._off else {}
@@ -58,6 +60,8 @@ class UseCaseRunner(Generic[TInput, TOutput]):
                     _any_overridden = True
                 if _any_overridden:
                     self._inferred["mapping_source"] = "decorator"
+                if meta.tags:
+                    self._meta_tags = meta.tags
 
     def run(self, input_dto: TInput, **ctx_overrides: Any) -> TOutput:
         if self._off:
@@ -72,8 +76,17 @@ class UseCaseRunner(Generic[TInput, TOutput]):
                 resolved["mapping_source"] = mapping.mapping_source
         resolved.update(ctx_overrides)
 
+        tags_override = resolved.pop("tags", None)
+        effective_tags: dict[str, str] | None = None
+        if self._meta_tags or tags_override:
+            merged = dict(self._meta_tags)
+            if tags_override:
+                merged.update(tags_override)
+            effective_tags = merged if merged else None
+
         ctx = ExecutionContext.build(
             level=self._level,
+            tags=effective_tags,
             **resolved,
         )
         token = set_context(ctx)

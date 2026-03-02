@@ -4,6 +4,7 @@ from forge_base.pulse.budget import BudgetPolicy
 from forge_base.pulse.buffer import AsyncBuffer
 from forge_base.pulse.collector import NoOpCollector, PulseCollector
 from forge_base.pulse.context import ExecutionContext, get_context, set_context
+from forge_base.pulse.dashboard import DashboardSummary, TrackSummary
 from forge_base.pulse.ecm import ExtensionCompatibilityMatrix, IncompatibleExtension
 from forge_base.pulse.exceptions import (
     PulseConfigError,
@@ -30,6 +31,7 @@ __all__ = [
     "BudgetPolicy",
     "PULSE_SCHEMA_VERSION",
     "BasicCollector",
+    "DashboardSummary",
     "ExecutionContext",
     "ExecutionRecord",
     "ExportPipeline",
@@ -52,6 +54,7 @@ __all__ = [
     "SUPPORTED_SPEC_VERSIONS",
     "SamplingPolicy",
     "SpanRecord",
+    "TrackSummary",
     "UseCaseRunner",
     "ValueTrackMapping",
     "ValueTrackRegistry",

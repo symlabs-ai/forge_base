@@ -8,10 +8,38 @@ from forge_base.pulse.level import MonitoringLevel
 
 if TYPE_CHECKING:
     from forge_base.pulse.basic_collector import ExecutionRecord
+    from forge_base.pulse.span import SpanRecord
 
 
 class _MetricsReporter(Protocol):
     def report(self) -> dict[str, Any]: ...
+
+
+def _span_basic(s: SpanRecord) -> dict[str, Any]:
+    return {
+        "span_id": s.span_id,
+        "name": s.name,
+        "duration_ms": s.duration_ms,
+        "parent_span_id": s.parent_span_id,
+    }
+
+
+def _span_detailed(s: SpanRecord) -> dict[str, Any]:
+    d = _span_basic(s)
+    d["attributes"] = dict(s.attributes)
+    return d
+
+
+def _span_diagnostic(s: SpanRecord) -> dict[str, Any]:
+    return {
+        "span_id": s.span_id,
+        "name": s.name,
+        "start_ns": s.start_ns,
+        "end_ns": s.end_ns,
+        "duration_ms": s.duration_ms,
+        "parent_span_id": s.parent_span_id,
+        "attributes": dict(s.attributes),
+    }
 
 
 @dataclass
@@ -59,15 +87,23 @@ class PulseSnapshot:
                 "timestamp": r.timestamp,
             }
             if r.spans:
-                exec_dict["spans"] = [
-                    {
-                        "span_id": s.span_id,
-                        "name": s.name,
-                        "duration_ms": s.duration_ms,
-                        "parent_span_id": s.parent_span_id,
-                    }
-                    for s in r.spans
-                ]
+                if level >= MonitoringLevel.DIAGNOSTIC:
+                    exec_dict["spans"] = [_span_diagnostic(s) for s in r.spans]
+                elif level >= MonitoringLevel.DETAILED:
+                    exec_dict["spans"] = [_span_detailed(s) for s in r.spans]
+                else:
+                    exec_dict["spans"] = [_span_basic(s) for s in r.spans]
+
+            if level >= MonitoringLevel.DETAILED and r.tags:
+                exec_dict["tags"] = dict(r.tags)
+
+            if level >= MonitoringLevel.DIAGNOSTIC:
+                if r.extra:
+                    exec_dict["extra"] = dict(r.extra)
+                exec_dict["mapping_source"] = r.mapping_source
+                if r.dropped_spans:
+                    exec_dict["dropped_spans"] = r.dropped_spans
+
             executions.append(exec_dict)
 
         histograms: dict[str, HistogramStats] = {}
