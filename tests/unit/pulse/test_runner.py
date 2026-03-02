@@ -6,6 +6,7 @@ from forge_base.application.usecase_base import UseCaseBase
 from forge_base.pulse.collector import NoOpCollector, PulseCollector
 from forge_base.pulse.context import ExecutionContext, _current_context, get_context
 from forge_base.pulse.level import MonitoringLevel
+from forge_base.pulse.meta import pulse_meta
 from forge_base.pulse.runner import UseCaseRunner
 
 
@@ -154,3 +155,114 @@ class TestUseCaseRunner:
     def test_spy_satisfies_collector_protocol(self):
         spy = _SpyCollector()
         assert isinstance(spy, PulseCollector)
+
+
+@pulse_meta(subtrack="checkout", feature="pay", value_track="revenue")
+class _DecoratedCapture(UseCaseBase[str, str]):
+    captured: ExecutionContext | None = None
+
+    def _before_execute(self) -> None:
+        pass
+
+    def _after_execute(self) -> None:
+        pass
+
+    def _on_error(self, error: Exception) -> None:
+        pass
+
+    def execute(self, input_dto: str) -> str:
+        self.__class__.captured = get_context()
+        return input_dto
+
+
+@pulse_meta()
+class _EmptyDecoratedCapture(UseCaseBase[str, str]):
+    captured: ExecutionContext | None = None
+
+    def _before_execute(self) -> None:
+        pass
+
+    def _after_execute(self) -> None:
+        pass
+
+    def _on_error(self, error: Exception) -> None:
+        pass
+
+    def execute(self, input_dto: str) -> str:
+        self.__class__.captured = get_context()
+        return input_dto
+
+
+@pytest.mark.pulse
+class TestUseCaseRunnerWithDecorator:
+    def setup_method(self):
+        self._token = _current_context.set(None)
+        _DecoratedCapture.captured = None
+        _EmptyDecoratedCapture.captured = None
+
+    def teardown_method(self):
+        _current_context.reset(self._token)
+
+    def test_decorator_overrides_subtrack(self):
+        uc = _DecoratedCapture()
+        runner = UseCaseRunner(uc, level=MonitoringLevel.BASIC)
+        runner.run("x")
+        ctx = _DecoratedCapture.captured
+        assert ctx is not None
+        assert ctx.subtrack == "checkout"
+
+    def test_decorator_overrides_feature(self):
+        uc = _DecoratedCapture()
+        runner = UseCaseRunner(uc, level=MonitoringLevel.BASIC)
+        runner.run("x")
+        ctx = _DecoratedCapture.captured
+        assert ctx is not None
+        assert ctx.feature == "pay"
+
+    def test_decorator_overrides_value_track(self):
+        uc = _DecoratedCapture()
+        runner = UseCaseRunner(uc, level=MonitoringLevel.BASIC)
+        runner.run("x")
+        ctx = _DecoratedCapture.captured
+        assert ctx is not None
+        assert ctx.value_track == "revenue"
+
+    def test_mapping_source_decorator(self):
+        uc = _DecoratedCapture()
+        runner = UseCaseRunner(uc, level=MonitoringLevel.BASIC)
+        runner.run("x")
+        ctx = _DecoratedCapture.captured
+        assert ctx is not None
+        assert ctx.mapping_source == "decorator"
+
+    def test_empty_decorator_keeps_heuristic(self):
+        uc = _EmptyDecoratedCapture()
+        runner = UseCaseRunner(uc, level=MonitoringLevel.BASIC)
+        runner.run("x")
+        ctx = _EmptyDecoratedCapture.captured
+        assert ctx is not None
+        assert ctx.mapping_source == "heuristic"
+
+    def test_ctx_overrides_win_over_decorator(self):
+        uc = _DecoratedCapture()
+        runner = UseCaseRunner(uc, level=MonitoringLevel.BASIC)
+        runner.run("x", value_track="custom", subtrack="override")
+        ctx = _DecoratedCapture.captured
+        assert ctx is not None
+        assert ctx.value_track == "custom"
+        assert ctx.subtrack == "override"
+
+    def test_off_level_does_not_read_decorator(self):
+        uc = _DecoratedCapture()
+        runner = UseCaseRunner(uc, level=MonitoringLevel.OFF)
+        assert runner._inferred == {}
+
+    def test_undecorated_usecase_unaffected(self):
+        uc = _ContextCapture()
+        _ContextCapture.captured = None
+        runner = UseCaseRunner(uc, level=MonitoringLevel.BASIC)
+        runner.run("x")
+        ctx = _ContextCapture.captured
+        assert ctx is not None
+        assert ctx.mapping_source == "heuristic"
+        assert ctx.value_track == "legacy"

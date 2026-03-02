@@ -7,6 +7,7 @@ from forge_base.pulse.collector import NoOpCollector, PulseCollector
 from forge_base.pulse.context import ExecutionContext, _current_context, set_context
 from forge_base.pulse.heuristic import infer_context
 from forge_base.pulse.level import MonitoringLevel
+from forge_base.pulse.meta import read_pulse_meta
 
 if TYPE_CHECKING:
     from forge_base.pulse.value_tracks import ValueTrackRegistry
@@ -35,6 +36,21 @@ class UseCaseRunner(Generic[TInput, TOutput]):
         # Bound method ref avoids attribute lookup on hot path (~30ns saving)
         self._execute = use_case.execute
         self._inferred: dict[str, str] = infer_context(use_case) if not self._off else {}
+        if not self._off:
+            meta = read_pulse_meta(use_case)
+            if meta is not None:
+                _any_overridden = False
+                if meta.subtrack:
+                    self._inferred["subtrack"] = meta.subtrack
+                    _any_overridden = True
+                if meta.feature:
+                    self._inferred["feature"] = meta.feature
+                    _any_overridden = True
+                if meta.value_track:
+                    self._inferred["value_track"] = meta.value_track
+                    _any_overridden = True
+                if _any_overridden:
+                    self._inferred["mapping_source"] = "decorator"
 
     def run(self, input_dto: TInput, **ctx_overrides: Any) -> TOutput:
         if self._off:

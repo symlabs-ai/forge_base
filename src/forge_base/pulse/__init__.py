@@ -6,6 +6,7 @@ from forge_base.pulse.exceptions import PulseConfigError, PulseError
 from forge_base.pulse.field_names import PulseFieldNames
 from forge_base.pulse.heuristic import infer_context
 from forge_base.pulse.level import MonitoringLevel
+from forge_base.pulse.meta import PulseMeta, pulse_meta, read_pulse_meta
 from forge_base.pulse.protocols import PulseExporterProtocol, PulseMetricsProtocol
 from forge_base.pulse.redaction import redact_keys
 from forge_base.pulse.report import HistogramStats, PulseSnapshot
@@ -26,6 +27,7 @@ __all__ = [
     "PulseError",
     "PulseExporterProtocol",
     "PulseFieldNames",
+    "PulseMeta",
     "PulseMetricsProtocol",
     "PulseSnapshot",
     "SUPPORTED_SPEC_VERSIONS",
@@ -34,6 +36,8 @@ __all__ = [
     "ValueTrackRegistry",
     "get_context",
     "infer_context",
+    "pulse_meta",
+    "read_pulse_meta",
     "redact_keys",
     "set_context",
     "validate_spec",
