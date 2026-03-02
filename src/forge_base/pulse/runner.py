@@ -1,4 +1,6 @@
-from typing import Any, Generic, TypeVar
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from forge_base.application.usecase_base import UseCaseBase
 from forge_base.pulse.collector import NoOpCollector, PulseCollector
@@ -6,23 +8,30 @@ from forge_base.pulse.context import ExecutionContext, _current_context, set_con
 from forge_base.pulse.heuristic import infer_context
 from forge_base.pulse.level import MonitoringLevel
 
+if TYPE_CHECKING:
+    from forge_base.pulse.value_tracks import ValueTrackRegistry
+
 TInput = TypeVar("TInput")
 TOutput = TypeVar("TOutput")
 
 
 class UseCaseRunner(Generic[TInput, TOutput]):
-    __slots__ = ("_use_case", "_level", "_off", "_collector", "_execute", "_inferred")
+    __slots__ = (
+        "_use_case", "_level", "_off", "_collector", "_execute", "_inferred", "_registry",
+    )
 
     def __init__(
         self,
         use_case: UseCaseBase[TInput, TOutput],
         level: MonitoringLevel = MonitoringLevel.OFF,
         collector: PulseCollector | None = None,
+        registry: ValueTrackRegistry | None = None,
     ) -> None:
         self._use_case = use_case
         self._level = level
         self._off: bool = level == MonitoringLevel.OFF
         self._collector: PulseCollector = collector or NoOpCollector()
+        self._registry = registry
         # Bound method ref avoids attribute lookup on hot path (~30ns saving)
         self._execute = use_case.execute
         self._inferred: dict[str, str] = infer_context(use_case) if not self._off else {}
@@ -31,9 +40,18 @@ class UseCaseRunner(Generic[TInput, TOutput]):
         if self._off:
             return self._execute(input_dto)
 
+        resolved = dict(self._inferred)
+        if self._registry is not None:
+            mapping = self._registry.resolve(resolved.get("use_case_name", ""))
+            if mapping is not None:
+                resolved["value_track"] = mapping.value_track
+                resolved["subtrack"] = mapping.subtrack or resolved.get("subtrack", "")
+                resolved["mapping_source"] = mapping.mapping_source
+        resolved.update(ctx_overrides)
+
         ctx = ExecutionContext.build(
             level=self._level,
-            **{**self._inferred, **ctx_overrides},
+            **resolved,
         )
         token = set_context(ctx)
         try:

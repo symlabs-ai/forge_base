@@ -119,7 +119,7 @@ class TestRunnerWithBasicCollector:
 
         snap = collector.snapshot()
         assert len(snap.executions) == 2
-        assert snap.schema_version == "0.2"
+        assert snap.schema_version == "0.3"
         assert snap.level == MonitoringLevel.BASIC
         assert all(e["success"] is True for e in snap.executions)
 
