@@ -20,6 +20,8 @@ Desenvolvedores que querem usar ForgeBase em seus projetos.
 | [CLI First](usuarios/cli-first.md) | Filosofia de desenvolvimento CLI First |
 | [Ambiente e Scripts](usuarios/ambiente_e_scripts.md) | Setup de ambiente e ferramentas |
 | [Extensão](usuarios/extending-forgebase.md) | Como estender ForgeBase |
+| [ForgePulse Quick Start](usuarios/pulse_quick_start.md) | Observabilidade nativa em 5 minutos |
+| [ForgePulse Cookbook](usuarios/pulse_cookbook.md) | Referência completa com receitas |
 
 ### Para Agentes de IA
 Agentes de IA (Claude Code, Cursor, Aider, etc.) que interagem com ForgeBase.
