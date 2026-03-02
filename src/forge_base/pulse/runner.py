@@ -10,6 +10,7 @@ from forge_base.pulse.level import MonitoringLevel
 from forge_base.pulse.meta import read_pulse_meta
 
 if TYPE_CHECKING:
+    from forge_base.pulse.policy import SamplingPolicy
     from forge_base.pulse.value_tracks import ValueTrackRegistry
 
 TInput = TypeVar("TInput")
@@ -19,6 +20,7 @@ TOutput = TypeVar("TOutput")
 class UseCaseRunner(Generic[TInput, TOutput]):
     __slots__ = (
         "_use_case", "_level", "_off", "_collector", "_execute", "_inferred", "_registry",
+        "_policy",
     )
 
     def __init__(
@@ -27,12 +29,14 @@ class UseCaseRunner(Generic[TInput, TOutput]):
         level: MonitoringLevel = MonitoringLevel.OFF,
         collector: PulseCollector | None = None,
         registry: ValueTrackRegistry | None = None,
+        policy: SamplingPolicy | None = None,
     ) -> None:
         self._use_case = use_case
         self._level = level
         self._off: bool = level == MonitoringLevel.OFF
         self._collector: PulseCollector = collector or NoOpCollector()
         self._registry = registry
+        self._policy = policy
         # Bound method ref avoids attribute lookup on hot path (~30ns saving)
         self._execute = use_case.execute
         self._inferred: dict[str, str] = infer_context(use_case) if not self._off else {}
@@ -70,14 +74,19 @@ class UseCaseRunner(Generic[TInput, TOutput]):
             **resolved,
         )
         token = set_context(ctx)
+        sampled = self._policy is None or self._policy.should_sample(ctx)
         try:
-            self._collector.on_start(ctx)
+            if sampled:
+                self._collector.on_start(ctx)
             result = self._use_case.execute(input_dto)
-            self._collector.on_success(ctx, result)
+            if sampled:
+                self._collector.on_success(ctx, result)
             return result
         except Exception as exc:
-            self._collector.on_error(ctx, exc)
+            if sampled:
+                self._collector.on_error(ctx, exc)
             raise
         finally:
-            self._collector.on_finish(ctx)
+            if sampled:
+                self._collector.on_finish(ctx)
             _current_context.reset(token)

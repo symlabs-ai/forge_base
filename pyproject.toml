@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge_base"
-version = "0.3.3"
+version = "0.3.4"
 description = "Cognitive Architecture Framework - Clean + Hexagonal Architecture with native observability. AI agent-friendly with programmatic API access."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -44,6 +44,7 @@ dev = [
     # Testing
     "pytest>=8.0.0",
     "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.23.0",
     "hypothesis>=6.0.0",  # Property-based testing
 
     # Code quality
@@ -196,6 +197,7 @@ known_first_party = ["forge_base"]
 DEP002 = [
     "pytest",
     "pytest-cov",
+    "pytest-asyncio",
     "hypothesis",
     "ruff",
     "mypy",

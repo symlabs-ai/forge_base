@@ -4,3 +4,7 @@ class PulseError(Exception):
 
 class PulseConfigError(PulseError):
     """Raised when pulse configuration (spec YAML, registry setup) is invalid."""
+
+
+class PulseIncompatibleExtensionError(PulseError):
+    """Raised when a CE extension is incompatible with the current Pulse version."""
