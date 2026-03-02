@@ -10,6 +10,7 @@ from forge_base.pulse.level import MonitoringLevel
 from forge_base.pulse.meta import read_pulse_meta
 
 if TYPE_CHECKING:
+    from forge_base.pulse.budget import BudgetPolicy
     from forge_base.pulse.policy import SamplingPolicy
     from forge_base.pulse.value_tracks import ValueTrackRegistry
 
@@ -20,7 +21,7 @@ TOutput = TypeVar("TOutput")
 class UseCaseRunner(Generic[TInput, TOutput]):
     __slots__ = (
         "_use_case", "_level", "_off", "_collector", "_execute", "_inferred", "_registry",
-        "_policy",
+        "_policy", "_budget",
     )
 
     def __init__(
@@ -30,6 +31,7 @@ class UseCaseRunner(Generic[TInput, TOutput]):
         collector: PulseCollector | None = None,
         registry: ValueTrackRegistry | None = None,
         policy: SamplingPolicy | None = None,
+        budget: BudgetPolicy | None = None,
     ) -> None:
         self._use_case = use_case
         self._level = level
@@ -37,6 +39,7 @@ class UseCaseRunner(Generic[TInput, TOutput]):
         self._collector: PulseCollector = collector or NoOpCollector()
         self._registry = registry
         self._policy = policy
+        self._budget = budget
         # Bound method ref avoids attribute lookup on hot path (~30ns saving)
         self._execute = use_case.execute
         self._inferred: dict[str, str] = infer_context(use_case) if not self._off else {}
@@ -75,6 +78,16 @@ class UseCaseRunner(Generic[TInput, TOutput]):
         )
         token = set_context(ctx)
         sampled = self._policy is None or self._policy.should_sample(ctx)
+
+        acc_token = None
+        span_token = None
+        if sampled:
+            from forge_base.pulse.span import _current_span_id, _span_accumulator, _SpanAccumulator
+
+            acc = _SpanAccumulator(self._budget)
+            acc_token = _span_accumulator.set(acc)
+            span_token = _current_span_id.set("")
+
         try:
             if sampled:
                 self._collector.on_start(ctx)
@@ -87,6 +100,11 @@ class UseCaseRunner(Generic[TInput, TOutput]):
                 self._collector.on_error(ctx, exc)
             raise
         finally:
+            # on_finish must run before resetting the accumulator — BasicCollector
+            # harvests spans from _span_accumulator inside on_finish.
             if sampled:
                 self._collector.on_finish(ctx)
+            if sampled and acc_token is not None and span_token is not None:
+                _span_accumulator.reset(acc_token)
+                _current_span_id.reset(span_token)
             _current_context.reset(token)

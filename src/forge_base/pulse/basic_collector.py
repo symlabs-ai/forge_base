@@ -9,6 +9,7 @@ from forge_base.pulse.context import ExecutionContext
 from forge_base.pulse.field_names import PulseFieldNames
 from forge_base.pulse.level import MonitoringLevel
 from forge_base.pulse.protocols import PulseMetricsProtocol
+from forge_base.pulse.span import SpanRecord, _span_accumulator
 
 if TYPE_CHECKING:
     from forge_base.pulse.report import PulseSnapshot
@@ -25,6 +26,7 @@ class ExecutionRecord:
     success: bool
     error_type: str
     timestamp: float = field(default_factory=time.time)
+    spans: list[SpanRecord] = field(default_factory=list)
 
 
 class BasicCollector:
@@ -106,6 +108,9 @@ class BasicCollector:
                 **self._standard_labels(context),
             )
 
+        acc = _span_accumulator.get()
+        spans = acc.harvest() if acc is not None else []
+
         record = ExecutionRecord(
             correlation_id=cid,
             use_case_name=context.use_case_name,
@@ -115,6 +120,7 @@ class BasicCollector:
             duration_ms=duration_ms,
             success=(error_type == ""),
             error_type=error_type,
+            spans=spans,
         )
         with self._lock:
             self._records.append(record)

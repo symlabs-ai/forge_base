@@ -45,8 +45,9 @@ class PulseSnapshot:
     ) -> PulseSnapshot:
         report = metrics.report()
 
-        executions = [
-            {
+        executions = []
+        for r in records:
+            exec_dict: dict[str, Any] = {
                 "correlation_id": r.correlation_id,
                 "use_case_name": r.use_case_name,
                 "value_track": r.value_track,
@@ -57,8 +58,17 @@ class PulseSnapshot:
                 "error_type": r.error_type,
                 "timestamp": r.timestamp,
             }
-            for r in records
-        ]
+            if r.spans:
+                exec_dict["spans"] = [
+                    {
+                        "span_id": s.span_id,
+                        "name": s.name,
+                        "duration_ms": s.duration_ms,
+                        "parent_span_id": s.parent_span_id,
+                    }
+                    for s in r.spans
+                ]
+            executions.append(exec_dict)
 
         histograms: dict[str, HistogramStats] = {}
         for key, hist_data in report.get("histograms", {}).items():
