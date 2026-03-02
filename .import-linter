@@ -1,5 +1,5 @@
 [importlinter]
-root_package = forgebase
+root_package = forge_base
 include_external_packages = False
 
 [importlinter:contract:layers]
@@ -11,34 +11,62 @@ layers =
     application
     domain
 containers =
-    forgebase
+    forge_base
 
 [importlinter:contract:domain-independence]
 name = Domain Layer Independence
 type = forbidden
 source_modules =
-    forgebase.domain
+    forge_base.domain
 forbidden_modules =
-    forgebase.application
-    forgebase.infrastructure
-    forgebase.adapters
-    forgebase.core
+    forge_base.application
+    forge_base.infrastructure
+    forge_base.adapters
+    forge_base.core
 
 [importlinter:contract:application-boundaries]
 name = Application Layer Boundaries
 type = forbidden
 source_modules =
-    forgebase.application
+    forge_base.application
 forbidden_modules =
-    forgebase.infrastructure
-    forgebase.adapters
-    forgebase.core
+    forge_base.infrastructure
+    forge_base.adapters
+    forge_base.core
 
 [importlinter:contract:infrastructure-boundaries]
 name = Infrastructure Layer Boundaries
 type = forbidden
 source_modules =
-    forgebase.infrastructure
+    forge_base.infrastructure
 forbidden_modules =
-    forgebase.adapters
-    forgebase.core
+    forge_base.adapters
+    forge_base.core
+
+[importlinter:contract:pulse-no-infra]
+name = Pulse Cannot Import Infrastructure
+type = forbidden
+source_modules =
+    forge_base.pulse
+forbidden_modules =
+    forge_base.infrastructure
+    forge_base.adapters
+
+[importlinter:contract:pulse-no-domain]
+name = Pulse Cannot Import Domain
+type = forbidden
+source_modules =
+    forge_base.pulse
+forbidden_modules =
+    forge_base.domain
+
+[importlinter:contract:core-no-pulse]
+name = Existing Layers Cannot Import Pulse
+type = forbidden
+source_modules =
+    forge_base.domain
+    forge_base.application
+    forge_base.infrastructure
+    forge_base.adapters
+forbidden_modules =
+    forge_base.pulse

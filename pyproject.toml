@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge_base"
-version = "0.2.0"
+version = "0.3.0"
 description = "Cognitive Architecture Framework - Clean + Hexagonal Architecture with native observability. AI agent-friendly with programmatic API access."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -99,12 +99,15 @@ addopts = [
     "--cov=src/forge_base",
     "--cov-report=term-missing",
     "--cov-report=html",
+    "-m not pulse_benchmark",
 ]
 markers = [
     "unit: Unit tests",
     "integration: Integration tests",
     "property: Property-based tests",
     "contract: Contract tests",
+    "pulse: ForgePulse tests",
+    "pulse_benchmark: ForgePulse benchmark tests",
 ]
 
 # Coverage configuration
@@ -156,6 +159,7 @@ ban-relative-imports = "all"
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]  # Allow unused imports in __init__.py
 "tests/*" = ["B011"]      # Allow assert False in tests
+"tests/benchmarks/*" = ["B011"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["forge_base", "examples"]
