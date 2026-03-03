@@ -1,10 +1,10 @@
 # ForgeBase
 
-**ForgeBase** é o núcleo técnico do Forge Framework — a infraestrutura cognitiva onde o raciocínio do ForgeProcess se transforma em código observável, reflexivo e modular.
+**ForgeBase** is the technical core of the Forge Framework — the cognitive infrastructure where ForgeProcess reasoning is transformed into observable, reflexive, and modular code.
 
 ---
 
-## 🤖 For AI Coding Agents
+## For AI Coding Agents
 
 **First time using ForgeBase?** Access complete API documentation programmatically:
 
@@ -38,16 +38,16 @@ for tool, result in results.items():
 ```
 
 **Why this matters:**
-- ✅ Works offline (docs embedded in package)
-- ✅ Structured, machine-readable results (not CLI text parsing)
-- ✅ Auto-discovery of components and architecture
-- ✅ Integrated quality checking and code generation
+- Works offline (docs embedded in package)
+- Structured, machine-readable results (not CLI text parsing)
+- Auto-discovery of components and architecture
+- Integrated quality checking and code generation
 
-📚 **Complete guide:** See [docs/agentes-ia/](docs/agentes-ia/) for full documentation with error codes, data structures, and workflow examples.
+**Complete guide:** See [docs/ai-agents/](docs/ai-agents/) for full documentation with error codes, data structures, and workflow examples.
 
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
 ### Installation
 
@@ -88,227 +88,226 @@ python devtool.py test
 
 ---
 
-## 🏗️ Estrutura do Repositório
+## Repository Structure
 
 ```
 forge_base/
-├── docs/                 # Documentação completa (reorganizada)
-│   ├── usuarios/         # Guias para desenvolvedores humanos
-│   ├── agentes-ia/       # Documentação para AI agents
-│   ├── referencia/       # Referência técnica e arquitetura
+├── docs/                 # Complete documentation (reorganized)
+│   ├── users/            # Guides for human developers
+│   ├── ai-agents/        # Documentation for AI agents
+│   ├── reference/        # Technical reference and architecture
 │   └── adr/              # Architecture Decision Records
-├── examples/             # Exemplos de uso do framework
-├── scripts/              # Scripts de desenvolvimento (scaffolding, discovery)
-├── src/                  # Código-fonte do framework ForgeBase
+├── examples/             # Framework usage examples
+├── scripts/              # Development scripts (scaffolding, discovery)
+├── src/                  # ForgeBase framework source code
 │   └── forge_base/
-│       ├── domain/           # Camada de Domínio
-│       ├── application/      # Camada de Aplicação
-│       ├── infrastructure/   # Camada de Infraestrutura
-│       ├── integration/      # Adaptadores e integrações
-│       └── observability/    # Sistema de observabilidade
-├── tests/                # Testes (unit, integration, property-based, contract)
-├── devtool.py           # CLI unificada para desenvolvimento
-├── pyproject.toml       # Configuração do projeto (PEP 621)
-├── setup.py             # Shim para backward compatibility
-├── CHANGELOG.md         # Histórico de mudanças
-├── CONTRIBUTING.md      # Guia de contribuição
-├── VERSION.MD           # Versão atual do projeto
-└── README.md            # Este arquivo
+│       ├── domain/           # Domain Layer
+│       ├── application/      # Application Layer
+│       ├── infrastructure/   # Infrastructure Layer
+│       ├── integration/      # Adapters and integrations
+│       └── observability/    # Observability system
+├── tests/                # Tests (unit, integration, property-based, contract)
+├── devtool.py           # Unified development CLI
+├── pyproject.toml       # Project configuration (PEP 621)
+├── setup.py             # Shim for backward compatibility
+├── CHANGELOG.md         # Change history
+├── CONTRIBUTING.md      # Contribution guide
+├── VERSION.MD           # Current project version
+└── README.md            # This file
 ```
 
-### 📂 Detalhamento das Pastas
+### Folder Details
 
 #### `docs/`
-Documentação completa do projeto, organizada por público-alvo:
-- **usuarios/** — Guias para desenvolvedores (início rápido, receitas, testes)
-- **agentes-ia/** — Documentação para AI agents (APIs, descoberta, ecossistema)
-- **referencia/** — Referência técnica (ForgeProcess, arquitetura, backlog)
+Complete project documentation, organized by target audience:
+- **users/** — Guides for developers (quick start, recipes, testing)
+- **ai-agents/** — Documentation for AI agents (APIs, discovery, ecosystem)
+- **reference/** — Technical reference (ForgeProcess, architecture)
 - **adr/** — Architecture Decision Records
 
 #### `examples/`
-Exemplos práticos de uso do framework:
-- **user_management/** — Sistema completo de gerenciamento de usuários
-  - Demonstra Clean Architecture na prática
-  - Inclui domínio (User, Email), aplicação (CreateUserUseCase) e infraestrutura (JSONUserRepository)
+Practical framework usage examples:
+- **user_management/** — Complete user management system
+  - Demonstrates Clean Architecture in practice
+  - Includes domain (User, Email), application (CreateUserUseCase), and infrastructure (JSONUserRepository)
 
 #### `scripts/`
-Ferramentas de desenvolvimento:
-- **scaffold.py** — Gerador de boilerplate (UseCases, Ports, Adapters)
-- **discover.py** — Descoberta e catalogação de componentes
-- **mypy.ini** — Configuração de type checking
+Development tools:
+- **scaffold.py** — Boilerplate generator (UseCases, Ports, Adapters)
+- **discover.py** — Component discovery and cataloging
+- **mypy.ini** — Type checking configuration
 
 #### `src/forge_base/`
-Código-fonte seguindo Clean + Hexagonal Architecture:
+Source code following Clean + Hexagonal Architecture:
 
-**`domain/`** — Camada de Domínio (núcleo do negócio)
-- `entity_base.py` — Classe base para entidades com identidade imutável
-- `value_object_base.py` — Classe base para value objects imutáveis
-- `exceptions.py` — Exceções de negócio (BusinessRuleViolation, ValidationError)
+**`domain/`** — Domain Layer (business core)
+- `entity_base.py` — Base class for entities with immutable identity
+- `value_object_base.py` — Base class for immutable value objects
+- `exceptions.py` — Business exceptions (BusinessRuleViolation, ValidationError)
 
-**`application/`** — Camada de Aplicação (orquestração)
-- `usecase_base.py` — Classe base genérica para casos de uso
-- `port_base.py` — Classe base para portas (abstrações de I/O)
-- `dto_base.py` — Classe base para DTOs (Data Transfer Objects)
+**`application/`** — Application Layer (orchestration)
+- `usecase_base.py` — Generic base class for use cases
+- `port_base.py` — Base class for ports (I/O abstractions)
+- `dto_base.py` — Base class for DTOs (Data Transfer Objects)
 
-**`infrastructure/`** — Camada de Infraestrutura (implementações)
-- `config/` — Gerenciamento de configurações (YAML, environment)
-- `repository/` — Implementações do padrão Repository
-  - `repository_base.py` — Interface abstrata do Repository Pattern
-  - `json_repository.py` — Repository com armazenamento em JSON (dev/testing)
-  - `sql_repository.py` — Repository com SQLAlchemy (produção)
+**`infrastructure/`** — Infrastructure Layer (implementations)
+- `config/` — Configuration management (YAML, environment)
+- `repository/` — Repository Pattern implementations
+  - `repository_base.py` — Abstract Repository Pattern interface
+  - `json_repository.py` — Repository with JSON storage (dev/testing)
+  - `sql_repository.py` — Repository with SQLAlchemy (production)
 
-**`integration/`** — Adaptadores externos
-- Adaptadores para sistemas externos, APIs, etc.
+**`integration/`** — External adapters
+- Adapters for external systems, APIs, etc.
 
-**`observability/`** — Sistema de observabilidade nativo
-- Decoradores e utilitários para métricas, logging e tracing
+**`observability/`** — Native observability system
+- Decorators and utilities for metrics, logging, and tracing
 
 #### `tests/`
-Suíte de testes completa:
-- **unit/** — Testes unitários isolados
-- **integration/** — Testes de integração entre componentes
-- **property_based/** — Testes baseados em propriedades (Hypothesis)
-- **contract_tests/** — Testes de contratos entre camadas
+Complete test suite:
+- **unit/** — Isolated unit tests
+- **integration/** — Inter-component integration tests
+- **property_based/** — Property-based tests (Hypothesis)
+- **contract_tests/** — Contract tests between layers
 
 #### `devtool.py`
-CLI unificada para desenvolvimento:
+Unified development CLI:
 ```bash
-python devtool.py scaffold      # Gerar boilerplate
-python devtool.py discover      # Catalogar componentes
-python devtool.py test          # Executar testes
+python devtool.py scaffold      # Generate boilerplate
+python devtool.py discover      # Catalog components
+python devtool.py test          # Run tests
 python devtool.py lint          # Linters (Ruff, Mypy)
-python devtool.py check-deps    # Validar dependências
-python devtool.py check-arch    # Validar arquitetura
-python devtool.py quality       # Suite completa de qualidade
+python devtool.py check-deps    # Validate dependencies
+python devtool.py check-arch    # Validate architecture
+python devtool.py quality       # Full quality suite
 ```
 
-### 📄 Arquivos de Configuração
+### Configuration Files
 
 #### `pyproject.toml`
-Configuração moderna seguindo PEP 621:
-- Metadados do projeto e dependências
-- Configuração de ferramentas (pytest, mypy, ruff, coverage, deptry)
-- Fonte única de verdade para todo o projeto
+Modern configuration following PEP 621:
+- Project metadata and dependencies
+- Tool configuration (pytest, mypy, ruff, coverage, deptry)
+- Single source of truth for the entire project
 
 #### `.import-linter`
-Validação de boundaries da Clean Architecture:
-- Garante que camadas não violem dependências
-- Domain não pode importar Application/Infrastructure
-- Application não pode importar Infrastructure
+Clean Architecture boundary validation:
+- Ensures layers do not violate dependencies
+- Domain cannot import Application/Infrastructure
+- Application cannot import Infrastructure
 
 #### `VERSION.MD`
-Rastreamento da versão atual do projeto
+Current project version tracking
 
 #### `CHANGELOG.md`
-Histórico detalhado de mudanças por versão
+Detailed change history by version
 
 ---
 
-## 🧠 Filosofia
+## Philosophy
 
-> "Forjar é transformar pensamento em estrutura."
+> "To forge is to transform thought into structure."
 
-ForgeBase não é apenas um framework técnico — é uma **arquitetura cognitiva** que:
-- **Pensa**: Cada componente carrega intenção e propósito
-- **Mede**: Observabilidade nativa em todos os níveis
-- **Explica**: Capacidade de auto-reflexão e documentação viva
+ForgeBase is not just a technical framework — it is a **cognitive architecture** that:
+- **Thinks**: Each component carries intention and purpose
+- **Measures**: Native observability at all levels
+- **Explains**: Self-reflection and living documentation capability
 
-### Princípios Fundamentais
+### Core Principles
 
-1. **Reflexividade** — O código entende e explica seu próprio funcionamento
-2. **Autonomia** — Módulos independentes com contratos bem definidos
-3. **Coerência Cognitiva** — Padrões consistentes em toda a arquitetura
+1. **Reflexivity** — Code understands and explains its own workings
+2. **Autonomy** — Independent modules with well-defined contracts
+3. **Cognitive Coherence** — Consistent patterns across the entire architecture
 
 ---
 
-## 🚀 Status do Projeto
+## Project Status
 
-**Versão Atual:** v0.1.2 (Production-Ready)
+**Current Version:** v0.1.2 (Production-Ready)
 
-### ✅ Completo (FASE 1 - Foundation)
+### Complete (PHASE 1 - Foundation)
 
 **Domain Layer**
-- ✅ EntityBase com ID imutável (property-based)
-- ✅ ValueObjectBase com igualdade estrutural
-- ✅ Exceções de negócio (BusinessRuleViolation, ValidationError)
+- EntityBase with immutable ID (property-based)
+- ValueObjectBase with structural equality
+- Business exceptions (BusinessRuleViolation, ValidationError)
 
 **Application Layer**
-- ✅ UseCaseBase genérico (Generic[TInput, TOutput])
-- ✅ PortBase para abstrações de I/O
-- ✅ DTOBase para transferência de dados
+- Generic UseCaseBase (Generic[TInput, TOutput])
+- PortBase for I/O abstractions
+- DTOBase for data transfer
 
 **Infrastructure Layer**
-- ✅ RepositoryBase (Repository Pattern do DDD)
-- ✅ JSONRepository (thread-safe, development/testing)
-- ✅ SQLRepository (SQLAlchemy, production-ready)
-- ✅ ConfigLoader (YAML + environment variables)
+- RepositoryBase (DDD Repository Pattern)
+- JSONRepository (thread-safe, development/testing)
+- SQLRepository (SQLAlchemy, production-ready)
+- ConfigLoader (YAML + environment variables)
 
 **Developer Tooling**
-- ✅ devtool.py (CLI unificada)
-- ✅ Scaffolding (geração de boilerplate)
-- ✅ Discovery (catalogação de componentes)
-- ✅ Modern dependency management (pyproject.toml)
-- ✅ Import standardization (100% absolute imports)
-- ✅ Cross-platform support
+- devtool.py (unified CLI)
+- Scaffolding (boilerplate generation)
+- Discovery (component cataloging)
+- Modern dependency management (pyproject.toml)
+- Import standardization (100% absolute imports)
+- Cross-platform support
 
 **Quality Assurance**
-- ✅ 84+ testes passing (unit + integration + property-based + contract)
-- ✅ Mypy strict type checking
-- ✅ Ruff linting + pre-commit hooks
-- ✅ Import-linter (architecture boundary validation)
-- ✅ Deptry (dependency hygiene)
+- 84+ tests passing (unit + integration + property-based + contract)
+- Mypy strict type checking
+- Ruff linting + pre-commit hooks
+- Import-linter (architecture boundary validation)
+- Deptry (dependency hygiene)
 
-### 🚧 Em Desenvolvimento (FASE 2)
+### In Development (PHASE 2)
 
 **Observability**
-- 🚧 Métricas nativas
-- 🚧 Decoradores de observabilidade
-- 🚧 Sistema de logging estruturado
+- Native metrics
+- Observability decorators
+- Structured logging system
 
 **Integration Layer**
-- 🚧 Adaptadores para sistemas externos
-- 🚧 API adapters (REST, GraphQL)
+- External system adapters
+- API adapters (REST, GraphQL)
 
-### 📋 Backlog
+### Backlog
 
-Consulte o [CHANGELOG.md](/CHANGELOG.md) para histórico detalhado de mudanças.
+See [CHANGELOG.md](/CHANGELOG.md) for detailed change history.
 
-Consulte o [docs/referencia/backlog.md](/docs/referencia/backlog.md) para o roadmap completo com 54 componentes organizados em 8 fases.
-
----
-
-## 📖 Documentação
-
-Para entender a arquitetura completa, consulte:
-
-### Para Desenvolvedores
-- [Início Rápido](/docs/usuarios/inicio-rapido.md) — Instalação e primeiros passos
-- [Receitas](/docs/usuarios/receitas.md) — Exemplos práticos de uso
-- [Guia de Testes](/docs/usuarios/guia-de-testes.md) — Como executar e escrever testes
-
-### Para AI Agents
-- [Início Rápido](/docs/agentes-ia/inicio-rapido.md) — Quick start para agentes de IA
-- [Guia Completo](/docs/agentes-ia/guia-completo.md) — Referência completa de APIs
-- [Descoberta](/docs/agentes-ia/descoberta.md) — Sistema de descoberta de APIs
-- [Ecossistema](/docs/agentes-ia/ecossistema.md) — Integração com ferramentas
-
-### Referência Técnica
-- [ForgeProcess](/docs/referencia/forge-process.md) — Ciclo cognitivo de desenvolvimento
-- [Arquitetura](/docs/referencia/arquitetura.md) — Modularização do núcleo
-- [Backlog](/docs/referencia/backlog.md) — Roadmap (8 fases, 54 componentes)
+See [CHANGELOG.md](/CHANGELOG.md) for detailed change history.
 
 ---
-## 🛠️ AVISOS IMPORTANTES
-- Nunca grave nada na raíz sem solitacao explicita do usuario
-- Nunca de push no repositorio remoto sem solitacao explicita do usuario
-- Nunca crie tags ou aumente versao do forge_base sem solitacao explicita do usuario
-- A fonte da verdade sobre a versao atual, bem como historico sintetico pode ser encontrada em VERSION.md
 
-## 🛠️ Tecnologias
+## Documentation
+
+For a complete understanding of the architecture, see:
+
+### For Developers
+- [Quick Start](/docs/users/quick-start.md) — Installation and first steps
+- [Recipes](/docs/users/recipes.md) — Practical usage examples
+- [Testing Guide](/docs/users/testing-guide.md) — How to run and write tests
+
+### For AI Agents
+- [Quick Start](/docs/ai-agents/quick-start.md) — Quick start for AI agents
+- [Complete Guide](/docs/ai-agents/complete-guide.md) — Full API reference
+- [Discovery](/docs/ai-agents/discovery.md) — API discovery system
+- [Ecosystem](/docs/ai-agents/ecosystem.md) — Tool integration
+
+### Technical Reference
+- [ForgeProcess](/docs/reference/forge-process.md) — Cognitive development cycle
+- [Architecture](/docs/reference/architecture.md) — Core modularization
+
+---
+## IMPORTANT NOTICES
+- Never write anything to the root without explicit user request
+- Never push to the remote repository without explicit user request
+- Never create tags or bump forge_base version without explicit user request
+- The source of truth for the current version, as well as synthetic history, can be found in VERSION.md
+
+## Technologies
 
 - **Python 3.11+**
 - **Clean Architecture** + **Hexagonal Architecture**
-- **Observabilidade Nativa** (Logging, Métricas, Tracing)
+- **Native Observability** (Logging, Metrics, Tracing)
 - **Test-Driven Development**
 
 ---

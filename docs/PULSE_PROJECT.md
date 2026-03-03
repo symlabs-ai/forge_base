@@ -1,109 +1,109 @@
-# ForgePulse — Plano de Projeto
+# ForgePulse — Project Plan
 
-Documento central de implementacao do ForgePulse: camada opcional de instrumentacao
-por ValueTrack com governanca CL/CE.
+Central implementation document for ForgePulse: optional instrumentation layer
+per ValueTrack with CL/CE governance.
 
-**Origem:** [ForgePulse_PROPOSAL.md](ForgePulse_PROPOSAL.md)
-**ADRs relacionados:** [003-observability-first](adr/003-observability-first.md), [007-opentelemetry-integration](adr/007-opentelemetry-integration.md)
-**Versao base:** ForgeBase 0.2.0
-**Status:** Em planejamento
-
----
-
-## Indice
-
-1. [Visao e Principios](#1-visao-e-principios)
-2. [Arquitetura CL/CE](#2-arquitetura-clce)
-3. [Decisoes Tecnicas Chave](#3-decisoes-tecnicas-chave)
-4. [Mapa de Fases](#4-mapa-de-fases)
-5. [Fase 0 — Fundacao (no-op)](#5-fase-0--fundacao-no-op)
-6. [Fase 1 — BASIC/STANDARD + Heuristica Legado](#6-fase-1--basicstandard--heuristica-legado)
-7. [Fase 2 — Mapeamento por Spec (CE)](#7-fase-2--mapeamento-por-spec-ce)
-8. [Fase 3 — Decorators Opcionais + Tracing](#8-fase-3--decorators-opcionais--tracing)
-9. [Fase 4 — Governanca Avancada](#9-fase-4--governanca-avancada)
-10. [Fase 5 — Strict Mode + Relatorios](#10-fase-5--strict-mode--relatorios)
-11. [Codigo Existente Reaproveitado](#11-codigo-existente-reaproveitado)
-12. [Estrategia de Testes](#12-estrategia-de-testes)
-13. [Riscos e Mitigacoes](#13-riscos-e-mitigacoes)
-14. [Glossario](#14-glossario)
+**Origin:** [ForgePulse_PROPOSAL.md](ForgePulse_PROPOSAL.md)
+**Related ADRs:** [003-observability-first](adr/003-observability-first.md), [007-opentelemetry-integration](adr/007-opentelemetry-integration.md)
+**Base version:** ForgeBase 0.2.0
+**Status:** In planning
 
 ---
 
-## 1. Visao e Principios
+## Table of Contents
 
-### Problema
-
-O ForgeBase mede "saude tecnica" (logs, metricas, traces), mas nao mede "valor entregue por eixo".
-Sem essa conexao, roadmap vira narrativa e cada produto instrumenta do seu jeito.
-
-### Objetivo
-
-Adicionar ao ForgeBase uma camada opcional (`pulse/`) que instrumenta execucoes por ValueTrack
-sem quebrar compatibilidade, preservando Clean Architecture e permitindo governanca CL/CE.
-
-### Principios Inviolaveis
-
-| # | Principio | Verificacao |
-|---|-----------|-------------|
-| P1 | **Compatibilidade total** — ForgeBase sem ForgePulse continua identico | Todos os 248+ testes passam sem mudanca |
-| P2 | **Opt-in** — Nada obrigatorio. Decorators sao metadata opcional | UseCase nao importa nada de `pulse/` |
-| P3 | **Clean Architecture intacta** — UseCases nao dependem de infra | import-linter valida boundaries |
-| P4 | **Overhead controlado** — OFF = custo zero real | Benchmark: < 100ns overhead em OFF |
-| P5 | **Schema estavel** — Eventos/metricas seguem versao | Dataclass versionado com campo `schema_version` |
+1. [Vision and Principles](#1-vision-and-principles)
+2. [CL/CE Architecture](#2-clce-architecture)
+3. [Key Technical Decisions](#3-key-technical-decisions)
+4. [Phase Map](#4-phase-map)
+5. [Phase 0 — Foundation (no-op)](#5-phase-0--foundation-no-op)
+6. [Phase 1 — BASIC/STANDARD + Legacy Heuristic](#6-phase-1--basicstandard--legacy-heuristic)
+7. [Phase 2 — Mapping via Spec (CE)](#7-phase-2--mapping-via-spec-ce)
+8. [Phase 3 — Optional Decorators + Tracing](#8-phase-3--optional-decorators--tracing)
+9. [Phase 4 — Advanced Governance](#9-phase-4--advanced-governance)
+10. [Phase 5 — Strict Mode + Reports](#10-phase-5--strict-mode--reports)
+11. [Existing Code Reused](#11-existing-code-reused)
+12. [Testing Strategy](#12-testing-strategy)
+13. [Risks and Mitigations](#13-risks-and-mitigations)
+14. [Glossary](#14-glossary)
 
 ---
 
-## 2. Arquitetura CL/CE
+## 1. Vision and Principles
 
-### CL — Core Logic (nucleo estavel, vive em `forge_base`)
+### Problem
 
-Permanece confiavel, consistente e compativel:
+ForgeBase measures "technical health" (logs, metrics, traces), but does not measure "value delivered per axis".
+Without this connection, the roadmap becomes narrative and each product instruments in its own way.
 
-- Runtime de execucao (engine)
-- Contratos (interfaces/tipos) e schema base
-- Propagacao de contexto (`ExecutionContext`)
-- Mecanismos de plugin/hook e governanca
-- Protocolos de observabilidade (`LoggerProtocol`, `MetricsProtocol`)
+### Objective
 
-**CL nao contem:** regras de cliente, politica especifica, exporter especifico.
+Add to ForgeBase an optional layer (`pulse/`) that instruments executions per ValueTrack
+without breaking compatibility, preserving Clean Architecture and enabling CL/CE governance.
 
-### CE — Customer Extensions (extensoes configuraveis, vivem no produto)
+### Inviolable Principles
 
-Varia por projeto/tenant/produto/ambiente:
+| # | Principle | Verification |
+|---|-----------|--------------|
+| P1 | **Full compatibility** — ForgeBase without ForgePulse remains identical | All 248+ tests pass without changes |
+| P2 | **Opt-in** — Nothing mandatory. Decorators are optional metadata | UseCase does not import anything from `pulse/` |
+| P3 | **Clean Architecture intact** — UseCases do not depend on infra | import-linter validates boundaries |
+| P4 | **Controlled overhead** — OFF = real zero cost | Benchmark: < 100ns overhead in OFF |
+| P5 | **Stable schema** — Events/metrics follow versioning | Versioned dataclass with `schema_version` field |
 
-- Mapeamentos de ValueTracks/SubTracks para UseCases (via spec YAML)
-- Politicas de monitoramento (nivel, sampling, budgets)
-- Exporters/sinks (OTEL/Prometheus/ClickHouse/arquivo)
-- Relatorios customizados
-- Classificacoes de risco e tags
+---
 
-**CE nao pode furar o CL. CE pluga via contrato (protocols).**
+## 2. CL/CE Architecture
 
-### Onde a instrumentacao acontece
+### CL — Core Logic (stable core, lives in `forge_base`)
+
+Remains reliable, consistent, and compatible:
+
+- Execution runtime (engine)
+- Contracts (interfaces/types) and base schema
+- Context propagation (`ExecutionContext`)
+- Plugin/hook mechanisms and governance
+- Observability protocols (`LoggerProtocol`, `MetricsProtocol`)
+
+**CL does not contain:** customer rules, specific policies, specific exporters.
+
+### CE — Customer Extensions (configurable extensions, live in the product)
+
+Varies by project/tenant/product/environment:
+
+- ValueTrack/SubTrack mappings to UseCases (via YAML spec)
+- Monitoring policies (level, sampling, budgets)
+- Exporters/sinks (OTEL/Prometheus/ClickHouse/file)
+- Custom reports
+- Risk classifications and tags
+
+**CE cannot break through CL. CE plugs in via contract (protocols).**
+
+### Where Instrumentation Happens
 
 ```
 Adapter (HTTP/CLI)
     |
     v
-UseCaseRunner (composition root)  <-- cria ExecutionContext, mede inicio/fim/erro
+UseCaseRunner (composition root)  <-- creates ExecutionContext, measures start/end/error
     |
     v
-UseCaseBase.execute()             <-- permanece PURO, sem dependencia de pulse
+UseCaseBase.execute()             <-- remains PURE, no dependency on pulse
     |
     v
-Port/Repository                   <-- adapters medem custo/latencia/retry via protocols
+Port/Repository                   <-- adapters measure cost/latency/retry via protocols
 ```
 
 ---
 
-## 3. Decisoes Tecnicas Chave
+## 3. Key Technical Decisions
 
-### DT-1: Propagacao de contexto via `contextvars`
+### TD-1: Context propagation via `contextvars`
 
-**Problema:** Injetar `ExecutionContext` no `execute(input_dto)` viola Clean Architecture.
-Thread-local (`threading.local`) nao funciona com async.
+**Problem:** Injecting `ExecutionContext` into `execute(input_dto)` violates Clean Architecture.
+Thread-local (`threading.local`) does not work with async.
 
-**Decisao:** Usar `contextvars.ContextVar` (stdlib, async-safe).
+**Decision:** Use `contextvars.ContextVar` (stdlib, async-safe).
 
 ```python
 # pulse/context.py
@@ -111,37 +111,37 @@ from contextvars import ContextVar
 _current_context: ContextVar[ExecutionContext | None] = ContextVar('pulse_ctx', default=None)
 ```
 
-O `UseCaseRunner` seta o contexto antes de chamar `execute()`.
-Qualquer camada le sem dependencia explicita. A assinatura de `execute()` nao muda.
+The `UseCaseRunner` sets the context before calling `execute()`.
+Any layer can read it without explicit dependency. The `execute()` signature does not change.
 
-**Referencia:** `LogContext` em `log_service.py:67-107` ja usa pattern similar com `threading.local`.
+**Reference:** `LogContext` in `log_service.py:67-107` already uses a similar pattern with `threading.local`.
 
-### DT-2: Protocolo de metricas separado (sem quebrar MetricsProtocol)
+### TD-2: Separate metrics protocol (without breaking MetricsProtocol)
 
-**Problema:** O `MetricsProtocol` atual (`composition/protocols.py:51-73`) so tem `increment()` e `timing()`.
-ForgePulse precisa de `histogram()` e `gauge()`. Estender o protocolo existente quebra mypy/pyright
-para qualquer classe que implemente `MetricsProtocol` sem os novos metodos.
+**Problem:** The current `MetricsProtocol` (`composition/protocols.py:51-73`) only has `increment()` and `timing()`.
+ForgePulse needs `histogram()` and `gauge()`. Extending the existing protocol would break mypy/pyright
+for any class implementing `MetricsProtocol` without the new methods.
 
-**Decisao:** Manter `MetricsProtocol` intacto. ForgePulse define `PulseMetricsProtocol` proprio.
+**Decision:** Keep `MetricsProtocol` intact. ForgePulse defines its own `PulseMetricsProtocol`.
 
 ```python
 # pulse/protocols.py
 class PulseMetricsProtocol(Protocol):
-    """Protocolo estendido para pulse. Nao altera MetricsProtocol existente."""
+    """Extended protocol for pulse. Does not alter existing MetricsProtocol."""
     def increment(self, name: str, value: int = 1, **tags: Any) -> None: ...
     def timing(self, name: str, value: float, **tags: Any) -> None: ...
     def histogram(self, name: str, value: float, **tags: Any) -> None: ...
     def gauge(self, name: str, value: float, **tags: Any) -> None: ...
 ```
 
-`TrackMetrics` ja implementa todos os 4 metodos — satisfaz `PulseMetricsProtocol` sem mudanca.
-`MetricsProtocol` original permanece com `increment()` e `timing()` — zero breaking change.
+`TrackMetrics` already implements all 4 methods — satisfies `PulseMetricsProtocol` without changes.
+The original `MetricsProtocol` remains with `increment()` and `timing()` — zero breaking change.
 
-**Resultado:** typing no ecossistema nao falha ao atualizar para 0.3.0.
+**Result:** typing in the ecosystem does not fail when upgrading to 0.3.0.
 
-### DT-3: Niveis de monitoramento como enum com fast-path
+### TD-3: Monitoring levels as enum with fast-path
 
-**Decisao:** Enum `MonitoringLevel` com check de nivel antes de qualquer alocacao.
+**Decision:** `MonitoringLevel` enum with level check before any allocation.
 
 ```python
 class MonitoringLevel(IntEnum):
@@ -152,58 +152,58 @@ class MonitoringLevel(IntEnum):
     DIAGNOSTIC = 4
 ```
 
-Usando `IntEnum`, o check `if level >= MonitoringLevel.STANDARD` e uma comparacao de inteiros (~1ns).
-Em OFF, o `UseCaseRunner` faz passthrough direto — nenhum `ExecutionContext` criado,
-nenhum `ContextVar` setado, nenhum dict alocado. Ver DT-3b.
+Using `IntEnum`, the check `if level >= MonitoringLevel.STANDARD` is an integer comparison (~1ns).
+In OFF, the `UseCaseRunner` does a direct passthrough — no `ExecutionContext` created,
+no `ContextVar` set, no dict allocated. See TD-3b.
 
-### DT-3b: Fast-path real em OFF (sem alocacao)
+### TD-3b: Real fast-path in OFF (no allocation)
 
-**Problema:** Criar `ExecutionContext` (frozen dataclass) + `ContextVar.set()` custa ~200-500ns.
-A meta "OFF < 100ns" e inatingivel se qualquer objeto for criado.
+**Problem:** Creating `ExecutionContext` (frozen dataclass) + `ContextVar.set()` costs ~200-500ns.
+The "OFF < 100ns" target is unattainable if any object is created.
 
-**Decisao:** Em OFF, o `UseCaseRunner.run()` e passthrough direto:
+**Decision:** In OFF, `UseCaseRunner.run()` is a direct passthrough:
 
 ```python
 def run(self, input_dto: TInput, **ctx_overrides: Any) -> TOutput:
     if self._level == MonitoringLevel.OFF:
         return self._use_case.execute(input_dto)  # zero overhead
-    # ... contexto, medicao, coleta (somente level > OFF)
+    # ... context, measurement, collection (only level > OFF)
 ```
 
-- OFF: nao cria ExecutionContext, nao seta ContextVar, nao mede tempo
-- BASIC+: cria contexto completo, seta ContextVar, mede tempo
+- OFF: does not create ExecutionContext, does not set ContextVar, does not measure time
+- BASIC+: creates full context, sets ContextVar, measures time
 
-**Criterio:** benchmark com runner real (nao microbenchmark isolado).
+**Criterion:** benchmark with real runner (not isolated microbenchmark).
 
-Benchmarks sao executados em maquina de referencia e validados por comparacao
-relativa (`runner.run()` vs `use_case.execute()` direto), para evitar flutuacoes
-de nanosegundos por ambiente.
+Benchmarks are run on a reference machine and validated by relative comparison
+(`runner.run()` vs `use_case.execute()` directly), to avoid nanosecond fluctuations
+across environments.
 
-### DT-4: ECM adiado para Fase 4
+### TD-4: ECM deferred to Phase 4
 
-**Decisao:** Extension Compatibility Matrix so faz sentido quando existirem extensoes CE reais
-publicadas como pacotes separados. Ate la, confiar no versionamento semantico normal.
+**Decision:** Extension Compatibility Matrix only makes sense when real CE extensions
+exist as separate published packages. Until then, rely on normal semantic versioning.
 
-### DT-5: Relatorios sao dados estruturados, nao documentos
+### TD-5: Reports are structured data, not documents
 
-**Decisao:** ForgePulse CL expoe dataclasses com dados brutos (`PulseReport`).
-Formatacao em Markdown/JSON e responsabilidade de CE ou do produto consumidor.
+**Decision:** ForgePulse CL exposes dataclasses with raw data (`PulseReport`).
+Formatting into Markdown/JSON is the responsibility of CE or the consuming product.
 
-### DT-6: Schema padrao de field names (contrato CL, implementacao CE)
+### TD-6: Standard field name schema (CL contract, CE implementation)
 
-**Problema:** Sem contrato de nomenclatura, cada CE inventa nomes para as mesmas metricas
-("llm_tokens", "tokensIn", "prompt_tokens") e a comparabilidade entre produtos morre.
+**Problem:** Without a naming contract, each CE invents names for the same metrics
+("llm_tokens", "tokensIn", "prompt_tokens") and cross-product comparability dies.
 
-**Decisao:** O CL define `PulseFieldNames` — constantes com nomes padronizados para campos
-comuns (LLM, HTTP, DB, etc.). O CL **nao mede nada** — so define o envelope/shape aceito.
-CE implementa wrappers/exporters que populam esses campos (ou nao).
+**Decision:** CL defines `PulseFieldNames` — standardized constants for common fields
+(LLM, HTTP, DB, etc.). CL **does not measure anything** — it only defines the accepted envelope/shape.
+CE implements wrappers/exporters that populate these fields (or not).
 
 ```python
 # pulse/field_names.py
 class PulseFieldNames:
-    """Nomes padrao para campos de metricas/eventos. CL define shape, CE popula."""
+    """Standard names for metric/event fields. CL defines shape, CE populates."""
 
-    # LLM (opcional — CE de LLM usa; outros ignoram)
+    # LLM (optional — LLM CE uses it; others ignore)
     LLM_TOKENS_IN = "llm.tokens_in"
     LLM_TOKENS_OUT = "llm.tokens_out"
     LLM_LATENCY_MS = "llm.latency_ms"
@@ -211,35 +211,35 @@ class PulseFieldNames:
     LLM_COST = "llm.cost"
     LLM_FALLBACK_TRIGGERED = "llm.fallback_triggered"
 
-    # HTTP (opcional)
+    # HTTP (optional)
     HTTP_METHOD = "http.method"
     HTTP_STATUS_CODE = "http.status_code"
     HTTP_LATENCY_MS = "http.latency_ms"
 
-    # DB (opcional)
+    # DB (optional)
     DB_OPERATION = "db.operation"
     DB_LATENCY_MS = "db.latency_ms"
     DB_ROWS_AFFECTED = "db.rows_affected"
 ```
 
-Isso e CL/CE classico: contrato no CL, implementacao no CE. Sem dependencia de
-cliente OpenAI/Claude/etc. no core.
+This is classic CL/CE: contract in CL, implementation in CE. No dependency on
+OpenAI/Claude/etc. client in the core.
 
-**Entrega:** documentado e publicado na 0.3.0 como contrato v0.1. Implementacao de
-collectors especificos fica em CE.
+**Delivery:** documented and published in 0.3.0 as contract v0.1. Implementation of
+specific collectors belongs in CE.
 
-**Disciplina de tags:** `correlation_id` nunca e label de metrica; dados de usuario
-nao entram como tag. Identificadores de alta cardinalidade sao restritos a tracing
+**Tag discipline:** `correlation_id` is never a metric label; user data
+does not enter as a tag. High-cardinality identifiers are restricted to tracing
 (DETAILED).
 
-### DT-7: Redaction baseline desde o dia 1
+### TD-7: Baseline redaction from day 1
 
-**Problema:** `ExecutionContext.extra: dict[str, Any]` e `ctx_overrides` aceitam dados
-arbitrarios. Sem politica minima, chaves sensiveis (`password`, `token`, `secret`,
-`authorization`, `api_key`) podem vazar para exporters/logs desde a primeira coleta.
+**Problem:** `ExecutionContext.extra: dict[str, Any]` and `ctx_overrides` accept arbitrary
+data. Without a minimal policy, sensitive keys (`password`, `token`, `secret`,
+`authorization`, `api_key`) could leak to exporters/logs from the very first collection.
 
-**Decisao:** Fase 0 inclui `RedactionPolicy` minima aplicada na criacao do
-`ExecutionContext` (quando `level > OFF`):
+**Decision:** Phase 0 includes a minimal `RedactionPolicy` applied during
+`ExecutionContext` creation (when `level > OFF`):
 
 ```python
 # pulse/redaction.py
@@ -250,92 +250,92 @@ SENSITIVE_PATTERNS: frozenset[str] = frozenset({
 })
 
 def redact_keys(data: dict[str, Any], mask: str = "***") -> dict[str, Any]:
-    """Mascara valores de chaves sensiveis. Aplicado antes de qualquer export."""
+    """Masks values of sensitive keys. Applied before any export."""
     return {
         k: mask if _is_sensitive(k) else v
         for k, v in data.items()
     }
 ```
 
-- Denylist minima em frozenset (custo de lookup O(1))
-- Aplicada no ponto de coleta, antes do exporter receber dados
-- DIAGNOSTIC **nao inclui payload bruto** por padrao — exige allowlist explicita
-- CE pode estender com allowlist/denylist adicionais via policy
+- Minimal denylist in frozenset (O(1) lookup cost)
+- Applied at the collection point, before the exporter receives data
+- DIAGNOSTIC **does not include raw payload** by default — requires explicit allowlist
+- CE can extend with additional allowlist/denylist via policy
 
-**Resultado:** porta fechada desde o dia 1. Custo: ~20 linhas de codigo.
+**Result:** door closed from day 1. Cost: ~20 lines of code.
 
-Exporters recebem dados ja redigidos por padrao. Redaction e aplicada no contexto
-(na criacao do `ExecutionContext`) e novamente no caminho de export.
+Exporters receive already-redacted data by default. Redaction is applied in the context
+(during `ExecutionContext` creation) and again in the export path.
 
-### DT-8: Campo `mapping_source` no ExecutionContext
+### TD-8: `mapping_source` field in ExecutionContext
 
-**Problema:** Heuristica e util, mas gera ilusao de precisao. Sem saber a origem do
-mapeamento, relatorios nao conseguem distinguir "valor declarado" de "valor inferido".
+**Problem:** Heuristic is useful but creates an illusion of precision. Without knowing the mapping
+origin, reports cannot distinguish "declared value" from "inferred value".
 
-**Decisao:** `ExecutionContext` inclui campo `mapping_source` desde a Fase 0:
+**Decision:** `ExecutionContext` includes the `mapping_source` field from Phase 0:
 
 ```python
 mapping_source: Literal["spec", "decorator", "heuristic", "legacy"] = "legacy"
 ```
 
-- Fase 0: sempre `"legacy"` (tudo e no-op)
-- Fase 1: `"heuristic"` (inferencia por classe/modulo)
-- Fase 2: `"spec"` (mapeamento YAML)
-- Fase 3: `"decorator"` (metadata explicita)
+- Phase 0: always `"legacy"` (everything is no-op)
+- Phase 1: `"heuristic"` (inference by class/module)
+- Phase 2: `"spec"` (YAML mapping)
+- Phase 3: `"decorator"` (explicit metadata)
 
-Relatorios podem filtrar/agregar por fonte a partir da Fase 1.
+Reports can filter/aggregate by source starting from Phase 1.
 
 ---
 
-## 4. Mapa de Fases
+## 4. Phase Map
 
-ForgePulse e uma feature da serie 0.3.x. Cada fase e um patch incremental
-dentro da mesma minor version, garantindo compatibilidade entre patches.
+ForgePulse is a feature of the 0.3.x series. Each phase is an incremental patch
+within the same minor version, ensuring compatibility between patches.
 
 ```
-Fase 0 ──> Fase 1 ──> Fase 2 ──> Fase 3 ──> Fase 4 ──> Fase 5
+Phase 0 --> Phase 1 --> Phase 2 --> Phase 3 --> Phase 4 --> Phase 5
  v0.3.0     v0.3.1     v0.3.2     v0.3.3     v0.3.4     v0.3.5
 
- Fundacao   BASIC/     Spec CE    Decorators  Governanca  Strict +
- (no-op)    STANDARD              + Tracing   Avancada    Relatorios
+ Foundation  BASIC/     Spec CE    Decorators  Advanced    Strict +
+ (no-op)     STANDARD              + Tracing   Governance  Reports
 ```
 
-| Fase | Versao | Entrega Principal | Pre-requisito |
-|------|--------|-------------------|---------------|
+| Phase | Version | Main Deliverable | Prerequisite |
+|-------|---------|------------------|--------------|
 | 0 | 0.3.0 | ExecutionContext + MonitoringLevel + NoOpCollector | ForgeBase 0.2.0 |
-| 1 | 0.3.1 | Coleta BASIC/STANDARD + heuristica legado | Fase 0 |
-| 2 | 0.3.2 | Mapeamento ValueTrack via YAML spec | Fase 1 |
-| 3 | 0.3.3 | Decorators opt-in + tracing por span | Fase 2 |
-| 4 | 0.3.4 | Sampling, budgets, ECM | Fase 3 |
-| 5 | 0.3.5 | Strict mode + PulseReport estruturado | Fase 4 |
+| 1 | 0.3.1 | BASIC/STANDARD collection + legacy heuristic | Phase 0 |
+| 2 | 0.3.2 | ValueTrack mapping via YAML spec | Phase 1 |
+| 3 | 0.3.3 | Opt-in decorators + tracing per span | Phase 2 |
+| 4 | 0.3.4 | Sampling, budgets, ECM | Phase 3 |
+| 5 | 0.3.5 | Strict mode + structured PulseReport | Phase 4 |
 
-**Regra de versionamento:** patches 0.3.x sao aditivos — cada patch adiciona
-funcionalidade sem quebrar o que o anterior entregou. Um produto que depende de
-`forge_base>=0.3.0,<0.4.0` recebe todas as fases sem breaking change.
+**Versioning rule:** 0.3.x patches are additive — each patch adds
+functionality without breaking what the previous one delivered. A product depending on
+`forge_base>=0.3.0,<0.4.0` receives all phases without breaking changes.
 
 ---
 
-## 5. Fase 0 — Fundacao (no-op)
+## 5. Phase 0 — Foundation (no-op)
 
 **Patch:** 0.3.0
-**Objetivo:** Infraestrutura base com custo zero quando desligada.
+**Objective:** Base infrastructure with zero cost when disabled.
 
-### Estrutura de arquivos
+### File Structure
 
 ```
 src/forge_base/pulse/
-    __init__.py              # re-exports publicos
+    __init__.py              # public re-exports
     context.py               # ExecutionContext + ContextVar
     level.py                 # MonitoringLevel enum
     collector.py             # PulseCollector (interface) + NoOpCollector
-    runner.py                # UseCaseRunner (wrapa execute com contexto)
-    protocols.py             # PulseMetricsProtocol + PulseExporterProtocol (contratos)
-    field_names.py           # PulseFieldNames — contrato de nomenclatura (CL)
-    redaction.py             # RedactionPolicy — denylist minima de chaves sensiveis
+    runner.py                # UseCaseRunner (wraps execute with context)
+    protocols.py             # PulseMetricsProtocol + PulseExporterProtocol (contracts)
+    field_names.py           # PulseFieldNames — naming contract (CL)
+    redaction.py             # RedactionPolicy — minimal sensitive key denylist
     _version.py              # PULSE_SCHEMA_VERSION = "0.1"
 ```
 
-### Entregaveis
+### Deliverables
 
 #### 5.1 — ExecutionContext (`context.py`)
 
@@ -354,31 +354,31 @@ class ExecutionContext:
     level: MonitoringLevel = MonitoringLevel.OFF
     extra: dict[str, Any] = field(default_factory=dict)
 
-# Propagacao async-safe
+# Async-safe propagation
 _current_context: ContextVar[ExecutionContext | None] = ContextVar('pulse_ctx', default=None)
 
 def get_context() -> ExecutionContext | None: ...
 def set_context(ctx: ExecutionContext) -> Token: ...
 ```
 
-- `frozen=True` para imutabilidade (seguro em async/threads)
-- `ContextVar` da stdlib (funciona com asyncio, threads, e taskgroups)
-- `extra: dict[str, Any]` — aceita valores numericos sem stringificar
-- `mapping_source` — rastreia origem do mapeamento (spec/decorator/heuristic/legacy)
-- Campos com defaults = legado funciona sem configurar nada
-- `extra` passa por `redact_keys()` na criacao (quando level > OFF)
-- `extra` aceita apenas tipos JSON-like (`str`, `int`, `float`, `bool`, `None`, `list`, `dict`);
-  valores nao serializaveis sao descartados/normalizados com contador de eventos descartados
+- `frozen=True` for immutability (safe in async/threads)
+- `ContextVar` from stdlib (works with asyncio, threads, and taskgroups)
+- `extra: dict[str, Any]` — accepts numeric values without stringifying
+- `mapping_source` — tracks mapping origin (spec/decorator/heuristic/legacy)
+- Fields with defaults = legacy works without configuring anything
+- `extra` passes through `redact_keys()` during creation (when level > OFF)
+- `extra` accepts only JSON-like types (`str`, `int`, `float`, `bool`, `None`, `list`, `dict`);
+  non-serializable values are discarded/normalized with a counter of discarded events
 
 #### 5.2 — MonitoringLevel (`level.py`)
 
 ```python
 class MonitoringLevel(IntEnum):
-    OFF = 0           # no-op real, custo ~0
+    OFF = 0           # real no-op, cost ~0
     BASIC = 1         # duration + count + success/error
-    STANDARD = 2      # + latencia por adapter + erros por etapa
-    DETAILED = 3      # + tracing + custo (tokens/cpu)
-    DIAGNOSTIC = 4    # + profiling/payload (somente por flag)
+    STANDARD = 2      # + latency per adapter + errors per stage
+    DETAILED = 3      # + tracing + cost (tokens/cpu)
+    DIAGNOSTIC = 4    # + profiling/payload (only by flag)
 ```
 
 #### 5.3 — PulseCollector + NoOpCollector (`collector.py`)
@@ -390,7 +390,7 @@ class PulseCollector(Protocol):
     def on_error(self, ctx: ExecutionContext, error: Exception, duration_ms: float) -> None: ...
 
 class NoOpCollector:
-    """Custo zero. Usado quando level=OFF."""
+    """Zero cost. Used when level=OFF."""
     def on_start(self, ctx: ExecutionContext) -> None: pass
     def on_success(self, ctx: ExecutionContext, duration_ms: float) -> None: pass
     def on_error(self, ctx: ExecutionContext, error: Exception, duration_ms: float) -> None: pass
@@ -400,7 +400,7 @@ class NoOpCollector:
 
 ```python
 class UseCaseRunner(Generic[TInput, TOutput]):
-    """Wrapa execute() com contexto + coleta. Vive no composition root."""
+    """Wraps execute() with context + collection. Lives in the composition root."""
 
     def __init__(
         self,
@@ -410,137 +410,137 @@ class UseCaseRunner(Generic[TInput, TOutput]):
     ): ...
 
     def run(self, input_dto: TInput, **ctx_overrides: Any) -> TOutput:
-        # FAST-PATH: OFF = passthrough direto, zero alocacao
+        # FAST-PATH: OFF = direct passthrough, zero allocation
         if self._level == MonitoringLevel.OFF:
             return self._use_case.execute(input_dto)
 
         # INSTRUMENTED PATH (level > OFF):
-        # 1. Cria ExecutionContext (com inferencia de use_case pelo nome da classe)
-        # 2. Aplica redact_keys() no extra/ctx_overrides
-        # 3. Seta ContextVar
-        # 4. Chama collector.on_start()
-        # 5. Chama use_case.execute(input_dto)
-        # 6. Chama collector.on_success() ou on_error()
-        # 7. Restaura ContextVar
-        # 8. Retorna resultado
+        # 1. Creates ExecutionContext (with use_case inference from class name)
+        # 2. Applies redact_keys() to extra/ctx_overrides
+        # 3. Sets ContextVar
+        # 4. Calls collector.on_start()
+        # 5. Calls use_case.execute(input_dto)
+        # 6. Calls collector.on_success() or on_error()
+        # 7. Restores ContextVar
+        # 8. Returns result
         ...
 ```
 
-#### 5.5 — Protocolos (`protocols.py`)
+#### 5.5 — Protocols (`protocols.py`)
 
 ```python
 class PulseMetricsProtocol(Protocol):
-    """Protocolo estendido para pulse. MetricsProtocol original nao muda."""
+    """Extended protocol for pulse. Original MetricsProtocol does not change."""
     def increment(self, name: str, value: int = 1, **tags: Any) -> None: ...
     def timing(self, name: str, value: float, **tags: Any) -> None: ...
     def histogram(self, name: str, value: float, **tags: Any) -> None: ...
     def gauge(self, name: str, value: float, **tags: Any) -> None: ...
 
 class PulseExporterProtocol(Protocol):
-    """Contrato CE: quem quiser exportar dados implementa isto."""
+    """CE contract: anyone wanting to export data implements this."""
     def export_execution(self, ctx: ExecutionContext, duration_ms: float, success: bool) -> None: ...
 ```
 
-`TrackMetrics` ja satisfaz `PulseMetricsProtocol` sem nenhuma alteracao.
-`MetricsProtocol` em `composition/protocols.py` permanece intacto.
+`TrackMetrics` already satisfies `PulseMetricsProtocol` without any changes.
+`MetricsProtocol` in `composition/protocols.py` remains intact.
 
 #### 5.6 — PulseFieldNames (`field_names.py`)
 
-Constantes de nomenclatura padrao para campos de metricas/eventos.
-Contrato v0.1 — CL define shape, CE popula. Ver DT-6.
+Standard naming constants for metric/event fields.
+Contract v0.1 — CL defines shape, CE populates. See TD-6.
 
 #### 5.7 — RedactionPolicy (`redaction.py`)
 
-Denylist minima de chaves sensiveis aplicada na criacao do contexto.
-Chaves como `password`, `token`, `secret`, `authorization`, `api_key` sao mascaradas.
-Ver DT-7.
+Minimal sensitive key denylist applied during context creation.
+Keys such as `password`, `token`, `secret`, `authorization`, `api_key` are masked.
+See TD-7.
 
-### Criterios de aceitacao — Fase 0
+### Acceptance Criteria — Phase 0
 
-**Compatibilidade e boundaries:**
-- [ ] Todos os 248+ testes existentes passam sem mudanca
-- [ ] `UseCaseBase.execute()` inalterado (assinatura e comportamento)
-- [ ] `MetricsProtocol` em `composition/protocols.py` inalterado (zero breaking change em typing)
-- [ ] import-linter atualizado para `forge_base` (corrigir root_package) e com regras para `pulse/`:
-  - `application/*` nao importa `pulse/*`
-  - `domain/*` nao importa `pulse/*`
-  - `pulse/*` nao importa `adapters/*` nem `infrastructure/*`
-- [ ] `pulse/` nao e importado por nenhum modulo existente (zero acoplamento)
-- [ ] Pipeline falha se boundary for violado
+**Compatibility and boundaries:**
+- [ ] All 248+ existing tests pass without changes
+- [ ] `UseCaseBase.execute()` unchanged (signature and behavior)
+- [ ] `MetricsProtocol` in `composition/protocols.py` unchanged (zero breaking change in typing)
+- [ ] import-linter updated for `forge_base` (fix root_package) and with rules for `pulse/`:
+  - `application/*` does not import `pulse/*`
+  - `domain/*` does not import `pulse/*`
+  - `pulse/*` does not import `adapters/*` or `infrastructure/*`
+- [ ] `pulse/` is not imported by any existing module (zero coupling)
+- [ ] Pipeline fails if boundary is violated
 
-**Funcionalidade:**
-- [ ] `import forge_base.pulse` funciona
-- [ ] `ExecutionContext` com `extra: dict[str, Any]` (aceita valores numericos)
-- [ ] `ExecutionContext.mapping_source` presente com default `"legacy"`
-- [ ] `ExecutionContext` propagado via `contextvars` e legivel em qualquer camada
-- [ ] `PulseMetricsProtocol` definido em `pulse/protocols.py` (nao altera MetricsProtocol existente)
-- [ ] `PulseFieldNames` publicado como contrato v0.1 (nomes LLM/HTTP/DB)
-- [ ] `redact_keys()` mascara chaves sensiveis (`password`, `token`, `secret`, `authorization`, `api_key`)
+**Functionality:**
+- [ ] `import forge_base.pulse` works
+- [ ] `ExecutionContext` with `extra: dict[str, Any]` (accepts numeric values)
+- [ ] `ExecutionContext.mapping_source` present with default `"legacy"`
+- [ ] `ExecutionContext` propagated via `contextvars` and readable from any layer
+- [ ] `PulseMetricsProtocol` defined in `pulse/protocols.py` (does not alter existing MetricsProtocol)
+- [ ] `PulseFieldNames` published as contract v0.1 (LLM/HTTP/DB names)
+- [ ] `redact_keys()` masks sensitive keys (`password`, `token`, `secret`, `authorization`, `api_key`)
 
 **Performance:**
-- [ ] `UseCaseRunner` com `level=OFF` faz passthrough direto (nao cria ExecutionContext)
-- [ ] Benchmark real com runner: OFF < 100ns overhead
+- [ ] `UseCaseRunner` with `level=OFF` does direct passthrough (does not create ExecutionContext)
+- [ ] Real benchmark with runner: OFF < 100ns overhead
 
-**Documentacao:**
-- [ ] ADR-008 escrito documentando decisao CL/CE e ForgePulse
+**Documentation:**
+- [ ] ADR-008 written documenting CL/CE decision and ForgePulse
 
-### Testes novos
+### New Tests
 
 ```
 tests/unit/pulse/
-    test_context.py          # ExecutionContext criacao, frozen, defaults, ContextVar, mapping_source
-    test_level.py            # MonitoringLevel comparacoes, IntEnum behavior
-    test_collector.py        # NoOpCollector nao faz nada, protocol check
-    test_runner.py           # UseCaseRunner OFF=passthrough, com mock collector, contexto propagado
-    test_protocols.py        # PulseMetricsProtocol satisfeito por TrackMetrics
-    test_field_names.py      # PulseFieldNames constantes existem e sao strings
-    test_redaction.py        # Chaves sensiveis mascaradas, chaves normais preservadas
+    test_context.py          # ExecutionContext creation, frozen, defaults, ContextVar, mapping_source
+    test_level.py            # MonitoringLevel comparisons, IntEnum behavior
+    test_collector.py        # NoOpCollector does nothing, protocol check
+    test_runner.py           # UseCaseRunner OFF=passthrough, with mock collector, propagated context
+    test_protocols.py        # PulseMetricsProtocol satisfied by TrackMetrics
+    test_field_names.py      # PulseFieldNames constants exist and are strings
+    test_redaction.py        # Sensitive keys masked, normal keys preserved
 tests/benchmarks/
-    bench_pulse_overhead.py  # OFF < 100ns (com runner real), BASIC < 10us
+    bench_pulse_overhead.py  # OFF < 100ns (with real runner), BASIC < 10us
 ```
 
 ---
 
-## 6. Fase 1 — BASIC/STANDARD + Heuristica Legado
+## 6. Phase 1 — BASIC/STANDARD + Legacy Heuristic
 
 **Patch:** 0.3.1
-**Pre-requisito:** Fase 0 completa
-**Objetivo:** Primeira coleta real de metricas por use case, com fallback legado automatico.
+**Prerequisite:** Phase 0 complete
+**Objective:** First real metric collection per use case, with automatic legacy fallback.
 
-### Estrutura de arquivos (novos)
+### File Structure (new)
 
 ```
 src/forge_base/pulse/
-    basic_collector.py       # Implementacao BASIC/STANDARD
-    heuristic.py             # Inferencia automatica de value_track/feature
-    report.py                # PulseSnapshot dataclass (dados brutos)
+    basic_collector.py       # BASIC/STANDARD implementation
+    heuristic.py             # Automatic value_track/feature inference
+    report.py                # PulseSnapshot dataclass (raw data)
 ```
 
-### Entregaveis
+### Deliverables
 
 #### 6.1 — BasicCollector (`basic_collector.py`)
 
-Implementa `PulseCollector` usando `TrackMetrics` existente.
+Implements `PulseCollector` using the existing `TrackMetrics`.
 
-**Nivel BASIC coleta:**
-- `pulse.execution.count` (counter, por use_case + value_track)
-- `pulse.execution.duration_ms` (histogram, por use_case + value_track)
-- `pulse.execution.errors` (counter, por use_case + value_track + error_type)
-- `pulse.execution.success` (counter, por use_case + value_track)
+**BASIC level collects:**
+- `pulse.execution.count` (counter, per use_case + value_track)
+- `pulse.execution.duration_ms` (histogram, per use_case + value_track)
+- `pulse.execution.errors` (counter, per use_case + value_track + error_type)
+- `pulse.execution.success` (counter, per use_case + value_track)
 
-**Nivel STANDARD adiciona:**
-- Metricas com label de `subtrack`
-- `pulse.adapter.duration_ms` (histogram, por adapter + value_track)
-- Contagem de erros por etapa (antes/durante/apos execute)
+**STANDARD level adds:**
+- Metrics with `subtrack` label
+- `pulse.adapter.duration_ms` (histogram, per adapter + value_track)
+- Error count per stage (before/during/after execute)
 
-#### 6.2 — Heuristica legado (`heuristic.py`)
+#### 6.2 — Legacy Heuristic (`heuristic.py`)
 
 ```python
 def infer_context(use_case: UseCaseBase) -> dict[str, str]:
-    """Infere value_track, subtrack, feature a partir de classe/modulo."""
+    """Infers value_track, subtrack, feature from class/module."""
     cls = type(use_case)
-    module = cls.__module__           # ex: "meu_app.billing.usecases.create_invoice"
-    class_name = cls.__name__         # ex: "CreateInvoiceUseCase"
+    module = cls.__module__           # e.g.: "my_app.billing.usecases.create_invoice"
+    class_name = cls.__name__         # e.g.: "CreateInvoiceUseCase"
 
     return {
         "use_case": class_name,
@@ -550,16 +550,16 @@ def infer_context(use_case: UseCaseBase) -> dict[str, str]:
     }
 ```
 
-- Usa nome do modulo para inferir dominio/feature
-- `value_track` fica `"legacy"` ate que spec CE forneca mapeamento (Fase 2)
-- Zero configuracao necessaria
+- Uses module name to infer domain/feature
+- `value_track` stays `"legacy"` until CE spec provides mapping (Phase 2)
+- Zero configuration needed
 
 #### 6.3 — PulseSnapshot (`report.py`)
 
 ```python
 @dataclass
 class PulseSnapshot:
-    """Dados brutos de uma janela de observacao. Nao e relatorio formatado."""
+    """Raw data from an observation window. Not a formatted report."""
     timestamp: float
     schema_version: str
     level: MonitoringLevel
@@ -568,65 +568,65 @@ class PulseSnapshot:
     histograms: dict[str, HistogramStats]
 ```
 
-### Criterios de aceitacao — Fase 1
+### Acceptance Criteria — Phase 1
 
-- [ ] `UseCaseRunner(level=BASIC)` coleta duration + count + success/error
-- [ ] Heuristica infere `use_case`, `feature`, `subtrack` sem configuracao
-- [ ] `value_track="legacy"` para todos os use cases sem mapeamento
-- [ ] `PulseSnapshot` gerado com dados reais apos execucoes
-- [ ] Overhead BASIC < 10us por execucao (benchmark)
-- [ ] Integracao com `TrackMetrics` existente (reutiliza, nao duplica)
-- [ ] Nenhuma mudanca em codigo existente fora de `pulse/`
+- [ ] `UseCaseRunner(level=BASIC)` collects duration + count + success/error
+- [ ] Heuristic infers `use_case`, `feature`, `subtrack` without configuration
+- [ ] `value_track="legacy"` for all use cases without mapping
+- [ ] `PulseSnapshot` generated with real data after executions
+- [ ] BASIC overhead < 10us per execution (benchmark)
+- [ ] Integration with existing `TrackMetrics` (reuses, does not duplicate)
+- [ ] No changes to existing code outside `pulse/`
 
-### Testes novos
+### New Tests
 
 ```
 tests/unit/pulse/
-    test_basic_collector.py  # Coleta correta por nivel
-    test_heuristic.py        # Inferencia de contexto a partir de classe/modulo
-    test_report.py           # PulseSnapshot geracao e serializacao
+    test_basic_collector.py  # Correct collection per level
+    test_heuristic.py        # Context inference from class/module
+    test_report.py           # PulseSnapshot generation and serialization
 tests/integration/pulse/
-    test_runner_basic.py     # UseCaseRunner com BasicCollector end-to-end
+    test_runner_basic.py     # UseCaseRunner with BasicCollector end-to-end
 ```
 
 ---
 
-## 7. Fase 2 — Mapeamento por Spec (CE)
+## 7. Phase 2 — Mapping via Spec (CE)
 
 **Patch:** 0.3.2
-**Pre-requisito:** Fase 1 completa
-**Objetivo:** Produtos mapeiam use cases para ValueTracks reais sem mexer em codigo.
+**Prerequisite:** Phase 1 complete
+**Objective:** Products map use cases to real ValueTracks without touching code.
 
-### Estrutura de arquivos (novos)
+### File Structure (new)
 
 ```
 src/forge_base/pulse/
-    value_tracks.py          # ValueTrackRegistry + loader de spec
-    spec_schema.py           # Schema do YAML de mapeamento
+    value_tracks.py          # ValueTrackRegistry + spec loader
+    spec_schema.py           # YAML mapping schema
 ```
 
-### Entregaveis
+### Deliverables
 
 #### 7.1 — ValueTrackRegistry (`value_tracks.py`)
 
 ```python
 class ValueTrackRegistry:
-    """Resolve use_case -> (value_track, subtrack, tags)."""
+    """Resolves use_case -> (value_track, subtrack, tags)."""
 
     def load_from_yaml(self, path: str) -> None: ...
     def load_from_dict(self, data: dict) -> None: ...
     def resolve(self, use_case_name: str) -> ValueTrackMapping | None: ...
 ```
 
-#### 7.2 — Spec YAML (exemplo CE, nao vive no ForgeBase)
+#### 7.2 — Spec YAML (CE example, does not live in ForgeBase)
 
 ```yaml
-# forgepulse.value_tracks.yml (no produto, nao na lib)
+# forgepulse.value_tracks.yml (in the product, not in the lib)
 schema_version: "0.1"
 
 value_tracks:
   cost_governance:
-    description: "Governanca de custo"
+    description: "Cost governance"
     usecases:
       - CreateInvoiceUseCase
       - ProcessPaymentUseCase
@@ -638,7 +638,7 @@ value_tracks:
       risk: medium
 
   reliability:
-    description: "Confiabilidade do servico"
+    description: "Service reliability"
     usecases:
       - HealthCheckUseCase
       - RetryOperationUseCase
@@ -647,53 +647,53 @@ value_tracks:
       risk: high
 ```
 
-#### 7.3 — Ordem de resolucao no UseCaseRunner
+#### 7.3 — Resolution Order in UseCaseRunner
 
 ```
-1. ValueTrackRegistry (spec CE)     -> mapeamento explicito
-2. Decorator metadata (se houver)   -> Fase 3
-3. Heuristica legado (Fase 1)       -> fallback automatico
+1. ValueTrackRegistry (CE spec)      -> explicit mapping
+2. Decorator metadata (if present)   -> Phase 3
+3. Legacy heuristic (Phase 1)        -> automatic fallback
 ```
 
-### Criterios de aceitacao — Fase 2
+### Acceptance Criteria — Phase 2
 
-- [ ] `ValueTrackRegistry.load_from_yaml()` carrega spec valido
-- [ ] `ValueTrackRegistry.resolve("CreateInvoiceUseCase")` retorna mapeamento correto
-- [ ] `UseCaseRunner` consulta registry antes de heuristica
-- [ ] Metricas agrupadas por `value_track` real (nao mais apenas "legacy")
-- [ ] Spec invalido gera `ConfigurationError` (dominio, nao crash)
-- [ ] Schema versionado (`schema_version` validado)
-- [ ] Documentacao: guia CE "como mapear seus ValueTracks"
+- [ ] `ValueTrackRegistry.load_from_yaml()` loads valid spec
+- [ ] `ValueTrackRegistry.resolve("CreateInvoiceUseCase")` returns correct mapping
+- [ ] `UseCaseRunner` queries registry before heuristic
+- [ ] Metrics grouped by real `value_track` (no longer just "legacy")
+- [ ] Invalid spec generates `ConfigurationError` (domain error, not crash)
+- [ ] Versioned schema (`schema_version` validated)
+- [ ] Documentation: CE guide "how to map your ValueTracks"
 
-### Testes novos
+### New Tests
 
 ```
 tests/unit/pulse/
     test_value_tracks.py     # Registry load, resolve, fallback
-    test_spec_schema.py      # Validacao de spec YAML valido/invalido
+    test_spec_schema.py      # Valid/invalid YAML spec validation
 tests/integration/pulse/
-    test_runner_with_spec.py # End-to-end com spec CE carregado
+    test_runner_with_spec.py # End-to-end with loaded CE spec
 ```
 
 ---
 
-## 8. Fase 3 — Decorators Opcionais + Tracing
+## 8. Phase 3 — Optional Decorators + Tracing
 
 **Patch:** 0.3.3
-**Pre-requisito:** Fase 2 completa
-**Objetivo:** Precisao em modulos novos via decorators metadata-only e tracing por span.
+**Prerequisite:** Phase 2 complete
+**Objective:** Precision in new modules via metadata-only decorators and per-span tracing.
 
-### Estrutura de arquivos (novos)
+### File Structure (new)
 
 ```
 src/forge_base/pulse/
     decorators.py            # @pulse_track, @pulse_span (metadata only)
-    tracing.py               # Integracao com TracerPort existente
+    tracing.py               # Integration with existing TracerPort
 ```
 
-### Entregaveis
+### Deliverables
 
-#### 8.1 — Decorators metadata-only (`decorators.py`)
+#### 8.1 — Metadata-only Decorators (`decorators.py`)
 
 ```python
 def pulse_track(
@@ -701,88 +701,88 @@ def pulse_track(
     subtrack: str = "",
     tags: dict[str, str] | None = None,
 ) -> Callable:
-    """Marca um use case com ValueTrack. NAO instrumenta — apenas anota metadata."""
+    """Marks a use case with a ValueTrack. Does NOT instrument — only annotates metadata."""
     def decorator(cls):
         cls._pulse_metadata = PulseMetadata(value_track, subtrack, tags or {})
-        return cls  # nao wrapa, nao altera comportamento
+        return cls  # does not wrap, does not alter behavior
     return decorator
 
-# Uso:
+# Usage:
 @pulse_track(value_track="cost_governance", subtrack="billing")
 class CreateInvoiceUseCase(UseCaseBase[CreateInvoiceInput, InvoiceOutput]):
     def execute(self, input_dto): ...
 ```
 
-- Decorator **nao wrapa** a classe/metodo
-- So adiciona atributo `_pulse_metadata`
-- UseCaseRunner le o atributo na resolucao de contexto (prioridade 2, entre spec e heuristica)
-- Se o dev nao usar, nada muda
+- Decorator **does not wrap** the class/method
+- Only adds `_pulse_metadata` attribute
+- UseCaseRunner reads the attribute during context resolution (priority 2, between spec and heuristic)
+- If the developer doesn't use it, nothing changes
 
-#### 8.2 — Tracing integrado (`tracing.py`)
+#### 8.2 — Integrated Tracing (`tracing.py`)
 
 ```python
 class PulseTracer:
-    """Cria spans automaticos vinculados ao ExecutionContext."""
+    """Creates automatic spans linked to ExecutionContext."""
 
     def __init__(self, tracer: TracerPort, level: MonitoringLevel): ...
 
     def execution_span(self, ctx: ExecutionContext) -> Span | None:
-        """Cria span para execucao de use case. Retorna None se level < DETAILED."""
+        """Creates span for use case execution. Returns None if level < DETAILED."""
         if self.level < MonitoringLevel.DETAILED:
             return None
         ...
 ```
 
-- Reutiliza `TracerPort` e `Span` existentes (`observability/tracer_port.py`)
-- Spans vinculados ao `ExecutionContext.correlation_id`
-- Nivel DETAILED cria spans; BASIC/STANDARD nao
+- Reuses existing `TracerPort` and `Span` (`observability/tracer_port.py`)
+- Spans linked to `ExecutionContext.correlation_id`
+- DETAILED level creates spans; BASIC/STANDARD do not
 
-### Criterios de aceitacao — Fase 3
+### Acceptance Criteria — Phase 3
 
-- [ ] `@pulse_track` nao altera comportamento da classe (zero overhead)
-- [ ] `UseCaseRunner` resolve metadata de decorator (prioridade 2)
-- [ ] Ordem final: Spec > Decorator > Heuristica
-- [ ] Nivel DETAILED cria spans vinculados ao contexto
-- [ ] Spans reusam `TracerPort` existente (nao cria sistema paralelo)
-- [ ] `NoOpTracer` continua funcionando (DETAILED sem tracer = noop)
-- [ ] Decorators sao opcionais — nenhum modulo existente precisa deles
+- [ ] `@pulse_track` does not alter class behavior (zero overhead)
+- [ ] `UseCaseRunner` resolves decorator metadata (priority 2)
+- [ ] Final order: Spec > Decorator > Heuristic
+- [ ] DETAILED level creates spans linked to context
+- [ ] Spans reuse existing `TracerPort` (does not create parallel system)
+- [ ] `NoOpTracer` continues working (DETAILED without tracer = noop)
+- [ ] Decorators are optional — no existing module requires them
 
-### Testes novos
+### New Tests
 
 ```
 tests/unit/pulse/
-    test_decorators.py       # Metadata setada, classe nao alterada, prioridade
-    test_tracing.py          # Spans criados por nivel, vinculacao ao contexto
+    test_decorators.py       # Metadata set, class not altered, priority
+    test_tracing.py          # Spans created per level, context linking
 tests/integration/pulse/
-    test_runner_decorated.py # Runner + decorator + spec + heuristica combinados
+    test_runner_decorated.py # Runner + decorator + spec + heuristic combined
 ```
 
 ---
 
-## 9. Fase 4 — Governanca Avancada
+## 9. Phase 4 — Advanced Governance
 
 **Patch:** 0.3.4
-**Pre-requisito:** Fase 3 completa
-**Objetivo:** Controle fino de custo de telemetria e validacao de extensoes.
+**Prerequisite:** Phase 3 complete
+**Objective:** Fine-grained control of telemetry cost and extension validation.
 
-### Estrutura de arquivos (novos)
+### File Structure (new)
 
 ```
 src/forge_base/pulse/
     policy.py                # SamplingPolicy, BudgetPolicy
     ecm.py                   # ExtensionCompatibilityMatrix
-    buffer.py                # AsyncBuffer com drop controlado
+    buffer.py                # AsyncBuffer with controlled drop
 ```
 
-### Entregaveis
+### Deliverables
 
 #### 9.1 — Sampling Policy (`policy.py`)
 
 ```python
 @dataclass
 class SamplingPolicy:
-    """Decide se uma execucao deve ser instrumentada."""
-    default_rate: float = 1.0                    # 100% por padrao
+    """Decides whether an execution should be instrumented."""
+    default_rate: float = 1.0                    # 100% by default
     by_value_track: dict[str, float] = field(default_factory=dict)
     by_tenant: dict[str, float] = field(default_factory=dict)
 
@@ -794,7 +794,7 @@ class SamplingPolicy:
 ```python
 @dataclass
 class BudgetPolicy:
-    """Limita quantidade de telemetria por execucao."""
+    """Limits the amount of telemetry per execution."""
     max_spans_per_execution: int = 100
     max_events_per_execution: int = 50
     max_bytes_per_execution: int = 64 * 1024   # 64KB
@@ -804,92 +804,92 @@ class BudgetPolicy:
 
 ```python
 class ExtensionCompatibilityMatrix:
-    """Valida se extensoes CE sao compativeis com a versao do ForgeBase/Pulse."""
+    """Validates whether CE extensions are compatible with the ForgeBase/Pulse version."""
 
     def register_extension(self, name: str, version: str, requires_pulse: str): ...
     def validate(self, pulse_version: str) -> list[IncompatibleExtension]: ...
     def validate_or_raise(self, pulse_version: str) -> None: ...
 ```
 
-- Validacao no startup via `BuilderBase`
-- Extensao incompativel: desabilita (warn) ou falha (strict), conforme policy
-- Estrutura leve — sem banco, sem rede, sem lock
+- Validation on startup via `BuilderBase`
+- Incompatible extension: disables (warn) or fails (strict), per policy
+- Lightweight structure — no database, no network, no lock
 
 #### 9.4 — AsyncBuffer (`buffer.py`)
 
 ```python
 class AsyncBuffer:
-    """Buffer assincrono para exportacao com drop controlado."""
+    """Async buffer for export with controlled drop."""
 
     def __init__(self, max_size: int = 10_000, drop_policy: str = "oldest"): ...
-    def push(self, record: ExecutionRecord) -> bool: ...   # False se dropou
-    def flush(self, exporter: PulseExporterProtocol) -> int: ...  # retorna N exportados
+    def push(self, record: ExecutionRecord) -> bool: ...   # False if dropped
+    def flush(self, exporter: PulseExporterProtocol) -> int: ...  # returns N exported
 ```
 
-### Criterios de aceitacao — Fase 4
+### Acceptance Criteria — Phase 4
 
-- [ ] Sampling por value_track e tenant funciona
-- [ ] Budget limita spans/eventos/bytes por execucao
-- [ ] ECM valida extensoes no startup
-- [ ] Extensao incompativel gera warning ou erro conforme policy
-- [ ] AsyncBuffer com drop controlado nao bloqueia runtime
-- [ ] Overhead de policy check < 1us
+- [ ] Sampling by value_track and tenant works
+- [ ] Budget limits spans/events/bytes per execution
+- [ ] ECM validates extensions on startup
+- [ ] Incompatible extension generates warning or error per policy
+- [ ] AsyncBuffer with controlled drop does not block runtime
+- [ ] Policy check overhead < 1us
 
-### Testes novos
+### New Tests
 
 ```
 tests/unit/pulse/
     test_policy.py           # Sampling rates, budget limits
-    test_ecm.py              # Compatibilidade, incompatibilidade, strict mode
-    test_buffer.py           # Capacidade, drop, flush
+    test_ecm.py              # Compatibility, incompatibility, strict mode
+    test_buffer.py           # Capacity, drop, flush
 tests/property_based/
-    test_sampling_properties.py  # Taxa de sampling converge para o esperado
+    test_sampling_properties.py  # Sampling rate converges to expected
 ```
 
 ---
 
-## 10. Fase 5 — Strict Mode + Relatorios
+## 10. Phase 5 — Strict Mode + Reports
 
 **Patch:** 0.3.5
-**Pre-requisito:** Fase 4 completa
-**Objetivo:** Modo strict por escopo e dados estruturados para relatorios.
+**Prerequisite:** Phase 4 complete
+**Objective:** Strict mode per scope and structured data for reports.
 
-### Estrutura de arquivos (novos)
+### File Structure (new)
 
 ```
 src/forge_base/pulse/
-    strict.py                # StrictMode: valida que todo use case tem ValueTrack
-    report.py                # (estende) PulseReport com agregacoes
+    strict.py                # StrictMode: validates that every use case has a ValueTrack
+    report.py                # (extends) PulseReport with aggregations
 ```
 
-### Entregaveis
+### Deliverables
 
 #### 10.1 — Strict Mode (`strict.py`)
 
 ```python
 class StrictMode:
-    """Valida que todos os use cases em um escopo tem ValueTrack mapeado."""
+    """Validates that all use cases in a scope have a mapped ValueTrack."""
 
-    def __init__(self, scope: str = "*"):  # scope pode ser modulo ou package
+    def __init__(self, scope: str = "*"):  # scope can be module or package
         ...
 
     def validate(self, registry: ValueTrackRegistry, discovered: list[str]) -> StrictReport:
-        """Retorna lista de use cases sem mapeamento."""
+        """Returns list of use cases without mapping."""
         ...
 ```
 
-- Ativado por escopo (ex: `scope="meu_app.billing"`)
-- Nao bloqueia execucao — gera relatorio
-- `StrictReport` expoe `ok: bool` e `missing: list[str]`
-- Em CI, `assert_ok()` falha o pipeline quando `ok=False`
-- Util para CI: fail se use case novo sem ValueTrack
+- Activated per scope (e.g., `scope="my_app.billing"`)
+- Does not block execution — generates a report
+- `StrictReport` exposes `ok: bool` and `missing: list[str]`
+- In CI, `assert_ok()` fails the pipeline when `ok=False`
+- Useful for CI: fail if new use case without ValueTrack
 
-#### 10.2 — PulseReport estendido (`report.py`)
+#### 10.2 — Extended PulseReport (`report.py`)
 
 ```python
 @dataclass
 class PulseReport:
-    """Dados estruturados para consumo por relatorios CE."""
+    """Structured data for consumption by CE reports."""
     snapshot: PulseSnapshot
     by_value_track: dict[str, ValueTrackStats]
     by_tenant: dict[str, TenantStats]
@@ -905,61 +905,61 @@ class ValueTrackStats:
     p99_duration_ms: float
 ```
 
-- **Dados brutos, nao relatorio formatado**
-- CE ou produto converte para Markdown/JSON/dashboard
+- **Raw data, not a formatted report**
+- CE or product converts to Markdown/JSON/dashboard
 
-### Criterios de aceitacao — Fase 5
+### Acceptance Criteria — Phase 5
 
-- [ ] StrictMode identifica use cases sem mapeamento
-- [ ] PulseReport agrega por value_track e tenant
-- [ ] Dados exportaveis como dict/JSON
-- [ ] Integravel com CI (exit code != 0 se strict falha)
-- [ ] Documentacao completa: guia de adocao por fase
-
----
-
-## 11. Codigo Existente Reaproveitado
-
-Inventario do que ja existe e sera reutilizado (nao reimplementado):
-
-| Componente | Arquivo | Uso no ForgePulse |
-|------------|---------|-------------------|
-| `TrackMetrics` | `observability/track_metrics.py` | Backend de metricas para BasicCollector |
-| `LogService` + `LogContext` | `observability/log_service.py` | Pattern de context propagation (referencia para DT-1) |
-| `TracerPort` + `Span` | `observability/tracer_port.py` | Backend de tracing para Fase 3 |
-| `NoOpTracer` | `observability/tracer_port.py:325` | Pattern para nivel OFF |
-| `InMemoryTracer` | `observability/tracer_port.py:377` | Tracing em dev/testes |
-| `@track_metrics` | `application/decorators/track_metrics.py` | Pattern para decorators opt-in (referencia para Fase 3) |
-| `BuilderBase` | `composition/builder.py` | Composition root onde Runner se pluga |
-| `BuildContextBase` | `composition/build_context.py` | Context com cache, env resolution |
-| `BuildSpecBase` | `composition/build_spec.py` | Base para spec YAML de ValueTracks |
-| `PluginRegistryBase` | `composition/plugin_registry.py` | Base para ECM |
-| `LoggerProtocol` | `composition/protocols.py` | Contrato de logging |
-| `MetricsProtocol` | `composition/protocols.py` | Contrato de metricas (permanece intacto; pulse usa `PulseMetricsProtocol`) |
-| `UseCaseBase` | `application/usecase_base.py` | Interface que Runner wrapa (nao modifica) |
-| `DependencyContainer` | `core_init.py` | DI para registrar Pulse services |
+- [ ] StrictMode identifies use cases without mapping
+- [ ] PulseReport aggregates by value_track and tenant
+- [ ] Data exportable as dict/JSON
+- [ ] Integrable with CI (exit code != 0 if strict fails)
+- [ ] Complete documentation: adoption guide per phase
 
 ---
 
-## 12. Estrategia de Testes
+## 11. Existing Code Reused
 
-### Por tipo
+Inventory of what already exists and will be reused (not reimplemented):
 
-| Tipo | Diretorio | O que valida |
-|------|-----------|--------------|
-| Unit | `tests/unit/pulse/` | Cada componente isolado |
+| Component | File | Use in ForgePulse |
+|-----------|------|-------------------|
+| `TrackMetrics` | `observability/track_metrics.py` | Metrics backend for BasicCollector |
+| `LogService` + `LogContext` | `observability/log_service.py` | Context propagation pattern (reference for TD-1) |
+| `TracerPort` + `Span` | `observability/tracer_port.py` | Tracing backend for Phase 3 |
+| `NoOpTracer` | `observability/tracer_port.py:325` | Pattern for OFF level |
+| `InMemoryTracer` | `observability/tracer_port.py:377` | Tracing in dev/tests |
+| `@track_metrics` | `application/decorators/track_metrics.py` | Pattern for opt-in decorators (reference for Phase 3) |
+| `BuilderBase` | `composition/builder.py` | Composition root where Runner plugs in |
+| `BuildContextBase` | `composition/build_context.py` | Context with cache, env resolution |
+| `BuildSpecBase` | `composition/build_spec.py` | Base for ValueTrack YAML spec |
+| `PluginRegistryBase` | `composition/plugin_registry.py` | Base for ECM |
+| `LoggerProtocol` | `composition/protocols.py` | Logging contract |
+| `MetricsProtocol` | `composition/protocols.py` | Metrics contract (remains intact; pulse uses `PulseMetricsProtocol`) |
+| `UseCaseBase` | `application/usecase_base.py` | Interface that Runner wraps (does not modify) |
+| `DependencyContainer` | `core_init.py` | DI for registering Pulse services |
+
+---
+
+## 12. Testing Strategy
+
+### By Type
+
+| Type | Directory | What It Validates |
+|------|-----------|-------------------|
+| Unit | `tests/unit/pulse/` | Each component in isolation |
 | Integration | `tests/integration/pulse/` | Runner + Collector + Registry end-to-end |
-| Property-based | `tests/property_based/` | Sampling convergencia, context imutabilidade |
-| Benchmark | `tests/benchmarks/` | Overhead por nivel (OFF < 100ns, BASIC < 10us) |
+| Property-based | `tests/property_based/` | Sampling convergence, context immutability |
+| Benchmark | `tests/benchmarks/` | Overhead per level (OFF < 100ns, BASIC < 10us) |
 | Contract | `tests/contract_tests/` | PulseCollector protocol compliance |
-| Regression | Todos os 248+ existentes | Nada quebra (P1) |
+| Regression | All 248+ existing | Nothing breaks (P1) |
 
-### Regra de ouro
+### Golden Rule
 
-**Nenhum teste existente pode ser modificado ou removido por causa do ForgePulse.**
-Se um teste existente falha, e bug no ForgePulse, nao no teste.
+**No existing test may be modified or removed because of ForgePulse.**
+If an existing test fails, it's a bug in ForgePulse, not in the test.
 
-### Markers pytest
+### Pytest Markers
 
 ```ini
 [tool:pytest]
@@ -970,203 +970,203 @@ markers =
 
 ---
 
-## 13. Riscos e Mitigacoes
+## 13. Risks and Mitigations
 
-| # | Risco | Impacto | Mitigacao |
-|---|-------|---------|-----------|
-| R1 | Scope creep — cada fase atrai "mais uma feature" | Alto | Cada fase tem criterios de aceitacao fechados. Feature extra vai para fase seguinte. |
-| R2 | Performance — instrumentacao degrada runtime | Alto | Benchmarks obrigatorios por fase. OFF = passthrough direto comprovado. |
-| R3 | Acoplamento — pulse contamina camadas existentes | Alto | import-linter valida boundaries. Pipeline falha se violado. |
-| R4 | Typing quebra no ecossistema | Medio | `MetricsProtocol` intacto. Pulse usa `PulseMetricsProtocol` proprio (DT-2). |
-| R5 | Ninguem usa ValueTracks na pratica | Medio | Heuristica legado garante valor desde Fase 1 sem configuracao. |
-| R6 | Complexidade de contextvars com frameworks web | Medio | Testar com Flask, FastAPI. Frameworks ASGI propagam contextvars nativamente. |
-| R7 | YAML spec cresce sem governanca | Baixo | Schema versionado + validacao na Fase 2. |
-| R8 | Vazamento de PII via `extra`/tags | Alto | `RedactionPolicy` com denylist desde a Fase 0 (DT-7). DIAGNOSTIC exige allowlist explicita. |
-
----
-
-## 14. Glossario
-
-| Termo | Definicao |
-|-------|-----------|
-| **ValueTrack** | Eixo de valor mensuravel (ex: Governanca de Custo, Confiabilidade, Seguranca) |
-| **SubTrack** | Subdivisao de um ValueTrack (ex: billing, payments dentro de cost_governance) |
-| **CL** | Core Logic — nucleo estavel do ForgeBase |
-| **CE** | Customer Extensions — extensoes configuraveis por produto/cliente |
-| **ECM** | Extension Compatibility Matrix — validacao de compatibilidade de extensoes |
-| **MonitoringLevel** | Nivel de instrumentacao (OFF/BASIC/STANDARD/DETAILED/DIAGNOSTIC) |
-| **ExecutionContext** | Contexto imutavel propagado por toda a execucao via contextvars |
-| **PulseCollector** | Interface para coleta de metricas por nivel |
-| **UseCaseRunner** | Wrapper no composition root que instrumenta execute() sem alterar UseCase |
-| **PulseSnapshot** | Dados brutos de uma janela de observacao |
-| **PulseReport** | Agregacao estruturada para consumo por relatorios |
-| **Heuristica legado** | Inferencia automatica de contexto por nome de classe/modulo |
-| **Sampling** | Amostragem probabilistica para controle de volume |
-| **Budget** | Limite de telemetria por execucao (spans, eventos, bytes) |
-| **Strict Mode** | Validacao de que todo use case tem ValueTrack mapeado |
-| **PulseFieldNames** | Constantes de nomenclatura padrao para campos de metricas (contrato CL) |
-| **PulseMetricsProtocol** | Protocolo estendido de metricas para pulse (nao altera MetricsProtocol) |
-| **RedactionPolicy** | Denylist de chaves sensiveis aplicada na coleta de dados |
-| **mapping_source** | Campo que identifica origem do mapeamento (spec/decorator/heuristic/legacy) |
+| # | Risk | Impact | Mitigation |
+|---|------|--------|------------|
+| R1 | Scope creep — each phase attracts "just one more feature" | High | Each phase has closed acceptance criteria. Extra features go to the next phase. |
+| R2 | Performance — instrumentation degrades runtime | High | Mandatory benchmarks per phase. OFF = proven direct passthrough. |
+| R3 | Coupling — pulse contaminates existing layers | High | import-linter validates boundaries. Pipeline fails if violated. |
+| R4 | Typing breaks in the ecosystem | Medium | `MetricsProtocol` intact. Pulse uses its own `PulseMetricsProtocol` (TD-2). |
+| R5 | Nobody uses ValueTracks in practice | Medium | Legacy heuristic ensures value from Phase 1 without configuration. |
+| R6 | Complexity of contextvars with web frameworks | Medium | Test with Flask, FastAPI. ASGI frameworks propagate contextvars natively. |
+| R7 | YAML spec grows without governance | Low | Versioned schema + validation in Phase 2. |
+| R8 | PII leakage via `extra`/tags | High | `RedactionPolicy` with denylist from Phase 0 (TD-7). DIAGNOSTIC requires explicit allowlist. |
 
 ---
 
-## 15. Plano de Execucao e Registro de Evolucao
+## 14. Glossary
 
-### Convencoes
-
-- Cada fase e um PR unico. PR so e mergeado quando todos os criterios de aceitacao estao verdes.
-- Registro de evolucao e feito neste documento (secao 15.2) ao concluir cada fase.
-- Bloqueios sao registrados com data, descricao e resolucao.
-- Decisoes tomadas durante a implementacao que desviem do plano sao anotadas como "Desvio".
-
-### 15.1 — Checklist de Execucao
-
-#### Pre-Fase 0: Preparacao do terreno
-
-- [ ] Corrigir `.import-linter`: `root_package = forgebase` -> `root_package = forge_base`
-- [ ] Validar que import-linter roda e passa com config corrigido
-- [ ] Confirmar que todos os 248+ testes passam no estado atual (baseline)
-
-#### Fase 0 — Fundacao (0.3.0)
-
-| # | Tarefa | Arquivo(s) | Status |
-|---|--------|------------|--------|
-| F0.1 | Criar `pulse/` package com `__init__.py` | `pulse/__init__.py` | Pendente |
-| F0.2 | Implementar `MonitoringLevel` (IntEnum) | `pulse/level.py` | Pendente |
-| F0.3 | Implementar `ExecutionContext` (frozen dataclass + ContextVar) | `pulse/context.py` | Pendente |
-| F0.4 | Implementar `PulseCollector` (Protocol) + `NoOpCollector` | `pulse/collector.py` | Pendente |
-| F0.5 | Implementar `PulseMetricsProtocol` + `PulseExporterProtocol` | `pulse/protocols.py` | Pendente |
-| F0.6 | Implementar `PulseFieldNames` (constantes v0.1) | `pulse/field_names.py` | Pendente |
-| F0.7 | Implementar `redact_keys()` + denylist | `pulse/redaction.py` | Pendente |
-| F0.8 | Implementar `UseCaseRunner` com fast-path OFF | `pulse/runner.py` | Pendente |
-| F0.9 | Criar `_version.py` com `PULSE_SCHEMA_VERSION` | `pulse/_version.py` | Pendente |
-| F0.10 | Adicionar regras import-linter para `pulse/` | `.import-linter` | Pendente |
-| F0.11 | Escrever testes unitarios (context, level, collector, runner, protocols, redaction) | `tests/unit/pulse/` | Pendente |
-| F0.12 | Escrever benchmark OFF vs execute direto | `tests/benchmarks/` | Pendente |
-| F0.13 | Escrever ADR-008 (CL/CE + ForgePulse) | `docs/adr/008-forgepulse-clce.md` | Pendente |
-| F0.14 | Rodar suite completa (248+ testes antigos + novos) | CI | Pendente |
-| F0.15 | Bump version para 0.3.0, tag, CHANGELOG | `pyproject.toml`, `CHANGELOG.md` | Pendente |
-
-#### Fase 1 — BASIC/STANDARD (0.3.1)
-
-| # | Tarefa | Arquivo(s) | Status |
-|---|--------|------------|--------|
-| F1.1 | Implementar `BasicCollector` (BASIC + STANDARD) | `pulse/basic_collector.py` | Pendente |
-| F1.2 | Implementar `infer_context()` heuristica | `pulse/heuristic.py` | Pendente |
-| F1.3 | Implementar `PulseSnapshot` + `ExecutionRecord` | `pulse/report.py` | Pendente |
-| F1.4 | Integrar `BasicCollector` com `TrackMetrics` existente | `pulse/basic_collector.py` | Pendente |
-| F1.5 | Testes unitarios (basic_collector, heuristic, report) | `tests/unit/pulse/` | Pendente |
-| F1.6 | Teste integracao Runner + BasicCollector end-to-end | `tests/integration/pulse/` | Pendente |
-| F1.7 | Benchmark BASIC < 10us | `tests/benchmarks/` | Pendente |
-| F1.8 | Bump version para 0.3.1, tag, CHANGELOG | `pyproject.toml`, `CHANGELOG.md` | Pendente |
-
-#### Fase 2 — Mapeamento por Spec (0.3.2)
-
-| # | Tarefa | Arquivo(s) | Status |
-|---|--------|------------|--------|
-| F2.1 | Implementar `ValueTrackRegistry` (load YAML, resolve) | `pulse/value_tracks.py` | Pendente |
-| F2.2 | Implementar validacao de schema YAML | `pulse/spec_schema.py` | Pendente |
-| F2.3 | Integrar registry no `UseCaseRunner` (spec > heuristica) | `pulse/runner.py` | Pendente |
-| F2.4 | Testes unitarios (value_tracks, spec_schema) | `tests/unit/pulse/` | Pendente |
-| F2.5 | Teste integracao Runner + spec CE | `tests/integration/pulse/` | Pendente |
-| F2.6 | Documentacao: guia CE "como mapear seus ValueTracks" | `docs/usuarios/` | Pendente |
-| F2.7 | Bump version para 0.3.2, tag, CHANGELOG | `pyproject.toml`, `CHANGELOG.md` | Pendente |
-
-#### Fase 3 — Decorators + Tracing (0.3.3)
-
-| # | Tarefa | Arquivo(s) | Status |
-|---|--------|------------|--------|
-| F3.1 | Implementar `@pulse_track` (metadata-only) | `pulse/decorators.py` | Pendente |
-| F3.2 | Implementar `PulseTracer` (integracao com `TracerPort`) | `pulse/tracing.py` | Pendente |
-| F3.3 | Integrar decorator no Runner (spec > decorator > heuristica) | `pulse/runner.py` | Pendente |
-| F3.4 | Implementar `RedactionPolicy` completa para DIAGNOSTIC | `pulse/redaction.py` | Pendente |
-| F3.5 | Testes unitarios (decorators, tracing) | `tests/unit/pulse/` | Pendente |
-| F3.6 | Teste integracao Runner + decorator + spec + heuristica | `tests/integration/pulse/` | Pendente |
-| F3.7 | Bump version para 0.3.3, tag, CHANGELOG | `pyproject.toml`, `CHANGELOG.md` | Pendente |
-
-#### Fase 4 — Governanca Avancada (0.3.4)
-
-| # | Tarefa | Arquivo(s) | Status |
-|---|--------|------------|--------|
-| F4.1 | Implementar `SamplingPolicy` + `BudgetPolicy` | `pulse/policy.py` | Pendente |
-| F4.2 | Implementar `ExtensionCompatibilityMatrix` | `pulse/ecm.py` | Pendente |
-| F4.3 | Implementar `AsyncBuffer` com drop controlado | `pulse/buffer.py` | Pendente |
-| F4.4 | Testes unitarios (policy, ecm, buffer) | `tests/unit/pulse/` | Pendente |
-| F4.5 | Testes property-based (sampling convergencia) | `tests/property_based/` | Pendente |
-| F4.6 | Bump version para 0.3.4, tag, CHANGELOG | `pyproject.toml`, `CHANGELOG.md` | Pendente |
-
-#### Fase 5 — Strict Mode + Relatorios (0.3.5)
-
-| # | Tarefa | Arquivo(s) | Status |
-|---|--------|------------|--------|
-| F5.1 | Implementar `StrictMode` + `StrictReport` (`ok`, `missing`, `assert_ok()`) | `pulse/strict.py` | Pendente |
-| F5.2 | Implementar `PulseReport` + `ValueTrackStats` com `to_dict()` | `pulse/report.py` | Pendente |
-| F5.3 | Testes unitarios (strict, report serializacao) | `tests/unit/pulse/` | Pendente |
-| F5.4 | Teste integracao CI (strict mode falha pipeline) | `tests/integration/pulse/` | Pendente |
-| F5.5 | Documentacao completa: guia de adocao por fase | `docs/usuarios/` | Pendente |
-| F5.6 | Bump version para 0.3.5, tag, CHANGELOG | `pyproject.toml`, `CHANGELOG.md` | Pendente |
+| Term | Definition |
+|------|------------|
+| **ValueTrack** | Measurable value axis (e.g., Cost Governance, Reliability, Security) |
+| **SubTrack** | Subdivision of a ValueTrack (e.g., billing, payments within cost_governance) |
+| **CL** | Core Logic — stable core of ForgeBase |
+| **CE** | Customer Extensions — configurable extensions per product/customer |
+| **ECM** | Extension Compatibility Matrix — extension compatibility validation |
+| **MonitoringLevel** | Instrumentation level (OFF/BASIC/STANDARD/DETAILED/DIAGNOSTIC) |
+| **ExecutionContext** | Immutable context propagated throughout execution via contextvars |
+| **PulseCollector** | Interface for metric collection per level |
+| **UseCaseRunner** | Wrapper in the composition root that instruments execute() without altering UseCase |
+| **PulseSnapshot** | Raw data from an observation window |
+| **PulseReport** | Structured aggregation for report consumption |
+| **Legacy heuristic** | Automatic context inference from class/module name |
+| **Sampling** | Probabilistic sampling for volume control |
+| **Budget** | Telemetry limit per execution (spans, events, bytes) |
+| **Strict Mode** | Validation that every use case has a mapped ValueTrack |
+| **PulseFieldNames** | Standard naming constants for metric fields (CL contract) |
+| **PulseMetricsProtocol** | Extended metrics protocol for pulse (does not alter MetricsProtocol) |
+| **RedactionPolicy** | Sensitive key denylist applied during data collection |
+| **mapping_source** | Field identifying mapping origin (spec/decorator/heuristic/legacy) |
 
 ---
 
-### 15.2 — Registro de Evolucao
+## 15. Execution Plan and Evolution Log
 
-Historico de execucao. Atualizar ao concluir cada fase.
+### Conventions
 
-#### Fase 0
+- Each phase is a single PR. The PR is only merged when all acceptance criteria are green.
+- Evolution log is maintained in this document (section 15.2) upon completing each phase.
+- Blockers are recorded with date, description, and resolution.
+- Decisions made during implementation that deviate from the plan are noted as "Deviation".
 
-| Data | Evento | Notas |
-|------|--------|-------|
-| — | *Ainda nao iniciada* | — |
+### 15.1 — Execution Checklist
 
-#### Fase 1
+#### Pre-Phase 0: Groundwork
 
-| Data | Evento | Notas |
-|------|--------|-------|
-| — | *Ainda nao iniciada* | — |
+- [ ] Fix `.import-linter`: `root_package = forgebase` -> `root_package = forge_base`
+- [ ] Validate that import-linter runs and passes with corrected config
+- [ ] Confirm that all 248+ tests pass in the current state (baseline)
 
-#### Fase 2
+#### Phase 0 — Foundation (0.3.0)
 
-| Data | Evento | Notas |
-|------|--------|-------|
-| — | *Ainda nao iniciada* | — |
+| # | Task | File(s) | Status |
+|---|------|---------|--------|
+| F0.1 | Create `pulse/` package with `__init__.py` | `pulse/__init__.py` | Pending |
+| F0.2 | Implement `MonitoringLevel` (IntEnum) | `pulse/level.py` | Pending |
+| F0.3 | Implement `ExecutionContext` (frozen dataclass + ContextVar) | `pulse/context.py` | Pending |
+| F0.4 | Implement `PulseCollector` (Protocol) + `NoOpCollector` | `pulse/collector.py` | Pending |
+| F0.5 | Implement `PulseMetricsProtocol` + `PulseExporterProtocol` | `pulse/protocols.py` | Pending |
+| F0.6 | Implement `PulseFieldNames` (constants v0.1) | `pulse/field_names.py` | Pending |
+| F0.7 | Implement `redact_keys()` + denylist | `pulse/redaction.py` | Pending |
+| F0.8 | Implement `UseCaseRunner` with OFF fast-path | `pulse/runner.py` | Pending |
+| F0.9 | Create `_version.py` with `PULSE_SCHEMA_VERSION` | `pulse/_version.py` | Pending |
+| F0.10 | Add import-linter rules for `pulse/` | `.import-linter` | Pending |
+| F0.11 | Write unit tests (context, level, collector, runner, protocols, redaction) | `tests/unit/pulse/` | Pending |
+| F0.12 | Write benchmark OFF vs direct execute | `tests/benchmarks/` | Pending |
+| F0.13 | Write ADR-008 (CL/CE + ForgePulse) | `docs/adr/008-forgepulse-clce.md` | Pending |
+| F0.14 | Run full suite (248+ old tests + new) | CI | Pending |
+| F0.15 | Bump version to 0.3.0, tag, CHANGELOG | `pyproject.toml`, `CHANGELOG.md` | Pending |
 
-#### Fase 3
+#### Phase 1 — BASIC/STANDARD (0.3.1)
 
-| Data | Evento | Notas |
-|------|--------|-------|
-| — | *Ainda nao iniciada* | — |
+| # | Task | File(s) | Status |
+|---|------|---------|--------|
+| F1.1 | Implement `BasicCollector` (BASIC + STANDARD) | `pulse/basic_collector.py` | Pending |
+| F1.2 | Implement `infer_context()` heuristic | `pulse/heuristic.py` | Pending |
+| F1.3 | Implement `PulseSnapshot` + `ExecutionRecord` | `pulse/report.py` | Pending |
+| F1.4 | Integrate `BasicCollector` with existing `TrackMetrics` | `pulse/basic_collector.py` | Pending |
+| F1.5 | Unit tests (basic_collector, heuristic, report) | `tests/unit/pulse/` | Pending |
+| F1.6 | Integration test Runner + BasicCollector end-to-end | `tests/integration/pulse/` | Pending |
+| F1.7 | Benchmark BASIC < 10us | `tests/benchmarks/` | Pending |
+| F1.8 | Bump version to 0.3.1, tag, CHANGELOG | `pyproject.toml`, `CHANGELOG.md` | Pending |
 
-#### Fase 4
+#### Phase 2 — Mapping via Spec (0.3.2)
 
-| Data | Evento | Notas |
-|------|--------|-------|
-| — | *Ainda nao iniciada* | — |
+| # | Task | File(s) | Status |
+|---|------|---------|--------|
+| F2.1 | Implement `ValueTrackRegistry` (load YAML, resolve) | `pulse/value_tracks.py` | Pending |
+| F2.2 | Implement YAML schema validation | `pulse/spec_schema.py` | Pending |
+| F2.3 | Integrate registry in `UseCaseRunner` (spec > heuristic) | `pulse/runner.py` | Pending |
+| F2.4 | Unit tests (value_tracks, spec_schema) | `tests/unit/pulse/` | Pending |
+| F2.5 | Integration test Runner + CE spec | `tests/integration/pulse/` | Pending |
+| F2.6 | Documentation: CE guide "how to map your ValueTracks" | `docs/users/` | Pending |
+| F2.7 | Bump version to 0.3.2, tag, CHANGELOG | `pyproject.toml`, `CHANGELOG.md` | Pending |
 
-#### Fase 5
+#### Phase 3 — Decorators + Tracing (0.3.3)
 
-| Data | Evento | Notas |
-|------|--------|-------|
-| — | *Ainda nao iniciada* | — |
+| # | Task | File(s) | Status |
+|---|------|---------|--------|
+| F3.1 | Implement `@pulse_track` (metadata-only) | `pulse/decorators.py` | Pending |
+| F3.2 | Implement `PulseTracer` (integration with `TracerPort`) | `pulse/tracing.py` | Pending |
+| F3.3 | Integrate decorator in Runner (spec > decorator > heuristic) | `pulse/runner.py` | Pending |
+| F3.4 | Implement complete `RedactionPolicy` for DIAGNOSTIC | `pulse/redaction.py` | Pending |
+| F3.5 | Unit tests (decorators, tracing) | `tests/unit/pulse/` | Pending |
+| F3.6 | Integration test Runner + decorator + spec + heuristic | `tests/integration/pulse/` | Pending |
+| F3.7 | Bump version to 0.3.3, tag, CHANGELOG | `pyproject.toml`, `CHANGELOG.md` | Pending |
+
+#### Phase 4 — Advanced Governance (0.3.4)
+
+| # | Task | File(s) | Status |
+|---|------|---------|--------|
+| F4.1 | Implement `SamplingPolicy` + `BudgetPolicy` | `pulse/policy.py` | Pending |
+| F4.2 | Implement `ExtensionCompatibilityMatrix` | `pulse/ecm.py` | Pending |
+| F4.3 | Implement `AsyncBuffer` with controlled drop | `pulse/buffer.py` | Pending |
+| F4.4 | Unit tests (policy, ecm, buffer) | `tests/unit/pulse/` | Pending |
+| F4.5 | Property-based tests (sampling convergence) | `tests/property_based/` | Pending |
+| F4.6 | Bump version to 0.3.4, tag, CHANGELOG | `pyproject.toml`, `CHANGELOG.md` | Pending |
+
+#### Phase 5 — Strict Mode + Reports (0.3.5)
+
+| # | Task | File(s) | Status |
+|---|------|---------|--------|
+| F5.1 | Implement `StrictMode` + `StrictReport` (`ok`, `missing`, `assert_ok()`) | `pulse/strict.py` | Pending |
+| F5.2 | Implement `PulseReport` + `ValueTrackStats` with `to_dict()` | `pulse/report.py` | Pending |
+| F5.3 | Unit tests (strict, report serialization) | `tests/unit/pulse/` | Pending |
+| F5.4 | Integration test CI (strict mode fails pipeline) | `tests/integration/pulse/` | Pending |
+| F5.5 | Complete documentation: adoption guide per phase | `docs/users/` | Pending |
+| F5.6 | Bump version to 0.3.5, tag, CHANGELOG | `pyproject.toml`, `CHANGELOG.md` | Pending |
 
 ---
 
-### 15.3 — Registro de Bloqueios
+### 15.2 — Evolution Log
 
-| Data | Fase | Descricao | Resolucao | Status |
-|------|------|-----------|-----------|--------|
-| — | — | *Nenhum bloqueio registrado* | — | — |
+Execution history. Update upon completing each phase.
+
+#### Phase 0
+
+| Date | Event | Notes |
+|------|-------|-------|
+| — | *Not yet started* | — |
+
+#### Phase 1
+
+| Date | Event | Notes |
+|------|-------|-------|
+| — | *Not yet started* | — |
+
+#### Phase 2
+
+| Date | Event | Notes |
+|------|-------|-------|
+| — | *Not yet started* | — |
+
+#### Phase 3
+
+| Date | Event | Notes |
+|------|-------|-------|
+| — | *Not yet started* | — |
+
+#### Phase 4
+
+| Date | Event | Notes |
+|------|-------|-------|
+| — | *Not yet started* | — |
+
+#### Phase 5
+
+| Date | Event | Notes |
+|------|-------|-------|
+| — | *Not yet started* | — |
 
 ---
 
-### 15.4 — Registro de Desvios
+### 15.3 — Blocker Log
 
-Decisoes tomadas durante a implementacao que divergem do plano original.
-
-| Data | Fase | Desvio | Justificativa | Impacto |
-|------|------|--------|---------------|---------|
-| — | — | *Nenhum desvio registrado* | — | — |
+| Date | Phase | Description | Resolution | Status |
+|------|-------|-------------|------------|--------|
+| — | — | *No blockers recorded* | — | — |
 
 ---
 
-*Documento vivo. Atualizar a cada fase concluida.*
+### 15.4 — Deviation Log
+
+Decisions made during implementation that diverge from the original plan.
+
+| Date | Phase | Deviation | Justification | Impact |
+|------|-------|-----------|---------------|--------|
+| — | — | *No deviations recorded* | — | — |
+
+---
+
+*Living document. Update upon each completed phase.*

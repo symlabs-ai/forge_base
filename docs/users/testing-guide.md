@@ -1,41 +1,41 @@
-# Guia de Testes ForgeBase
+# ForgeBase Testing Guide
 
-> "Testes não apenas validam comportamento — validam intenção."
+> "Tests don't just validate behavior -- they validate intention."
 
-Este guia ensina como escrever testes efetivos no ForgeBase, incluindo testes unitários tradicionais e **testes cognitivos** que validam coerência entre intenção e execução.
+This guide teaches you how to write effective tests in ForgeBase, including traditional unit tests and **cognitive tests** that validate coherence between intention and execution.
 
 ---
 
-## Filosofia de Testes no ForgeBase
+## Testing Philosophy in ForgeBase
 
-ForgeBase adota uma filosofia de testes em **três níveis**:
+ForgeBase adopts a **three-level** testing philosophy:
 
-1. **Unit Tests** — Validam comportamento de componentes isolados
-2. **Integration Tests** — Validam interação entre componentes
-3. **Cognitive Tests** — Validam coerência entre intenção e execução
+1. **Unit Tests** -- Validate behavior of isolated components
+2. **Integration Tests** -- Validate interaction between components
+3. **Cognitive Tests** -- Validate coherence between intention and execution
 
 ```
 ┌────────────────────────────────────────────┐
-│          Cognitive Tests                   │  ← Valida INTENÇÃO
-│  "O código faz o que PRETENDÍAMOS?"       │
+│          Cognitive Tests                   │  ← Validates INTENTION
+│  "Does the code do what we INTENDED?"     │
 └─────────────┬──────────────────────────────┘
               │
 ┌─────────────┴──────────────────────────────┐
-│        Integration Tests                   │  ← Valida INTEGRAÇÃO
-│  "Os componentes funcionam juntos?"        │
+│        Integration Tests                   │  ← Validates INTEGRATION
+│  "Do the components work together?"        │
 └─────────────┬──────────────────────────────┘
               │
 ┌─────────────┴──────────────────────────────┐
-│           Unit Tests                       │  ← Valida COMPORTAMENTO
-│  "Este componente funciona isoladamente?"  │
+│           Unit Tests                       │  ← Validates BEHAVIOR
+│  "Does this component work in isolation?"  │
 └────────────────────────────────────────────┘
 ```
 
 ---
 
-## 1. Unit Tests (Testes Unitários)
+## 1. Unit Tests
 
-### Estrutura Básica
+### Basic Structure
 
 ```python
 import unittest
@@ -43,51 +43,51 @@ from forge_base.domain import EntityBase, ValidationError
 
 
 class TestUser(unittest.TestCase):
-    """Testes unitários para entidade User."""
+    """Unit tests for User entity."""
 
-    def test_cria_usuario_com_dados_validos(self):
-        """Testar criação de usuário com inputs válidos."""
+    def test_creates_user_with_valid_data(self):
+        """Test creating a user with valid inputs."""
         user = User(name="Alice", email="alice@example.com")
 
         self.assertEqual(user.name, "Alice")
         self.assertEqual(user.email, "alice@example.com")
         self.assertTrue(user.is_active)
 
-    def test_rejeita_nome_vazio(self):
-        """Testar que nome vazio levanta ValidationError."""
+    def test_rejects_empty_name(self):
+        """Test that an empty name raises ValidationError."""
         with self.assertRaises(ValidationError) as ctx:
             User(name="", email="alice@example.com")
 
-        self.assertIn("não pode ser vazio", str(ctx.exception).lower())
+        self.assertIn("cannot be empty", str(ctx.exception).lower())
 ```
 
-### O Que Testar?
+### What to Test?
 
-#### Camada de Domínio
+#### Domain Layer
 
 **Entities:**
-- Validação de invariantes
-- Métodos de negócio
-- Igualdade baseada em ID
-- Transições de estado
+- Invariant validation
+- Business methods
+- ID-based equality
+- State transitions
 
 ```python
 class TestOrder(unittest.TestCase):
-    def test_valida_total_positivo(self):
-        """Testar que total negativo é rejeitado."""
+    def test_validates_positive_total(self):
+        """Test that a negative total is rejected."""
         with self.assertRaises(ValidationError):
             Order(customer_id="123", items=[], total=-10)
 
-    def test_mark_as_paid_muda_status(self):
-        """Testar transição de status para pago."""
+    def test_mark_as_paid_changes_status(self):
+        """Test status transition to paid."""
         order = Order(customer_id="123", items=[...], total=50)
         order.mark_as_paid()
 
         self.assertEqual(order.status, "paid")
         self.assertIsNotNone(order.paid_at)
 
-    def test_nao_pode_modificar_pedido_pago(self):
-        """Testar regra de negócio: pedidos pagos são imutáveis."""
+    def test_cannot_modify_paid_order(self):
+        """Test business rule: paid orders are immutable."""
         order = Order(customer_id="123", items=[...], total=50)
         order.mark_as_paid()
 
@@ -96,31 +96,31 @@ class TestOrder(unittest.TestCase):
 ```
 
 **ValueObjects:**
-- Imutabilidade
-- Igualdade estrutural
-- Validação de formato
-- Operações (se aplicável)
+- Immutability
+- Structural equality
+- Format validation
+- Operations (if applicable)
 
 ```python
 class TestEmail(unittest.TestCase):
-    def test_valida_formato(self):
-        """Testar validação de formato de email."""
+    def test_validates_format(self):
+        """Test email format validation."""
         with self.assertRaises(ValidationError):
-            Email("email-invalido")
+            Email("invalid-email")
 
-        # Válido
+        # Valid
         email = Email("alice@example.com")
         self.assertEqual(str(email), "alice@example.com")
 
-    def test_imutabilidade(self):
-        """Testar que email é imutável."""
+    def test_immutability(self):
+        """Test that email is immutable."""
         email = Email("alice@example.com")
 
         with self.assertRaises(AttributeError):
             email.address = "bob@example.com"
 
-    def test_igualdade(self):
-        """Testar igualdade estrutural."""
+    def test_equality(self):
+        """Test structural equality."""
         email1 = Email("alice@example.com")
         email2 = Email("alice@example.com")
 
@@ -128,13 +128,13 @@ class TestEmail(unittest.TestCase):
         self.assertEqual(hash(email1), hash(email2))
 ```
 
-#### Camada de Aplicação
+#### Application Layer
 
 **UseCases:**
-- Validação de input DTOs
-- Orquestração correta
-- Output DTOs corretos
-- Tratamento de erros
+- Input DTO validation
+- Correct orchestration
+- Correct output DTOs
+- Error handling
 
 ```python
 class TestCreateUserUseCase(unittest.TestCase):
@@ -142,8 +142,8 @@ class TestCreateUserUseCase(unittest.TestCase):
         self.fake_repo = FakeRepository()
         self.usecase = CreateUserUseCase(user_repository=self.fake_repo)
 
-    def test_cria_usuario(self):
-        """Testar criação de usuário com sucesso."""
+    def test_creates_user(self):
+        """Test successful user creation."""
         output = self.usecase.execute(CreateUserInput(
             name="Alice",
             email="alice@example.com"
@@ -152,33 +152,33 @@ class TestCreateUserUseCase(unittest.TestCase):
         self.assertIsNotNone(output.user_id)
         self.assertEqual(output.name, "Alice")
 
-        # Verificar persistência
+        # Verify persistence
         self.assertEqual(self.fake_repo.count(), 1)
 
-    def test_rejeita_email_duplicado(self):
-        """Testar regra de negócio: email deve ser único."""
-        # Criar primeiro usuário
+    def test_rejects_duplicate_email(self):
+        """Test business rule: email must be unique."""
+        # Create first user
         self.usecase.execute(CreateUserInput(
             name="Alice",
             email="alice@example.com"
         ))
 
-        # Tentar duplicar
+        # Try to duplicate
         with self.assertRaises(BusinessRuleViolation) as ctx:
             self.usecase.execute(CreateUserInput(
                 name="Bob",
                 email="alice@example.com"
             ))
 
-        self.assertIn("já existe", str(ctx.exception))
+        self.assertIn("already exists", str(ctx.exception))
 ```
 
-#### Camada de Infraestrutura
+#### Infrastructure Layer
 
 **Repositories:**
-- Operações CRUD
-- Métodos de consulta
-- Tratamento de erros
+- CRUD operations
+- Query methods
+- Error handling
 
 ```python
 class TestJSONRepository(unittest.TestCase):
@@ -194,7 +194,7 @@ class TestJSONRepository(unittest.TestCase):
         shutil.rmtree(self.temp_dir)
 
     def test_save_and_find(self):
-        """Testar salvar e recuperar."""
+        """Test saving and retrieving."""
         user = User(name="Alice", email="alice@example.com")
         self.repo.save(user)
 
@@ -204,12 +204,12 @@ class TestJSONRepository(unittest.TestCase):
         self.assertEqual(found.id, user.id)
         self.assertEqual(found.name, "Alice")
 
-    def test_persistencia_entre_instancias(self):
-        """Testar que dados persistem entre instâncias de repository."""
+    def test_persistence_between_instances(self):
+        """Test that data persists between repository instances."""
         user = User(name="Alice", email="alice@example.com")
         self.repo.save(user)
 
-        # Criar nova instância do repo
+        # Create new repo instance
         new_repo = JSONRepository(
             file_path=self.file_path,
             entity_type=User
@@ -219,59 +219,59 @@ class TestJSONRepository(unittest.TestCase):
         self.assertIsNotNone(found)
 ```
 
-### Padrões de Teste
+### Test Patterns
 
 #### Arrange-Act-Assert (AAA)
 
 ```python
-def test_exemplo(self):
-    """Teste seguindo padrão AAA."""
+def test_example(self):
+    """Test following the AAA pattern."""
     # Arrange: Setup
     user = User(name="Alice", email="alice@example.com")
     order = Order(customer_id=user.id, items=[], total=50)
 
-    # Act: Executar
+    # Act: Execute
     order.mark_as_paid()
 
-    # Assert: Verificar
+    # Assert: Verify
     self.assertEqual(order.status, "paid")
     self.assertIsNotNone(order.paid_at)
 ```
 
-#### Given-When-Then (Estilo BDD)
+#### Given-When-Then (BDD Style)
 
 ```python
-def test_exemplo_estilo_bdd(self):
+def test_bdd_style_example(self):
     """
-    Dado um pedido pendente
-    Quando marcar como pago
-    Então status deve ser 'paid' e paid_at deve estar preenchido
+    Given a pending order
+    When marked as paid
+    Then status should be 'paid' and paid_at should be filled
     """
-    # Given (Dado)
+    # Given
     order = Order(customer_id="123", items=[], total=50, status="pending")
 
-    # When (Quando)
+    # When
     order.mark_as_paid()
 
-    # Then (Então)
+    # Then
     self.assertEqual(order.status, "paid")
     self.assertIsNotNone(order.paid_at)
 ```
 
 ---
 
-## 2. Integration Tests (Testes de Integração)
+## 2. Integration Tests
 
-Testes de integração validam a interação entre múltiplos componentes.
+Integration tests validate the interaction between multiple components.
 
-### Exemplo: UseCase + Repository
+### Example: UseCase + Repository
 
 ```python
 class TestCreateUserIntegration(unittest.TestCase):
-    """Testes de integração para fluxo CreateUser."""
+    """Integration tests for CreateUser flow."""
 
     def setUp(self):
-        # Componentes reais (não fakes)
+        # Real components (not fakes)
         self.temp_dir = tempfile.mkdtemp()
         self.repo = JSONRepository(
             file_path=os.path.join(self.temp_dir, "users.json"),
@@ -289,34 +289,34 @@ class TestCreateUserIntegration(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.temp_dir)
 
-    def test_fluxo_completo(self):
-        """Testar fluxo completo de criação de usuário."""
-        # Executar
+    def test_complete_flow(self):
+        """Test complete user creation flow."""
+        # Execute
         output = self.usecase.execute(CreateUserInput(
             name="Alice",
             email="alice@example.com"
         ))
 
-        # Verificar todas as camadas
-        # 1. Output DTO correto
+        # Verify all layers
+        # 1. Correct output DTO
         self.assertIsNotNone(output.user_id)
 
-        # 2. Persistido no repository
+        # 2. Persisted in repository
         user = self.repo.find_by_id(output.user_id)
         self.assertIsNotNone(user)
 
-        # 3. Métricas coletadas
+        # 3. Metrics collected
         report = self.metrics.report()
         self.assertIn('create_user', str(report))
 ```
 
 ---
 
-## 3. Cognitive Tests (Testes Cognitivos)
+## 3. Cognitive Tests
 
-**Testes cognitivos** validam que a execução cumpre a intenção original. Usam `ForgeTestCase`.
+**Cognitive tests** validate that execution fulfills the original intention. They use `ForgeTestCase`.
 
-### ForgeTestCase: Assertions Cognitivas
+### ForgeTestCase: Cognitive Assertions
 
 ```python
 from forge_base.testing import ForgeTestCase
@@ -324,10 +324,10 @@ from forge_base.testing.fakes import FakeRepository, FakeLogger, FakeMetricsColl
 
 
 class TestCreateUserCognitive(ForgeTestCase):
-    """Testes cognitivos para UseCase CreateUser."""
+    """Cognitive tests for CreateUser UseCase."""
 
     def setUp(self):
-        # Fakes para testes rápidos e isolados
+        # Fakes for fast and isolated tests
         self.fake_repo = FakeRepository()
         self.fake_logger = FakeLogger()
         self.fake_metrics = FakeMetricsCollector()
@@ -338,86 +338,86 @@ class TestCreateUserCognitive(ForgeTestCase):
             metrics=self.fake_metrics
         )
 
-    def test_cria_usuario_com_validacao_cognitiva(self):
+    def test_creates_user_with_cognitive_validation(self):
         """
-        Teste cognitivo validando:
-        - Intenção corresponde ao resultado
-        - Métricas coletadas
-        - Logs estruturados
-        - Performance aceitável
+        Cognitive test validating:
+        - Intention matches result
+        - Metrics collected
+        - Structured logs
+        - Acceptable performance
         """
-        # 1. Captura intenção
-        intent = "Criar usuário chamado Alice com email alice@example.com"
+        # 1. Capture intention
+        intent = "Create user named Alice with email alice@example.com"
 
-        # 2. Executa
+        # 2. Execute
         output = self.usecase.execute(CreateUserInput(
             name="Alice",
             email="alice@example.com"
         ))
 
-        # 3. Validações tradicionais
+        # 3. Traditional validations
         self.assertEqual(output.name, "Alice")
         self.assertEqual(output.email, "alice@example.com")
 
-        # 4. COGNITIVO: Valida intenção
-        actual = f"Criado usuário {output.name} com email {output.email}"
+        # 4. COGNITIVE: Validate intention
+        actual = f"Created user {output.name} with email {output.email}"
         self.assert_intent_matches(
             expected=intent,
             actual=actual,
-            threshold=0.75  # 75% similaridade mínima
+            threshold=0.75  # 75% minimum similarity
         )
 
-        # 5. COGNITIVO: Valida métricas
+        # 5. COGNITIVE: Validate metrics
         self.assert_metrics_collected({
             'create_user.duration': lambda v: v > 0,
             'create_user.count': lambda v: v == 1
         })
 
-        # 6. COGNITIVO: Valida logs estruturados
+        # 6. COGNITIVE: Validate structured logs
         logs = self.fake_logger.get_logs(level='info')
         self.assertTrue(any('user' in log['message'].lower() for log in logs))
 
-        # 7. COGNITIVO: Valida performance
+        # 7. COGNITIVE: Validate performance
         self.assert_performance_within(
             lambda: self.usecase.execute(CreateUserInput(...)),
             max_duration_ms=50.0
         )
 
-        # 8. Valida persistência
+        # 8. Validate persistence
         self.assertEqual(self.fake_repo.count(), 1)
 ```
 
-### Intent Tracking em Testes
+### Intent Tracking in Tests
 
 ```python
 from forge_base.integration import IntentTracker
 
 
 class TestWithIntentTracking(ForgeTestCase):
-    def test_valida_coerencia(self):
-        """Teste com rastreamento completo de intenção."""
+    def test_validates_coherence(self):
+        """Test with complete intent tracking."""
         tracker = IntentTracker()
 
-        # Captura intenção
+        # Capture intention
         intent_id = tracker.capture_intent(
-            description="Criar usuário Alice",
-            expected_outcome="Usuário criado com sucesso"
+            description="Create user Alice",
+            expected_outcome="User created successfully"
         )
 
-        # Executa
+        # Execute
         output = self.usecase.execute(CreateUserInput(...))
 
-        # Registra execução
+        # Record execution
         tracker.record_execution(
             intent_id=intent_id,
-            actual_outcome=f"Usuário {output.user_id} criado",
+            actual_outcome=f"User {output.user_id} created",
             success=True
         )
 
-        # Valida coerência
+        # Validate coherence
         report = tracker.validate_coherence(intent_id)
 
-        # Asserções
+        # Assertions
         self.assertIn(report.coherence_level, [
             CoherenceLevel.PERFECT,
             CoherenceLevel.HIGH
@@ -429,122 +429,122 @@ class TestWithIntentTracking(ForgeTestCase):
 
 ## Test Doubles: Fakes vs Mocks
 
-ForgeBase prefere **Fakes** sobre Mocks.
+ForgeBase prefers **Fakes** over Mocks.
 
-### Fakes (Recomendado)
+### Fakes (Recommended)
 
-Implementações funcionais in-memory para testes.
+Functional in-memory implementations for testing.
 
 ```python
-# Usando Fakes
-def test_com_fakes(self):
-    fake_repo = FakeRepository()  # Implementação real, in-memory
+# Using Fakes
+def test_with_fakes(self):
+    fake_repo = FakeRepository()  # Real implementation, in-memory
     usecase = CreateUserUseCase(user_repository=fake_repo)
 
     output = usecase.execute(CreateUserInput(...))
 
-    # Verificar estado
+    # Verify state
     self.assertEqual(fake_repo.count(), 1)
     user = fake_repo.find_by_id(output.user_id)
     self.assertIsNotNone(user)
 ```
 
-**Vantagens:**
-- Mais próximo do comportamento real
-- Detecta bugs em interações
-- Fácil inspecionar estado
-- Menos frágil
+**Advantages:**
+- Closer to real behavior
+- Detects bugs in interactions
+- Easy to inspect state
+- Less fragile
 
-### Mocks (Use com Moderação)
+### Mocks (Use Sparingly)
 
 ```python
 from unittest.mock import Mock
 
-# Usando Mocks
-def test_com_mocks(self):
+# Using Mocks
+def test_with_mocks(self):
     mock_repo = Mock(spec=UserRepositoryPort)
-    mock_repo.find_by_email.return_value = None  # Sem duplicata
+    mock_repo.find_by_email.return_value = None  # No duplicate
 
     usecase = CreateUserUseCase(user_repository=mock_repo)
 
     output = usecase.execute(CreateUserInput(...))
 
-    # Verificar interações
+    # Verify interactions
     mock_repo.save.assert_called_once()
     mock_repo.find_by_email.assert_called_with("alice@example.com")
 ```
 
-**Use quando:**
-- Testar interações específicas
-- Simular erros difíceis de reproduzir
-- Verificar chamadas exatas
+**Use when:**
+- Testing specific interactions
+- Simulating hard-to-reproduce errors
+- Verifying exact calls
 
 ---
 
 ## Coverage
 
-### Rodando Testes com Coverage
+### Running Tests with Coverage
 
 ```bash
-# Executar todos os testes com coverage
+# Run all tests with coverage
 pytest --cov=forge_base --cov-report=html
 
-# Abrir relatório
+# Open report
 open htmlcov/index.html
 ```
 
-### Metas de Coverage
+### Coverage Goals
 
-| Camada | Meta |
-|--------|------|
-| **Domain Layer** | ≥95% |
-| **Application Layer** | ≥90% |
-| **Infrastructure Layer** | ≥80% |
-| **Adapters Layer** | ≥70% |
+| Layer | Goal |
+|-------|------|
+| **Domain Layer** | >=95% |
+| **Application Layer** | >=90% |
+| **Infrastructure Layer** | >=80% |
+| **Adapters Layer** | >=70% |
 
 ---
 
-## Executando Testes
+## Running Tests
 
-### Executar Todos os Testes
+### Run All Tests
 
 ```bash
 pytest
 ```
 
-### Executar Arquivo Específico
+### Run Specific File
 
 ```bash
 pytest tests/unit/domain/test_user.py
 ```
 
-### Executar Teste Específico
+### Run Specific Test
 
 ```bash
-pytest tests/unit/domain/test_user.py::TestUser::test_cria_usuario
+pytest tests/unit/domain/test_user.py::TestUser::test_creates_user
 ```
 
-### Executar por Markers
+### Run by Markers
 
 ```bash
-# Apenas testes rápidos
+# Only fast tests
 pytest -m "not slow"
 
-# Testes de integração
+# Integration tests
 pytest -m integration
 
-# Testes cognitivos
+# Cognitive tests
 pytest -m cognitive
 ```
 
-### Output Verbose
+### Verbose Output
 
 ```bash
 pytest -v
 pytest -vv  # Extra verbose
 ```
 
-### Parar na Primeira Falha
+### Stop on First Failure
 
 ```bash
 pytest -x
@@ -552,65 +552,65 @@ pytest -x
 
 ---
 
-## Boas Práticas
+## Best Practices
 
-### 1. Uma Asserção por Teste (Ideal)
+### 1. One Assertion per Test (Ideal)
 
 ```python
-# Bom
-def test_cria_usuario(self):
+# Good
+def test_creates_user(self):
     output = usecase.execute(input_dto)
     self.assertIsNotNone(output.user_id)
 
-def test_persiste_usuario(self):
+def test_persists_user(self):
     usecase.execute(input_dto)
     self.assertEqual(repo.count(), 1)
 
-# Aceitável para testes cognitivos
-def test_validacao_cognitiva(self):
-    # Múltiplas asserções relacionadas OK
+# Acceptable for cognitive tests
+def test_cognitive_validation(self):
+    # Multiple related assertions are OK
     self.assert_intent_matches(...)
     self.assert_metrics_collected(...)
     self.assert_performance_within(...)
 ```
 
-### 2. Nomes de Testes são Documentação
+### 2. Test Names Are Documentation
 
 ```python
-# Bom: Descreve comportamento
-def test_rejeita_preco_negativo(self):
+# Good: Describes behavior
+def test_rejects_negative_price(self):
     ...
 
-def test_marca_pedido_como_pago_quando_pagamento_sucede(self):
+def test_marks_order_as_paid_when_payment_succeeds(self):
     ...
 
-# Ruim: Não descritivo
-def test_preco(self):
+# Bad: Not descriptive
+def test_price(self):
     ...
 
-def test_pedido(self):
+def test_order(self):
     ...
 ```
 
-### 3. setUp() para Contexto Compartilhado
+### 3. setUp() for Shared Context
 
 ```python
 class TestCreateUser(unittest.TestCase):
     def setUp(self):
-        # Setup compartilhado
+        # Shared setup
         self.fake_repo = FakeRepository()
         self.usecase = CreateUserUseCase(user_repository=self.fake_repo)
 
-    def test_caso_1(self):
-        # Usa self.usecase
+    def test_case_1(self):
+        # Uses self.usecase
         ...
 
-    def test_caso_2(self):
-        # Usa self.usecase
+    def test_case_2(self):
+        # Uses self.usecase
         ...
 ```
 
-### 4. tearDown() para Cleanup
+### 4. tearDown() for Cleanup
 
 ```python
 def setUp(self):
@@ -620,28 +620,28 @@ def tearDown(self):
     shutil.rmtree(self.temp_dir)
 ```
 
-### 5. Docstrings em Testes
+### 5. Docstrings in Tests
 
 ```python
-def test_cria_usuario(self):
+def test_creates_user(self):
     """
-    Testar que CreateUserUseCase cria um usuário com sucesso.
+    Test that CreateUserUseCase creates a user successfully.
 
-    Dado input válido (nome e email)
-    Quando execute() é chamado
-    Então usuário deve ser criado e persistido
+    Given valid input (name and email)
+    When execute() is called
+    Then the user should be created and persisted
     """
     ...
 ```
 
 ---
 
-## Debugging de Testes
+## Debugging Tests
 
 ### Print Debugging
 
 ```python
-def test_exemplo(self):
+def test_example(self):
     output = usecase.execute(input_dto)
     print(f"Output: {output.to_dict()}")  # Debug
     self.assertEqual(output.name, "Alice")
@@ -650,7 +650,7 @@ def test_exemplo(self):
 ### pdb (Python Debugger)
 
 ```python
-def test_exemplo(self):
+def test_example(self):
     import pdb; pdb.set_trace()  # Breakpoint
     output = usecase.execute(input_dto)
     self.assertEqual(output.name, "Alice")
@@ -659,20 +659,20 @@ def test_exemplo(self):
 ### pytest --pdb
 
 ```bash
-# Entrar no debugger em caso de falha
+# Enter the debugger on failure
 pytest --pdb
 ```
 
 ---
 
-## Recursos Adicionais
+## Additional Resources
 
-- **[Receitas](receitas.md)** — Exemplos práticos
-- **[ADR-004: Cognitive Testing](../adr/004-cognitive-testing.md)** — Filosofia de testes cognitivos
-- **[Início Rápido](inicio-rapido.md)** — Tutorial inicial
+- **[Recipes](recipes.md)** -- Practical examples
+- **[ADR-004: Cognitive Testing](../adr/004-cognitive-testing.md)** -- Cognitive testing philosophy
+- **[Quick Start](quick-start.md)** -- Getting started tutorial
 
 ---
 
-**Teste com Propósito!**
+**Test with Purpose!**
 
-*"Cada teste documenta intenção e valida coerência."*
+*"Each test documents intention and validates coherence."*

@@ -1,33 +1,33 @@
-# ForgeBase - Receitas Práticas
+# ForgeBase - Practical Recipes
 
-> Soluções prontas para casos comuns de desenvolvimento
+> Ready-made solutions for common development cases
 
-Este cookbook fornece soluções práticas para casos de uso frequentes no ForgeBase. Cada receita é autocontida e pode ser copiada/adaptada para seu projeto.
-
----
-
-## Índice
-
-1. [Como Criar uma Entity](#1-como-criar-uma-entity)
-2. [Como Criar um ValueObject](#2-como-criar-um-valueobject)
-3. [Como Criar um UseCase](#3-como-criar-um-usecase)
-4. [Como Criar um Port](#4-como-criar-um-port)
-5. [Como Criar um Adapter](#5-como-criar-um-adapter)
-6. [Como Adicionar Observabilidade](#6-como-adicionar-observabilidade)
-7. [Como Escrever Testes Cognitivos](#7-como-escrever-testes-cognitivos)
-8. [Como Integrar com ForgeProcess](#8-como-integrar-com-forgeprocess)
-9. [Como Criar um Repository Customizado](#9-como-criar-um-repository-customizado)
-10. [Como Adicionar Validações Customizadas](#10-como-adicionar-validações-customizadas)
-11. [Como Usar Dependency Injection](#11-como-usar-dependency-injection)
-12. [Como Adicionar um Novo Adapter](#12-como-adicionar-um-novo-adapter)
+This cookbook provides practical solutions for frequent use cases in ForgeBase. Each recipe is self-contained and can be copied/adapted for your project.
 
 ---
 
-## 1. Como Criar uma Entity
+## Table of Contents
 
-**Problema**: Preciso criar uma entidade de domínio com identidade e invariantes.
+1. [How to Create an Entity](#1-how-to-create-an-entity)
+2. [How to Create a ValueObject](#2-how-to-create-a-valueobject)
+3. [How to Create a UseCase](#3-how-to-create-a-usecase)
+4. [How to Create a Port](#4-how-to-create-a-port)
+5. [How to Create an Adapter](#5-how-to-create-an-adapter)
+6. [How to Add Observability](#6-how-to-add-observability)
+7. [How to Write Cognitive Tests](#7-how-to-write-cognitive-tests)
+8. [How to Integrate with ForgeProcess](#8-how-to-integrate-with-forgeprocess)
+9. [How to Create a Custom Repository](#9-how-to-create-a-custom-repository)
+10. [How to Add Custom Validations](#10-how-to-add-custom-validations)
+11. [How to Use Dependency Injection](#11-how-to-use-dependency-injection)
+12. [How to Add a New Adapter](#12-how-to-add-a-new-adapter)
 
-**Solução**:
+---
+
+## 1. How to Create an Entity
+
+**Problem**: I need to create a domain entity with identity and invariants.
+
+**Solution**:
 
 ```python
 from forge_base.domain import EntityBase, ValidationError, BusinessRuleViolation
@@ -36,14 +36,14 @@ from datetime import datetime
 
 class Order(EntityBase):
     """
-    Entidade Order.
+    Order Entity.
 
-    Representa um pedido com itens, total e status.
+    Represents an order with items, total, and status.
 
-    Regras de Negócio:
-        - Pedido deve ter pelo menos um item
-        - Total deve ser positivo
-        - Uma vez pago, pedido não pode ser modificado
+    Business Rules:
+        - Order must have at least one item
+        - Total must be positive
+        - Once paid, order cannot be modified
     """
 
     def __init__(
@@ -64,55 +64,55 @@ class Order(EntityBase):
         self.validate()
 
     def validate(self) -> None:
-        """Validar invariantes do pedido."""
+        """Validate order invariants."""
         if not self.customer_id:
-            raise ValidationError("Pedido deve ter um cliente")
+            raise ValidationError("Order must have a customer")
 
         if not self.items:
-            raise ValidationError("Pedido deve ter pelo menos um item")
+            raise ValidationError("Order must have at least one item")
 
         if self.total <= 0:
-            raise ValidationError("Total do pedido deve ser positivo")
+            raise ValidationError("Order total must be positive")
 
         if self.status not in ["pending", "paid", "shipped", "cancelled"]:
-            raise ValidationError(f"Status inválido: {self.status}")
+            raise ValidationError(f"Invalid status: {self.status}")
 
     def mark_as_paid(self) -> None:
-        """Marcar pedido como pago."""
+        """Mark order as paid."""
         if self.status == "cancelled":
-            raise BusinessRuleViolation("Não é possível pagar pedido cancelado")
+            raise BusinessRuleViolation("Cannot pay a cancelled order")
 
         if self.paid_at is not None:
-            raise BusinessRuleViolation("Pedido já foi pago")
+            raise BusinessRuleViolation("Order has already been paid")
 
         self.status = "paid"
         self.paid_at = datetime.now()
 
     def add_item(self, item: dict, price: float) -> None:
-        """Adicionar item ao pedido."""
+        """Add item to order."""
         if self.paid_at is not None:
-            raise BusinessRuleViolation("Não é possível modificar pedido pago")
+            raise BusinessRuleViolation("Cannot modify a paid order")
 
         self.items.append(item)
         self.total += price
 
     def __str__(self) -> str:
-        return f"Order {self.id} ({self.status}) - R${self.total:.2f}"
+        return f"Order {self.id} ({self.status}) - ${self.total:.2f}"
 ```
 
-**Pontos-Chave**:
-- Herda de `EntityBase`
-- `validate()` verifica invariantes
-- Métodos de negócio (`mark_as_paid`, `add_item`)
-- Exceções apropriadas (`ValidationError` vs `BusinessRuleViolation`)
+**Key Points**:
+- Inherits from `EntityBase`
+- `validate()` checks invariants
+- Business methods (`mark_as_paid`, `add_item`)
+- Appropriate exceptions (`ValidationError` vs `BusinessRuleViolation`)
 
 ---
 
-## 2. Como Criar um ValueObject
+## 2. How to Create a ValueObject
 
-**Problema**: Preciso de um objeto imutável que representa um valor (não tem identidade).
+**Problem**: I need an immutable object that represents a value (has no identity).
 
-**Solução**:
+**Solution**:
 
 ```python
 from forge_base.domain import ValueObjectBase, ValidationError
@@ -121,25 +121,25 @@ import re
 
 class EmailAddress(ValueObjectBase):
     """
-    Value object para endereço de email.
+    Value object for email address.
 
-    Valor imutável representando um email validado.
+    Immutable value representing a validated email.
     """
 
     def __init__(self, address: str):
         super().__init__()
         self.address = address
         self.validate()
-        self._freeze()  # Torna imutável
+        self._freeze()  # Makes it immutable
 
     def validate(self) -> None:
-        """Validar formato do email."""
+        """Validate email format."""
         if not self.address:
-            raise ValidationError("Endereço de email não pode ser vazio")
+            raise ValidationError("Email address cannot be empty")
 
         pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         if not re.match(pattern, self.address):
-            raise ValidationError(f"Formato de email inválido: {self.address}")
+            raise ValidationError(f"Invalid email format: {self.address}")
 
     def to_dict(self) -> dict:
         return {"address": self.address}
@@ -161,7 +161,7 @@ class EmailAddress(ValueObjectBase):
 
 
 class Money(ValueObjectBase):
-    """Value object para valores monetários."""
+    """Value object for monetary values."""
 
     def __init__(self, amount: float, currency: str = "BRL"):
         super().__init__()
@@ -172,41 +172,41 @@ class Money(ValueObjectBase):
 
     def validate(self) -> None:
         if self.amount < 0:
-            raise ValidationError("Valor não pode ser negativo")
+            raise ValidationError("Amount cannot be negative")
 
         if self.currency not in ["USD", "EUR", "BRL"]:
-            raise ValidationError(f"Moeda não suportada: {self.currency}")
+            raise ValidationError(f"Unsupported currency: {self.currency}")
 
     def add(self, other: 'Money') -> 'Money':
-        """Somar dois valores monetários."""
+        """Add two monetary values."""
         if self.currency != other.currency:
-            raise ValueError("Não é possível somar moedas diferentes")
+            raise ValueError("Cannot add different currencies")
         return Money(self.amount + other.amount, self.currency)
 
     def __str__(self) -> str:
         return f"{self.currency} {self.amount:.2f}"
 ```
 
-**Pontos-Chave**:
-- Herda de `ValueObjectBase`
-- `_freeze()` garante imutabilidade
-- Igualdade baseada em valor, não identidade
-- Hashable (pode usar em sets/dicts)
+**Key Points**:
+- Inherits from `ValueObjectBase`
+- `_freeze()` ensures immutability
+- Equality based on value, not identity
+- Hashable (can be used in sets/dicts)
 
 ---
 
-## 3. Como Criar um UseCase
+## 3. How to Create a UseCase
 
-**Problema**: Preciso implementar um caso de uso de aplicação.
+**Problem**: I need to implement an application use case.
 
-**Solução**:
+**Solution**:
 
 ```python
 from forge_base.application import UseCaseBase, DTOBase
 
 
 class PlaceOrderInput(DTOBase):
-    """Input para colocar um pedido."""
+    """Input for placing an order."""
 
     def __init__(self, customer_id: str, items: list[dict]):
         self.customer_id = customer_id
@@ -214,9 +214,9 @@ class PlaceOrderInput(DTOBase):
 
     def validate(self) -> None:
         if not self.customer_id:
-            raise ValueError("ID do cliente é obrigatório")
+            raise ValueError("Customer ID is required")
         if not self.items:
-            raise ValueError("Pelo menos um item é obrigatório")
+            raise ValueError("At least one item is required")
 
     def to_dict(self) -> dict:
         return {"customer_id": self.customer_id, "items": self.items}
@@ -230,7 +230,7 @@ class PlaceOrderInput(DTOBase):
 
 
 class PlaceOrderOutput(DTOBase):
-    """Output da criação do pedido."""
+    """Output from order creation."""
 
     def __init__(self, order_id: str, total: float, status: str):
         self.order_id = order_id
@@ -258,14 +258,14 @@ class PlaceOrderOutput(DTOBase):
 
 class PlaceOrderUseCase(UseCaseBase):
     """
-    Colocar um novo pedido.
+    Place a new order.
 
-    Orquestra:
-        1. Validar que cliente existe
-        2. Calcular total do pedido
-        3. Criar entidade de pedido
-        4. Persistir pedido
-        5. Enviar notificação de confirmação
+    Orchestrates:
+        1. Validate that customer exists
+        2. Calculate order total
+        3. Create order entity
+        4. Persist order
+        5. Send confirmation notification
     """
 
     def __init__(
@@ -279,41 +279,41 @@ class PlaceOrderUseCase(UseCaseBase):
         self.notification_service = notification_service
 
     def execute(self, input_dto: PlaceOrderInput) -> PlaceOrderOutput:
-        """Executar criação do pedido."""
-        # 1. Validar input
+        """Execute order creation."""
+        # 1. Validate input
         input_dto.validate()
 
-        # 2. Validar que cliente existe
+        # 2. Validate that customer exists
         customer = self.customer_repository.find_by_id(input_dto.customer_id)
         if customer is None:
             raise BusinessRuleViolation(
-                f"Cliente não encontrado: {input_dto.customer_id}"
+                f"Customer not found: {input_dto.customer_id}"
             )
 
-        # 3. Calcular total
+        # 3. Calculate total
         total = sum(item["price"] * item["quantity"] for item in input_dto.items)
 
-        # 4. Criar entidade de pedido
+        # 4. Create order entity
         order = Order(
             customer_id=customer.id,
             items=input_dto.items,
             total=total
         )
 
-        # 5. Validar regras de negócio
+        # 5. Validate business rules
         order.validate()
 
-        # 6. Persistir
+        # 6. Persist
         self.order_repository.save(order)
 
-        # 7. Enviar notificação
+        # 7. Send notification
         self.notification_service.send(
             recipient=customer.email,
-            subject="Confirmação de Pedido",
-            body=f"Seu pedido {order.id} foi realizado!"
+            subject="Order Confirmation",
+            body=f"Your order {order.id} has been placed!"
         )
 
-        # 8. Retornar output
+        # 8. Return output
         return PlaceOrderOutput(
             order_id=order.id,
             total=order.total,
@@ -321,32 +321,32 @@ class PlaceOrderUseCase(UseCaseBase):
         )
 
     def _before_execute(self) -> None:
-        """Hook antes da execução."""
+        """Hook before execution."""
         pass
 
     def _after_execute(self) -> None:
-        """Hook após a execução."""
+        """Hook after execution."""
         pass
 
     def _on_error(self, error: Exception) -> None:
-        """Hook em caso de erro."""
+        """Hook on error."""
         pass
 ```
 
-**Pontos-Chave**:
-- Herda de `UseCaseBase`
-- Input/Output DTOs explícitos
-- Dependências injetadas via construtor
-- Orquestração clara (passos numerados)
-- Hooks para observabilidade
+**Key Points**:
+- Inherits from `UseCaseBase`
+- Explicit Input/Output DTOs
+- Dependencies injected via constructor
+- Clear orchestration (numbered steps)
+- Hooks for observability
 
 ---
 
-## 4. Como Criar um Port
+## 4. How to Create a Port
 
-**Problema**: Preciso definir um contrato de comunicação externa.
+**Problem**: I need to define an external communication contract.
 
-**Solução**:
+**Solution**:
 
 ```python
 from abc import ABC, abstractmethod
@@ -354,9 +354,9 @@ from abc import ABC, abstractmethod
 
 class NotificationServicePort(ABC):
     """
-    Port para envio de notificações.
+    Port for sending notifications.
 
-    Implementações podem usar email, SMS, push notifications, etc.
+    Implementations can use email, SMS, push notifications, etc.
     """
 
     @abstractmethod
@@ -367,7 +367,7 @@ class NotificationServicePort(ABC):
         body: str,
         **options
     ) -> None:
-        """Enviar uma notificação."""
+        """Send a notification."""
         pass
 
     @abstractmethod
@@ -378,16 +378,16 @@ class NotificationServicePort(ABC):
         body: str
     ) -> dict[str, bool]:
         """
-        Enviar notificação para múltiplos destinatários.
+        Send notification to multiple recipients.
 
-        Retorna:
-            Dict mapeando destinatário para status de sucesso
+        Returns:
+            Dict mapping recipient to success status
         """
         pass
 
 
 class PaymentGatewayPort(ABC):
-    """Port para processamento de pagamentos."""
+    """Port for payment processing."""
 
     @abstractmethod
     def charge(
@@ -398,10 +398,10 @@ class PaymentGatewayPort(ABC):
         customer_id: str
     ) -> dict:
         """
-        Processar um pagamento.
+        Process a payment.
 
-        Retorna:
-            Dict com transaction_id, status, etc.
+        Returns:
+            Dict with transaction_id, status, etc.
         """
         pass
 
@@ -411,24 +411,24 @@ class PaymentGatewayPort(ABC):
         transaction_id: str,
         amount: float
     ) -> dict:
-        """Processar um reembolso."""
+        """Process a refund."""
         pass
 ```
 
-**Pontos-Chave**:
-- Herda de `ABC`
-- Métodos `@abstractmethod`
-- Docstring explicando contrato
-- Foco em **o quê**, não **como**
-- Type hints claros
+**Key Points**:
+- Inherits from `ABC`
+- `@abstractmethod` methods
+- Docstring explaining the contract
+- Focus on **what**, not **how**
+- Clear type hints
 
 ---
 
-## 5. Como Criar um Adapter
+## 5. How to Create an Adapter
 
-**Problema**: Preciso implementar um port com tecnologia específica.
+**Problem**: I need to implement a port with specific technology.
 
-**Solução**:
+**Solution**:
 
 ```python
 import smtplib
@@ -437,9 +437,9 @@ from email.mime.text import MIMEText
 
 class EmailNotificationAdapter(NotificationServicePort):
     """
-    Implementação de email do NotificationServicePort.
+    Email implementation of NotificationServicePort.
 
-    Usa SMTP para enviar notificações por email.
+    Uses SMTP to send notifications via email.
     """
 
     def __init__(
@@ -463,7 +463,7 @@ class EmailNotificationAdapter(NotificationServicePort):
         body: str,
         **options
     ) -> None:
-        """Enviar notificação por email."""
+        """Send notification via email."""
         msg = MIMEText(body)
         msg["Subject"] = subject
         msg["From"] = self.from_address
@@ -480,7 +480,7 @@ class EmailNotificationAdapter(NotificationServicePort):
         subject: str,
         body: str
     ) -> dict[str, bool]:
-        """Enviar para múltiplos destinatários."""
+        """Send to multiple recipients."""
         results = {}
         for recipient in recipients:
             try:
@@ -493,9 +493,9 @@ class EmailNotificationAdapter(NotificationServicePort):
 
 class ConsoleNotificationAdapter(NotificationServicePort):
     """
-    Implementação de console (para testes/dev).
+    Console implementation (for testing/dev).
 
-    Imprime notificações no stdout ao invés de enviar.
+    Prints notifications to stdout instead of sending them.
     """
 
     def send(
@@ -505,10 +505,10 @@ class ConsoleNotificationAdapter(NotificationServicePort):
         body: str,
         **options
     ) -> None:
-        print(f"[NOTIFICAÇÃO]")
-        print(f"  Para: {recipient}")
-        print(f"  Assunto: {subject}")
-        print(f"  Corpo: {body}")
+        print(f"[NOTIFICATION]")
+        print(f"  To: {recipient}")
+        print(f"  Subject: {subject}")
+        print(f"  Body: {body}")
 
     def send_bulk(
         self,
@@ -521,19 +521,19 @@ class ConsoleNotificationAdapter(NotificationServicePort):
         return {r: True for r in recipients}
 ```
 
-**Pontos-Chave**:
-- Implementa o Port
-- Recebe configuração via construtor
-- Detalhes de implementação encapsulados
-- Múltiplos adapters para mesmo port
+**Key Points**:
+- Implements the Port
+- Receives configuration via constructor
+- Implementation details encapsulated
+- Multiple adapters for the same port
 
 ---
 
-## 6. Como Adicionar Observabilidade
+## 6. How to Add Observability
 
-**Problema**: Preciso de logs, métricas e tracing no meu UseCase.
+**Problem**: I need logs, metrics, and tracing in my UseCase.
 
-**Solução**:
+**Solution**:
 
 ```python
 from forge_base.observability import LogService, TrackMetrics
@@ -557,22 +557,22 @@ class PlaceOrderUseCase(UseCaseBase):
         track_errors=True
     )
     def execute(self, input_dto: PlaceOrderInput) -> PlaceOrderOutput:
-        # Log estruturado
+        # Structured logging
         self.logger.info(
-            "Criando pedido",
+            "Creating order",
             customer_id=input_dto.customer_id,
             items_count=len(input_dto.items)
         )
 
         try:
-            # ... lógica ...
+            # ... logic ...
 
-            # Métricas customizadas
+            # Custom metrics
             self.metrics.increment("orders.placed", tags={"customer": input_dto.customer_id})
             self.metrics.gauge("order.total", total, tags={"customer": input_dto.customer_id})
 
             self.logger.info(
-                "Pedido criado com sucesso",
+                "Order created successfully",
                 order_id=order.id,
                 total=order.total
             )
@@ -581,7 +581,7 @@ class PlaceOrderUseCase(UseCaseBase):
 
         except Exception as e:
             self.logger.error(
-                "Falha ao criar pedido",
+                "Failed to create order",
                 error=str(e),
                 customer_id=input_dto.customer_id
             )
@@ -589,12 +589,12 @@ class PlaceOrderUseCase(UseCaseBase):
             raise
 ```
 
-**Com Context Manager para Performance:**
+**With Context Manager for Performance:**
 
 ```python
 def execute(self, input_dto):
     with self.metrics.measure("place_order.total"):
-        # ... lógica ...
+        # ... logic ...
 
         with self.metrics.measure("place_order.validate_customer"):
             customer = self.customer_repository.find_by_id(...)
@@ -608,35 +608,35 @@ def execute(self, input_dto):
     return output
 ```
 
-**Pontos-Chave**:
-- Logger e metrics injetados
-- `@track_metrics` decorator para auto-instrumentação
-- Logs estruturados (key-value pairs)
-- Context managers para durations
+**Key Points**:
+- Logger and metrics injected
+- `@track_metrics` decorator for auto-instrumentation
+- Structured logs (key-value pairs)
+- Context managers for durations
 - Error tracking
 
 ---
 
-## 7. Como Escrever Testes Cognitivos
+## 7. How to Write Cognitive Tests
 
-Veja o [Guia de Testes](guia-de-testes.md) para documentação completa sobre testes cognitivos.
+See the [Testing Guide](testing-guide.md) for complete documentation on cognitive tests.
 
 ---
 
-## 8. Como Integrar com ForgeProcess
+## 8. How to Integrate with ForgeProcess
 
-**Problema**: Preciso sincronizar specs YAML com código Python.
+**Problem**: I need to synchronize YAML specs with Python code.
 
-**Solução**:
+**Solution**:
 
-### Passo 1: Criar Spec YAML
+### Step 1: Create YAML Spec
 
 ```yaml
 # specs/place_order.yaml
 version: "1.0"
 usecase:
   name: PlaceOrder
-  description: Criar um novo pedido de cliente
+  description: Create a new customer order
 
   inputs:
     - name: customer_id
@@ -655,12 +655,12 @@ usecase:
       type: str
 
   business_rules:
-    - Cliente deve existir
-    - Pedido deve ter pelo menos um item
-    - Total deve ser calculado corretamente
+    - Customer must exist
+    - Order must have at least one item
+    - Total must be calculated correctly
 ```
 
-### Passo 2: Gerar Código
+### Step 2: Generate Code
 
 ```python
 from forge_base.integration import YAMLSync
@@ -670,35 +670,35 @@ sync = YAMLSync()
 # Parse YAML
 spec = sync.parse_yaml("specs/place_order.yaml")
 
-# Gerar código skeleton
+# Generate skeleton code
 code = sync.generate_code(spec)
 
-# Escrever em arquivo
+# Write to file
 with open("src/application/place_order_usecase.py", "w") as f:
     f.write(code)
 ```
 
-### Passo 3: Validar Consistência
+### Step 3: Validate Consistency
 
 ```python
-# Detectar drift
+# Detect drift
 drift = sync.detect_drift(PlaceOrderUseCase, spec)
 
 if drift:
-    print("Drift detectado:")
+    print("Drift detected:")
     for issue in drift:
         print(f"  - {issue}")
 else:
-    print("Código corresponde à spec YAML")
+    print("Code matches the YAML spec")
 ```
 
 ---
 
-## 9. Como Criar um Repository Customizado
+## 9. How to Create a Custom Repository
 
-**Problema**: Preciso implementar um repository para tecnologia específica (MongoDB, Redis, etc.).
+**Problem**: I need to implement a repository for a specific technology (MongoDB, Redis, etc.).
 
-**Solução**:
+**Solution**:
 
 ```python
 from forge_base.infrastructure.repository import RepositoryBase
@@ -706,7 +706,7 @@ from pymongo import MongoClient
 
 
 class MongoDBRepository(RepositoryBase[T]):
-    """Implementação MongoDB do RepositoryBase."""
+    """MongoDB implementation of RepositoryBase."""
 
     def __init__(
         self,
@@ -752,11 +752,11 @@ class MongoDBRepository(RepositoryBase[T]):
         return self.collection.count_documents({"_id": id}) > 0
 
     def close(self):
-        """Limpar conexão."""
+        """Clean up connection."""
         self.client.close()
 
 
-# Uso
+# Usage
 repository = MongoDBRepository(
     connection_string="mongodb://localhost:27017",
     database="my_app",
@@ -765,19 +765,19 @@ repository = MongoDBRepository(
 )
 ```
 
-**Pontos-Chave**:
-- Implementa `RepositoryBase[T]`
-- Generic type para entidade
-- Métodos CRUD completos
+**Key Points**:
+- Implements `RepositoryBase[T]`
+- Generic type for entity
+- Complete CRUD methods
 - Cleanup resources (close)
 
 ---
 
-## 10. Como Adicionar Validações Customizadas
+## 10. How to Add Custom Validations
 
-**Problema**: Preciso de validações reutilizáveis no domínio.
+**Problem**: I need reusable validations in the domain.
 
-**Solução**:
+**Solution**:
 
 ```python
 # src/domain/validators.py
@@ -785,54 +785,54 @@ from forge_base.domain import ValidationError
 
 
 class DomainValidators:
-    """Validadores de domínio reutilizáveis."""
+    """Reusable domain validators."""
 
     @staticmethod
-    def not_empty(value: str, field_name: str = "Campo") -> None:
-        """Validar que string não está vazia."""
+    def not_empty(value: str, field_name: str = "Field") -> None:
+        """Validate that string is not empty."""
         if not value or not value.strip():
-            raise ValidationError(f"{field_name} não pode ser vazio")
+            raise ValidationError(f"{field_name} cannot be empty")
 
     @staticmethod
-    def min_length(value: str, min_len: int, field_name: str = "Campo") -> None:
-        """Validar tamanho mínimo."""
+    def min_length(value: str, min_len: int, field_name: str = "Field") -> None:
+        """Validate minimum length."""
         if len(value) < min_len:
             raise ValidationError(
-                f"{field_name} deve ter pelo menos {min_len} caracteres"
+                f"{field_name} must have at least {min_len} characters"
             )
 
     @staticmethod
-    def max_length(value: str, max_len: int, field_name: str = "Campo") -> None:
-        """Validar tamanho máximo."""
+    def max_length(value: str, max_len: int, field_name: str = "Field") -> None:
+        """Validate maximum length."""
         if len(value) > max_len:
             raise ValidationError(
-                f"{field_name} deve ter no máximo {max_len} caracteres"
+                f"{field_name} must have at most {max_len} characters"
             )
 
     @staticmethod
-    def in_range(value: float, min_val: float, max_val: float, field_name: str = "Campo") -> None:
-        """Validar que valor está no intervalo."""
+    def in_range(value: float, min_val: float, max_val: float, field_name: str = "Field") -> None:
+        """Validate that value is within range."""
         if not (min_val <= value <= max_val):
             raise ValidationError(
-                f"{field_name} deve estar entre {min_val} e {max_val}"
+                f"{field_name} must be between {min_val} and {max_val}"
             )
 
     @staticmethod
-    def positive(value: float, field_name: str = "Campo") -> None:
-        """Validar que valor é positivo."""
+    def positive(value: float, field_name: str = "Field") -> None:
+        """Validate that value is positive."""
         if value <= 0:
-            raise ValidationError(f"{field_name} deve ser positivo")
+            raise ValidationError(f"{field_name} must be positive")
 
     @staticmethod
     def email_format(value: str, field_name: str = "Email") -> None:
-        """Validar formato de email."""
+        """Validate email format."""
         import re
         pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         if not re.match(pattern, value):
-            raise ValidationError(f"Formato de {field_name} inválido: {value}")
+            raise ValidationError(f"Invalid {field_name} format: {value}")
 
 
-# Uso em Entity
+# Usage in Entity
 class Product(EntityBase):
     def __init__(self, name: str, price: float, description: str = ""):
         super().__init__()
@@ -842,35 +842,35 @@ class Product(EntityBase):
         self.validate()
 
     def validate(self) -> None:
-        DomainValidators.not_empty(self.name, "Nome do produto")
-        DomainValidators.max_length(self.name, 100, "Nome do produto")
-        DomainValidators.positive(self.price, "Preço do produto")
+        DomainValidators.not_empty(self.name, "Product name")
+        DomainValidators.max_length(self.name, 100, "Product name")
+        DomainValidators.positive(self.price, "Product price")
 
         if self.description:
-            DomainValidators.max_length(self.description, 500, "Descrição")
+            DomainValidators.max_length(self.description, 500, "Description")
 ```
 
-**Pontos-Chave**:
-- Validators centralizados e reutilizáveis
-- Mensagens de erro consistentes
-- Fácil testar isoladamente
-- Composição em entities
+**Key Points**:
+- Centralized and reusable validators
+- Consistent error messages
+- Easy to test in isolation
+- Composition in entities
 
 ---
 
-## 11. Como Usar Dependency Injection
+## 11. How to Use Dependency Injection
 
-**Problema**: Preciso conectar dependências sem acoplamento.
+**Problem**: I need to connect dependencies without coupling.
 
-**Solução**:
+**Solution**:
 
 ```python
-# main.py com DI Container
+# main.py with DI Container
 from forge_base.infrastructure.configuration import ConfigLoader
 
 
 def setup_dependencies(config: dict) -> dict:
-    """Configurar dependências a partir da configuração."""
+    """Set up dependencies from configuration."""
 
     # Logger
     logger = LogService(
@@ -912,36 +912,36 @@ def setup_dependencies(config: dict) -> dict:
 
 
 def main():
-    # Carregar config
+    # Load config
     config = ConfigLoader.load("config.yaml")
 
-    # Configurar DI
+    # Set up DI
     deps = setup_dependencies(config)
 
-    # Usar use case
+    # Use the use case
     usecase = deps["place_order_usecase"]
 
-    # Executar
+    # Execute
     output = usecase.execute(PlaceOrderInput(...))
-    print(f"Pedido criado: {output.order_id}")
+    print(f"Order created: {output.order_id}")
 
 
 if __name__ == "__main__":
     main()
 ```
 
-**Pontos-Chave**:
-- Centraliza wiring em um lugar
+**Key Points**:
+- Centralizes wiring in one place
 - Configuration-driven
-- Fácil trocar implementações
+- Easy to swap implementations
 
 ---
 
-## 12. Como Adicionar um Novo Adapter
+## 12. How to Add a New Adapter
 
-**Problema**: Preciso adicionar um novo tipo de adapter (ex: gRPC, GraphQL).
+**Problem**: I need to add a new type of adapter (e.g., gRPC, GraphQL).
 
-**Solução**:
+**Solution**:
 
 ```python
 # src/adapters/grpc/grpc_adapter.py
@@ -952,9 +952,9 @@ from forge_base.adapters import AdapterBase
 
 class GRPCAdapter(AdapterBase):
     """
-    Adapter gRPC para expor UseCases via gRPC.
+    gRPC Adapter to expose UseCases via gRPC.
 
-    Mapeia métodos de serviço gRPC para execuções de UseCase.
+    Maps gRPC service methods to UseCase executions.
     """
 
     def __init__(
@@ -981,22 +981,22 @@ class GRPCAdapter(AdapterBase):
         method_name: str,
         usecase: UseCaseBase
     ):
-        """Registrar um UseCase para ser exposto via gRPC."""
+        """Register a UseCase to be exposed via gRPC."""
         key = f"{service_name}.{method_name}"
         self._usecases[key] = usecase
 
     def start(self):
-        """Iniciar servidor gRPC."""
+        """Start gRPC server."""
         self.server.add_insecure_port(f"{self.host}:{self.port}")
         self.server.start()
-        print(f"Servidor gRPC escutando em {self.host}:{self.port}")
+        print(f"gRPC server listening on {self.host}:{self.port}")
 
     def stop(self):
-        """Parar servidor gRPC."""
+        """Stop gRPC server."""
         self.server.stop(grace=5)
 
 
-# Uso
+# Usage
 adapter = GRPCAdapter(port=50051)
 
 adapter.register_usecase(
@@ -1008,24 +1008,24 @@ adapter.register_usecase(
 adapter.start()
 ```
 
-**Pontos-Chave**:
-- Herda de `AdapterBase`
-- Implementa `name()` e `module()`
-- Encapsula tecnologia específica (gRPC)
-- Registra UseCases dinamicamente
+**Key Points**:
+- Inherits from `AdapterBase`
+- Implements `name()` and `module()`
+- Encapsulates specific technology (gRPC)
+- Registers UseCases dynamically
 
 ---
 
-## Próximos Passos
+## Next Steps
 
-Explore mais:
-- **[Início Rápido](inicio-rapido.md)** — Tutorial completo
-- **[Guia de Testes](guia-de-testes.md)** — Testes cognitivos detalhados
-- **[ADRs](../adr/)** — Decisões arquiteturais
-- **[Exemplos](../../examples/)** — Exemplos completos executáveis
+Explore more:
+- **[Quick Start](quick-start.md)** -- Complete tutorial
+- **[Testing Guide](testing-guide.md)** -- Detailed cognitive tests
+- **[ADRs](../adr/)** -- Architectural decisions
+- **[Examples](../../examples/)** -- Complete runnable examples
 
 ---
 
-**Feliz Forjamento!**
+**Happy Forging!**
 
-*"Cada receita é uma história de transformar pensamento em estrutura."*
+*"Each recipe is a story of transforming thought into structure."*

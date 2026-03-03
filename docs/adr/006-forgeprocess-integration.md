@@ -2,64 +2,64 @@
 
 ## Status
 
-**Aceita** (2025-11-03)
-**Atualizada** (2025-11-04) - Adicionado contexto completo do ciclo cognitivo
+**Accepted** (2025-11-03)
+**Updated** (2025-11-04) - Added full cognitive cycle context
 
 ## Context
 
-ForgeBase é o **núcleo de execução** do Forge Framework, mas não existe isoladamente. Ele é a **manifestação técnica** das intenções capturadas pelo ForgeProcess.
+ForgeBase is the **execution core** of the Forge Framework, but it does not exist in isolation. It is the **technical manifestation** of the intents captured by ForgeProcess.
 
-### O Ciclo Cognitivo Completo
+### The Complete Cognitive Cycle
 
-O ForgeProcess não é apenas sincronização YAML ↔ Code. É um **ciclo cognitivo** de 5 fases:
+ForgeProcess is not just YAML ↔ Code synchronization. It is a **cognitive cycle** with 5 phases:
 
 ```
-MDD (Valor) → BDD (Comportamento) → TDD (Prova) → CLI (Execução) → Feedback (Aprendizado)
+MDD (Value) → BDD (Behavior) → TDD (Proof) → CLI (Execution) → Feedback (Learning)
 ```
 
-**Fase 1 - MDD (Market Driven Development)**: Define **PORQUÊ** o sistema existe
-- Especifica valor de mercado em `forge.yaml`
-- Define ValueTracks e SupportTracks
-- Estabelece Value KPIs
+**Phase 1 - MDD (Market Driven Development)**: Defines **WHY** the system exists
+- Specifies market value in `forge.yaml`
+- Defines ValueTracks and SupportTracks
+- Establishes Value KPIs
 
-**Fase 2 - BDD (Behavior Driven Development)**: Define **O QUÊ** o sistema faz
-- Traduz valor em comportamento verificável (`.feature` files)
-- Especifica scenarios em Gherkin (Given/When/Then)
-- Documenta business rules
+**Phase 2 - BDD (Behavior Driven Development)**: Defines **WHAT** the system does
+- Translates value into verifiable behavior (`.feature` files)
+- Specifies scenarios in Gherkin (Given/When/Then)
+- Documents business rules
 
-**Transição MDD → BDD**: O momento crítico onde **intenção de valor** se transforma em **comportamento observável**.
+**MDD → BDD Transition**: The critical moment where **value intent** transforms into **observable behavior**.
 
-**Fase 3 - TDD (Test Driven Development)**: Prova **COMO** implementar
-- Cada behavior vira teste (Red-Green-Refactor)
-- Testes são memória técnica viva
-- Código nasce validado
+**Phase 3 - TDD (Test Driven Development)**: Proves **HOW** to implement
+- Each behavior becomes a test (Red-Green-Refactor)
+- Tests are living technical memory
+- Code is born validated
 
-**Fase 4 - CLI (Interface Cognitiva)**: **Executar e observar**
-- Ambiente simbólico de teste
-- Humanos e IA podem explorar behaviors
-- Coleta logs, métricas, traces
+**Phase 4 - CLI (Cognitive Interface)**: **Execute and observe**
+- Symbolic test environment
+- Humans and AI can explore behaviors
+- Collects logs, metrics, traces
 
-**Fase 5 - Feedback (Reflexão)**: **Aprender e ajustar**
-- Feedback Operacional: métricas, erros, performance
-- Feedback de Valor: KPIs, stakeholders, usuários
-- Loop de aprendizado fecha o ciclo
+**Phase 5 - Feedback (Reflection)**: **Learn and adjust**
+- Operational Feedback: metrics, errors, performance
+- Value Feedback: KPIs, stakeholders, users
+- Learning loop closes the cycle
 
-### Integração ForgeBase ↔ ForgeProcess
+### ForgeBase ↔ ForgeProcess Integration
 
-Dentro deste ciclo cognitivo, ForgeBase implementa:
+Within this cognitive cycle, ForgeBase implements:
 
-- **ForgeProcess**: Define **o quê** fazer (intent, YAML specs, behaviors)
-- **ForgeBase**: Implementa **como** fazer (code, execution, infrastructure)
+- **ForgeProcess**: Defines **what** to do (intent, YAML specs, behaviors)
+- **ForgeBase**: Implements **how** to do it (code, execution, infrastructure)
 
-Para que o Forge Framework seja verdadeiramente **cognitivo**, precisa haver um **loop de feedback** entre intenção (ForgeProcess) e execução (ForgeBase):
+For the Forge Framework to be truly **cognitive**, there must be a **feedback loop** between intent (ForgeProcess) and execution (ForgeBase):
 
 ```
 ┌──────────────────────────────────────────────────┐
 │                                                  │
 │  ForgeProcess (Intent Layer)                    │
-│  - Define YAML specs                            │
-│  - Captura intenções                            │
-│  - Orquestra processos                          │
+│  - Defines YAML specs                           │
+│  - Captures intents                             │
+│  - Orchestrates processes                       │
 │                                                  │
 └────────────────┬─────────────────────────────────┘
                  │
@@ -75,9 +75,9 @@ Para que o Forge Framework seja verdadeiramente **cognitivo**, precisa haver um 
 ┌──────────────────────────────────────────────────┐
 │                                                  │
 │  ForgeBase (Execution Layer)                    │
-│  - Executa UseCases                             │
-│  - Valida regras de negócio                     │
-│  - Coleta métricas                              │
+│  - Executes UseCases                            │
+│  - Validates business rules                     │
+│  - Collects metrics                             │
 │                                                  │
 └────────────────┬─────────────────────────────────┘
                  │
@@ -93,45 +93,45 @@ Para que o Forge Framework seja verdadeiramente **cognitivo**, precisa haver um 
 ┌──────────────────────────────────────────────────┐
 │                                                  │
 │  ForgeProcess (Learning)                        │
-│  - Analisa coerência                            │
-│  - Ajusta processos                             │
-│  - Melhora especificações                       │
+│  - Analyzes coherence                           │
+│  - Adjusts processes                            │
+│  - Improves specifications                      │
 │                                                  │
 └──────────────────────────────────────────────────┘
 ```
 
-### Desafios
+### Challenges
 
-1. **Drift Detection**: Como detectar quando código não reflete mais a spec YAML?
-2. **Bidirectional Sync**: Como manter YAML e código sincronizados?
-3. **Coherence Validation**: Como medir se execução cumpriu a intenção?
-4. **Learning Loop**: Como feedback de execução melhora especificações?
-5. **Autonomia**: Como evitar que ForgeBase dependa de ForgeProcess em runtime?
+1. **Drift Detection**: How to detect when code no longer reflects the YAML spec?
+2. **Bidirectional Sync**: How to keep YAML and code synchronized?
+3. **Coherence Validation**: How to measure whether execution fulfilled the intent?
+4. **Learning Loop**: How does execution feedback improve specifications?
+5. **Autonomy**: How to prevent ForgeBase from depending on ForgeProcess at runtime?
 
-### Forças em Jogo
+### Forces at Play
 
-**Necessidades:**
-- Sincronização automática YAML ↔ Code
-- Validação de coerência cognitiva
-- Feedback loop para aprendizado
-- Geração de código a partir de specs
-- Detecção de divergências
+**Needs:**
+- Automatic YAML ↔ Code synchronization
+- Cognitive coherence validation
+- Feedback loop for learning
+- Code generation from specs
+- Divergence detection
 
-**Riscos:**
-- Acoplamento excessivo
-- Overhead de sincronização
-- Complexidade de manutenção
-- Conflitos de merge (YAML vs Code)
+**Risks:**
+- Excessive coupling
+- Synchronization overhead
+- Maintenance complexity
+- Merge conflicts (YAML vs Code)
 
 ## Decision
 
-**Adotamos integração bidirecional com dois componentes principais: YAMLSync e IntentTracker.**
+**We adopted bidirectional integration with two main components: YAMLSync and IntentTracker.**
 
-### 1. YAMLSync: Sincronização YAML ↔ Code
+### 1. YAMLSync: YAML ↔ Code Synchronization
 
-**Propósito**: Manter especificações YAML e código Python sincronizados.
+**Purpose**: Keep YAML specifications and Python code synchronized.
 
-#### YAML Schema para UseCases
+#### YAML Schema for UseCases
 
 ```yaml
 # specs/create_user.yaml
@@ -180,26 +180,26 @@ usecase:
       message: "Invalid email format: '{email}'"
 ```
 
-#### Funcionalidades do YAMLSync
+#### YAMLSync Features
 
-**1. Parse YAML → Validação**
+**1. Parse YAML → Validation**
 ```python
 sync = YAMLSync()
 spec = sync.parse_yaml("specs/create_user.yaml")
-# Valida schema version, required fields, etc.
+# Validates schema version, required fields, etc.
 ```
 
 **2. Generate Code from YAML**
 ```python
 code = sync.generate_code(spec)
-# Gera:
+# Generates:
 # - Input DTO (CreateUserInput)
 # - Output DTO (CreateUserOutput)
 # - UseCase skeleton (CreateUserUseCase)
-# - Docstrings com business rules
+# - Docstrings with business rules
 ```
 
-**Código gerado:**
+**Generated code:**
 ```python
 class CreateUserInput(DTOBase):
     """Input DTO for CreateUser."""
@@ -256,56 +256,56 @@ if drift:
 **4. Export Code → YAML**
 ```python
 sync.export_to_yaml(CreateUserUseCase, "specs/create_user_exported.yaml")
-# Reverse engineering: Código → YAML
+# Reverse engineering: Code → YAML
 ```
 
-#### Workflow de Desenvolvimento
+#### Development Workflow
 
-**Opção A: YAML-First (Recomendado)**
+**Option A: YAML-First (Recommended)**
 ```bash
-# 1. Criar spec YAML
+# 1. Create YAML spec
 vim specs/create_user.yaml
 
-# 2. Gerar código skeleton
+# 2. Generate code skeleton
 forge_base generate usecase specs/create_user.yaml
 
-# 3. Implementar lógica
+# 3. Implement logic
 vim src/application/create_user_usecase.py
 
-# 4. Validar consistência
+# 4. Validate consistency
 forge_base validate usecase CreateUserUseCase --spec specs/create_user.yaml
 ```
 
-**Opção B: Code-First**
+**Option B: Code-First**
 ```bash
-# 1. Implementar UseCase
+# 1. Implement UseCase
 vim src/application/create_user_usecase.py
 
-# 2. Exportar para YAML
+# 2. Export to YAML
 forge_base export usecase CreateUserUseCase --output specs/create_user.yaml
 
-# 3. Refinar YAML no ForgeProcess
+# 3. Refine YAML in ForgeProcess
 ```
 
-#### Integração com CI/CD
+#### CI/CD Integration
 
 ```yaml
 # .github/workflows/validate.yml
 - name: Validate YAML ↔ Code Sync
   run: |
     forge_base validate all-usecases --fail-on-drift
-    # Falha se qualquer UseCase tem drift
+    # Fails if any UseCase has drift
 ```
 
-### 2. IntentTracker: Coerência Cognitiva
+### 2. IntentTracker: Cognitive Coherence
 
-**Propósito**: Validar que execução cumpre a intenção original.
+**Purpose**: Validate that execution fulfills the original intent.
 
-#### Fluxo de Intent Tracking
+#### Intent Tracking Flow
 
 **1. Capture Intent (ForgeProcess)**
 ```python
-# Antes de executar
+# Before executing
 intent_id = intent_tracker.capture_intent(
     description="Create user with name Alice and email alice@example.com",
     expected_outcome="User created successfully with valid email",
@@ -319,7 +319,7 @@ intent_id = intent_tracker.capture_intent(
 
 **2. Execute (ForgeBase)**
 ```python
-# Execução normal
+# Normal execution
 result = usecase.execute(CreateUserInput(
     name="Alice",
     email="alice@example.com"
@@ -328,7 +328,7 @@ result = usecase.execute(CreateUserInput(
 
 **3. Record Execution**
 ```python
-# Após execução
+# After execution
 intent_tracker.record_execution(
     intent_id=intent_id,
     actual_outcome=f"User {result.user_id} created with email {result.email}",
@@ -343,7 +343,7 @@ intent_tracker.record_execution(
 
 **4. Validate Coherence**
 ```python
-# Análise de coerência
+# Coherence analysis
 report = intent_tracker.validate_coherence(intent_id)
 
 print(f"Coherence Level: {report.coherence_level.value}")
@@ -378,10 +378,10 @@ class CoherenceLevel(Enum):
 #### Learning Data Export
 
 ```python
-# Exportar dados para ML analysis
+# Export data for ML analysis
 learning_data = intent_tracker.export_learning_data()
 
-# Formato:
+# Format:
 [
   {
     "intent": {
@@ -406,7 +406,7 @@ learning_data = intent_tracker.export_learning_data()
   ...
 ]
 
-# Salvar para análise
+# Save for analysis
 with open("/var/learning/coherence_data.jsonl", "w") as f:
     for record in learning_data:
         f.write(json.dumps(record) + "\n")
@@ -414,7 +414,7 @@ with open("/var/learning/coherence_data.jsonl", "w") as f:
 
 ### 3. Feedback Manager
 
-**Propósito**: Orquestrar feedback de ForgeBase → ForgeProcess.
+**Purpose**: Orchestrate feedback from ForgeBase → ForgeProcess.
 
 ```python
 # src/forge_base/observability/feedback_manager.py
@@ -467,43 +467,43 @@ class FeedbackManager:
         ...
 ```
 
-### 4. Autonomia: Runtime Independence
+### 4. Autonomy: Runtime Independence
 
-**Princípio Crítico**: ForgeBase **não depende** de ForgeProcess em runtime.
+**Critical Principle**: ForgeBase **does not depend** on ForgeProcess at runtime.
 
 ```python
-# ✅ ForgeBase funciona standalone
+# ✅ ForgeBase works standalone
 core = ForgeBaseCore()
 usecase = core.get_usecase(CreateUserUseCase)
 result = usecase.execute(input_dto)
-# Sem ForgeProcess, sem YAML, funciona perfeitamente
+# Without ForgeProcess, without YAML, works perfectly
 
-# ✅ Com ForgeProcess, adiciona feedback
-intent_id = intent_tracker.capture_intent(...)  # Opcional
+# ✅ With ForgeProcess, adds feedback
+intent_id = intent_tracker.capture_intent(...)  # Optional
 result = usecase.execute(input_dto)
-intent_tracker.record_execution(intent_id, ...)  # Opcional
+intent_tracker.record_execution(intent_id, ...)  # Optional
 ```
 
-**Autonomia garantida por:**
-- YAMLSync é **build-time tool**, não runtime dependency
-- IntentTracker é **opcional** (pode ser desabilitado)
-- ForgeBase pode ser distribuído sem ForgeProcess
-- YAML specs são documentation, não requirements
+**Autonomy guaranteed by:**
+- YAMLSync is a **build-time tool**, not a runtime dependency
+- IntentTracker is **optional** (can be disabled)
+- ForgeBase can be distributed without ForgeProcess
+- YAML specs are documentation, not requirements
 
 ## Consequences
 
-### Positivas
+### Positive
 
-✅ **Sincronização Automática**
+✅ **Automatic Synchronization**
 ```bash
-# Gerar código
+# Generate code
 forge_base generate usecase specs/create_user.yaml
 
-# Validar consistência
+# Validate consistency
 forge_base validate usecase CreateUserUseCase
 ```
 
-✅ **Coerência Validada Quantitativamente**
+✅ **Quantitatively Validated Coherence**
 ```python
 report = intent_tracker.validate_coherence(intent_id)
 assert report.similarity_score >= 0.80
@@ -511,114 +511,114 @@ assert report.similarity_score >= 0.80
 
 ✅ **Learning Loop**
 ```python
-# Feedback automático para ForgeProcess
+# Automatic feedback for ForgeProcess
 learning_data = intent_tracker.export_learning_data()
-# ForgeProcess usa para melhorar specs
+# ForgeProcess uses it to improve specs
 ```
 
-✅ **Documentation Viva**
+✅ **Living Documentation**
 ```yaml
-# YAML serve como documentação sempre atualizada
-# Drift detection garante que código reflete spec
+# YAML serves as always up-to-date documentation
+# Drift detection ensures code reflects the spec
 ```
 
-✅ **Desenvolvimento Guiado por Intent**
+✅ **Intent-Driven Development**
 ```bash
-# 1. Spec define intenção (ForgeProcess)
-# 2. Código implementa (ForgeBase)
-# 3. Testes validam coerência
-# 4. Feedback melhora spec
+# 1. Spec defines intent (ForgeProcess)
+# 2. Code implements (ForgeBase)
+# 3. Tests validate coherence
+# 4. Feedback improves spec
 # 5. Repeat
 ```
 
-### Negativas
+### Negative
 
-⚠️ **Overhead de Sincronização**
-- Manter YAML e código sincronizados requer disciplina
-- Drift pode ocorrer se validação não estiver em CI
+⚠️ **Synchronization Overhead**
+- Keeping YAML and code synchronized requires discipline
+- Drift can occur if validation is not in CI
 
-**Mitigation**: Validação automática em CI/CD
+**Mitigation**: Automatic validation in CI/CD
 
-⚠️ **Complexidade de Tooling**
-- YAMLSync e IntentTracker adicionam complexidade
-- Curva de aprendizado
+⚠️ **Tooling Complexity**
+- YAMLSync and IntentTracker add complexity
+- Learning curve
 
-**Mitigation**: Docs claras, exemplos, defaults sensatos
+**Mitigation**: Clear docs, examples, sensible defaults
 
-⚠️ **Storage de Learning Data**
-- Learning data pode crescer
-- Precisa de storage e processamento
+⚠️ **Learning Data Storage**
+- Learning data can grow
+- Requires storage and processing
 
 **Mitigation**: Retention policies, aggregation
 
-⚠️ **Latência de Tracking**
-- Intent tracking adiciona ~1-5ms por execução
+⚠️ **Tracking Latency**
+- Intent tracking adds ~1-5ms per execution
 
-**Mitigation**: Opcional, pode ser desabilitado em prod
+**Mitigation**: Optional, can be disabled in prod
 
-### Mitigações Implementadas
+### Implemented Mitigations
 
-1. **Autonomia Runtime**
-   - ForgeBase funciona sem ForgeProcess
-   - Intent tracking é opcional
-   - Zero dependências em runtime
+1. **Runtime Autonomy**
+   - ForgeBase works without ForgeProcess
+   - Intent tracking is optional
+   - Zero runtime dependencies
 
-2. **Tooling Ergonômico**
+2. **Ergonomic Tooling**
    - CLI commands: `generate`, `validate`, `export`
-   - IDE integration (futuro)
+   - IDE integration (future)
    - Auto-completion
 
-3. **Defaults Sensatos**
-   - Intent tracking desabilitado por default em prod
-   - Sampling configurável
-   - Performance overhead mínimo
+3. **Sensible Defaults**
+   - Intent tracking disabled by default in prod
+   - Configurable sampling
+   - Minimal performance overhead
 
 ## Alternatives Considered
 
-### 1. Acoplamento Forte (Runtime Dependency)
+### 1. Tight Coupling (Runtime Dependency)
 
 ```python
-# ForgeBase depende de ForgeProcess em runtime
+# ForgeBase depends on ForgeProcess at runtime
 class CreateUserUseCase:
     def execute(self, input_dto):
         spec = ForgeProcess.get_spec("CreateUser")  # Runtime call
         ...
 ```
 
-**Rejeitado porque:**
-- Violação de autonomia
-- ForgeBase não pode funcionar standalone
+**Rejected because:**
+- Violation of autonomy
+- ForgeBase cannot work standalone
 - Performance overhead
-- Acoplamento desnecessário
+- Unnecessary coupling
 
-### 2. Code-Only (Sem YAML)
+### 2. Code-Only (No YAML)
 
-**Rejeitado porque:**
-- Perde especificação declarativa
-- Sem feedback loop para ForgeProcess
-- Código é source of truth (difícil para não-devs)
+**Rejected because:**
+- Loses declarative specification
+- No feedback loop for ForgeProcess
+- Code is source of truth (hard for non-devs)
 
 ### 3. YAML-Only (Generated Code Never Edited)
 
-**Rejeitado porque:**
-- Código gerado é sempre limited
-- Desenvolvedores precisam de flexibilidade
-- Complexidade move para YAML (pior)
+**Rejected because:**
+- Generated code is always limited
+- Developers need flexibility
+- Complexity moves to YAML (worse)
 
 ### 4. No Coherence Validation
 
-**Rejeitado porque:**
-- Miss oportunidade de learning
-- Sem feedback quantitativo
-- "Funciona" ≠ "Funciona como pretendido"
+**Rejected because:**
+- Misses learning opportunity
+- No quantitative feedback
+- "It works" is not the same as "It works as intended"
 
 ## Implementation Guidelines
 
-### Para Desenvolvedores
+### For Developers
 
-**Workflow recomendado:**
+**Recommended workflow:**
 
-1. **Definir Spec YAML** (com ForgeProcess)
+1. **Define YAML Spec** (with ForgeProcess)
    ```yaml
    # specs/my_usecase.yaml
    usecase:
@@ -626,26 +626,26 @@ class CreateUserUseCase:
      ...
    ```
 
-2. **Gerar Skeleton**
+2. **Generate Skeleton**
    ```bash
    forge_base generate usecase specs/my_usecase.yaml
    ```
 
-3. **Implementar Lógica**
+3. **Implement Logic**
    ```python
-   # Editar código gerado
+   # Edit generated code
    class MyUseCaseUseCase(UseCaseBase):
        def execute(self, input_dto):
-           # Implementação real
+           # Real implementation
            ...
    ```
 
-4. **Validar Consistência**
+4. **Validate Consistency**
    ```bash
    forge_base validate usecase MyUseCase --spec specs/my_usecase.yaml
    ```
 
-5. **Testes com Intent Tracking**
+5. **Tests with Intent Tracking**
    ```python
    def test_my_usecase():
        intent_id = tracker.capture_intent(...)
@@ -656,7 +656,7 @@ class CreateUserUseCase:
        assert report.coherence_level in [CoherenceLevel.PERFECT, CoherenceLevel.HIGH]
    ```
 
-### Para Operadores
+### For Operators
 
 **Configuration:**
 ```yaml
@@ -693,12 +693,12 @@ integration:
 
 ## Complete ForgeProcess Documentation
 
-Para entender o **ciclo cognitivo completo** (MDD → BDD → TDD → CLI → Feedback), consulte:
+To understand the **complete cognitive cycle** (MDD → BDD → TDD → CLI → Feedback), see:
 
-📖 **[docs/FORGE_PROCESS.md](../FORGE_PROCESS.md)**
+**[docs/FORGE_PROCESS.md](../FORGE_PROCESS.md)**
 
-Este ADR documenta a **integração técnica** (YAMLSync, IntentTracker, FeedbackManager).
-O documento completo explica o **contexto filosófico e arquitetural** de todas as 5 fases.
+This ADR documents the **technical integration** (YAMLSync, IntentTracker, FeedbackManager).
+The complete document explains the **philosophical and architectural context** of all 5 phases.
 
 ---
 

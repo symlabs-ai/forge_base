@@ -1,163 +1,163 @@
 # Contributing to ForgeBase
 
-> "Forjar é transformar pensamento em estrutura — juntos."
+> "To forge is to transform thought into structure — together."
 
-Obrigado pelo interesse em contribuir com ForgeBase! Este documento guia como contribuir de forma efetiva e alinhada com os princípios do projeto.
-
----
-
-## 📜 Código de Conduta
-
-ForgeBase adota princípios de **Reflexividade**, **Autonomia** e **Coerência Cognitiva**. Esperamos que contribuidores:
-
-- Sejam respeitosos e construtivos em discussões
-- Valorizem código claro e explicativo
-- Priorizem arquitetura sobre quick fixes
-- Documentem decisões (não apenas código)
-- Testem não apenas comportamento, mas intenção
+Thank you for your interest in contributing to ForgeBase! This document guides you on how to contribute effectively and in alignment with the project's principles.
 
 ---
 
-## 🚀 Como Contribuir
+## Code of Conduct
 
-### 1. Reportar Bugs
+ForgeBase adopts the principles of **Reflexivity**, **Autonomy**, and **Cognitive Coherence**. We expect contributors to:
 
-**Antes de Reportar:**
-- Verifique se o bug já foi reportado em [Issues](https://github.com/symlabs-ai/forge_base/issues)
-- Confirme que é um bug (não comportamento esperado)
-- Tente reproduzir em ambiente limpo
+- Be respectful and constructive in discussions
+- Value clear and explanatory code
+- Prioritize architecture over quick fixes
+- Document decisions (not just code)
+- Test not only behavior, but intent
 
-**Criando um Bug Report:**
+---
+
+## How to Contribute
+
+### 1. Reporting Bugs
+
+**Before Reporting:**
+- Check if the bug has already been reported in [Issues](https://github.com/symlabs-ai/forge_base/issues)
+- Confirm it is a bug (not expected behavior)
+- Try to reproduce in a clean environment
+
+**Creating a Bug Report:**
 
 ```markdown
-**Descrição do Bug:**
-[Descrição clara do problema]
+**Bug Description:**
+[Clear description of the problem]
 
-**Como Reproduzir:**
-1. Crie entidade X com propriedade Y
-2. Execute método Z
-3. Observe erro
+**How to Reproduce:**
+1. Create entity X with property Y
+2. Execute method Z
+3. Observe error
 
-**Comportamento Esperado:**
-[O que deveria acontecer]
+**Expected Behavior:**
+[What should happen]
 
-**Comportamento Atual:**
-[O que está acontecendo]
+**Actual Behavior:**
+[What is happening]
 
-**Ambiente:**
+**Environment:**
 - ForgeBase version: 1.0.0
 - Python version: 3.11.0
 - OS: Ubuntu 22.04
 
 **Stacktrace:**
 ```
-[Cole o stack trace completo]
+[Paste the full stack trace]
 ```
 
-**Código para Reproduzir:**
+**Code to Reproduce:**
 ```python
-# Código mínimo que reproduz o bug
+# Minimal code that reproduces the bug
 ```
 ```
 
-### 2. Sugerir Funcionalidades
+### 2. Suggesting Features
 
-**Antes de Sugerir:**
-- Verifique se a feature já foi sugerida
-- Considere se alinha com filosofia ForgeBase (Clean Architecture, Observability First, etc.)
-- Pense em alternativas
+**Before Suggesting:**
+- Check if the feature has already been suggested
+- Consider whether it aligns with ForgeBase philosophy (Clean Architecture, Observability First, etc.)
+- Think of alternatives
 
-**Criando uma Feature Request:**
+**Creating a Feature Request:**
 
 ```markdown
-**Problema que Resolve:**
-[Qual problema esta feature resolve?]
+**Problem it Solves:**
+[What problem does this feature solve?]
 
-**Solução Proposta:**
-[Como você imagina que funcione]
+**Proposed Solution:**
+[How you envision it working]
 
-**Alternativas Consideradas:**
-[Outras formas de resolver o problema]
+**Alternatives Considered:**
+[Other ways to solve the problem]
 
-**Impacto na Arquitetura:**
-[Como afeta Clean Architecture, Ports/Adapters, etc.]
+**Architecture Impact:**
+[How it affects Clean Architecture, Ports/Adapters, etc.]
 
-**Exemplo de Uso:**
+**Usage Example:**
 ```python
-# Como seria usar a feature
+# How the feature would be used
 ```
 ```
 
-### 3. Contribuir com Código
+### 3. Contributing Code
 
-#### Preparando o Ambiente
+#### Setting Up the Environment
 
 ```bash
-# Clone o repositório
+# Clone the repository
 git clone https://github.com/symlabs-ai/forge_base.git
 cd forge_base
 
-# Crie um ambiente virtual
+# Create a virtual environment
 python -m venv venv
 source venv/bin/activate  # Linux/Mac
-# ou
+# or
 venv\Scripts\activate  # Windows
 
-# Instale dependências de desenvolvimento
+# Install development dependencies
 pip install -e ".[dev]"
 
-# Instale pre-commit hooks
+# Install pre-commit hooks
 pre-commit install
 ```
 
-#### Workflow de Desenvolvimento
+#### Development Workflow
 
-1. **Crie uma Branch**
+1. **Create a Branch**
 
 ```bash
-git checkout -b feature/minha-feature
-# ou
-git checkout -b fix/meu-bugfix
+git checkout -b feature/my-feature
+# or
+git checkout -b fix/my-bugfix
 ```
 
-Convenção de nomes:
-- `feature/` — Nova funcionalidade
-- `fix/` — Correção de bug
-- `docs/` — Apenas documentação
-- `refactor/` — Refatoração sem mudança de comportamento
-- `test/` — Adição/melhoria de testes
+Naming conventions:
+- `feature/` — New functionality
+- `fix/` — Bug fix
+- `docs/` — Documentation only
+- `refactor/` — Refactoring without behavior change
+- `test/` — Adding/improving tests
 
-2. **Escreva Código (TDD)**
+2. **Write Code (TDD)**
 
 ```bash
-# 1. Escreva o teste primeiro
+# 1. Write the test first
 vim tests/unit/domain/test_my_feature.py
 
-# 2. Execute testes (deve falhar)
+# 2. Run tests (should fail)
 pytest tests/unit/domain/test_my_feature.py
 
-# 3. Implemente a feature
+# 3. Implement the feature
 vim src/forge_base/domain/my_feature.py
 
-# 4. Execute testes (deve passar)
+# 4. Run tests (should pass)
 pytest tests/unit/domain/test_my_feature.py
 
-# 5. Refatore
+# 5. Refactor
 # ...
 
-# 6. Execute toda a suite
+# 6. Run the full suite
 pytest
 ```
 
-3. **Escreva Docstrings reST**
+3. **Write reST Docstrings**
 
 ```python
 def my_function(param: str, value: int) -> bool:
     """
-    [Uma linha descrevendo o que faz]
+    [One line describing what it does]
 
-    [Parágrafo explicando POR QUÊ esta implementação,
-    decisões de design, e contexto arquitetural]
+    [Paragraph explaining WHY this implementation,
+    design decisions, and architectural context]
 
     :param param: Description of param
     :type param: str
@@ -180,7 +180,7 @@ def my_function(param: str, value: int) -> bool:
     pass
 ```
 
-4. **Execute Linting**
+4. **Run Linting**
 
 ```bash
 # Ruff linting + formatting
@@ -191,40 +191,40 @@ ruff format .
 mypy src/forge_base
 ```
 
-5. **Execute Testes Completos**
+5. **Run Full Tests**
 
 ```bash
-# Todos os testes
+# All tests
 pytest
 
-# Com coverage
+# With coverage
 pytest --cov=forge_base --cov-report=html
 
-# Testes específicos
+# Specific tests
 pytest tests/unit/domain/
 
-# Apenas testes rápidos
+# Only fast tests
 pytest -m "not slow"
 ```
 
-6. **Commit com Mensagem Convencional**
+6. **Commit with Conventional Message**
 
 ```bash
 git add .
-git commit -m "feat: adiciona suporte para MongoDB Repository
+git commit -m "feat: add MongoDB Repository support
 
-Implementa MongoDBRepository que estende RepositoryBase
-para permitir persistência em MongoDB.
+Implements MongoDBRepository extending RepositoryBase
+to enable persistence in MongoDB.
 
-- Adiciona MongoDBRepository em infrastructure/repository/
-- Adiciona testes em tests/unit/infrastructure/
-- Atualiza documentação no cookbook
+- Adds MongoDBRepository in infrastructure/repository/
+- Adds tests in tests/unit/infrastructure/
+- Updates cookbook documentation
 
 Refs #123
 "
 ```
 
-**Formato de Commit:**
+**Commit Format:**
 
 ```
 <type>(<scope>): <subject>
@@ -235,85 +235,85 @@ Refs #123
 ```
 
 **Types:**
-- `feat`: Nova feature
+- `feat`: New feature
 - `fix`: Bug fix
-- `docs`: Apenas documentação
-- `style`: Formatação (sem mudança de código)
-- `refactor`: Refatoração sem mudança de comportamento
-- `test`: Adição/mudança de testes
-- `chore`: Tarefas de manutenção
+- `docs`: Documentation only
+- `style`: Formatting (no code change)
+- `refactor`: Refactoring without behavior change
+- `test`: Adding/changing tests
+- `chore`: Maintenance tasks
 
-**Exemplos:**
-
-```bash
-feat(domain): adiciona Money ValueObject
-fix(repository): corrige race condition em save()
-docs(adr): adiciona ADR-007 sobre caching
-refactor(usecase): simplifica validação de input
-test(integration): adiciona testes de YAML sync
-```
-
-7. **Push e Abra Pull Request**
+**Examples:**
 
 ```bash
-git push origin feature/minha-feature
+feat(domain): add Money ValueObject
+fix(repository): fix race condition in save()
+docs(adr): add ADR-007 on caching
+refactor(usecase): simplify input validation
+test(integration): add YAML sync tests
 ```
 
-No GitHub:
-- Abra Pull Request
-- Preencha template (descrição, testes, screenshots se aplicável)
-- Aguarde code review
+7. **Push and Open Pull Request**
+
+```bash
+git push origin feature/my-feature
+```
+
+On GitHub:
+- Open a Pull Request
+- Fill in the template (description, tests, screenshots if applicable)
+- Wait for code review
 
 ---
 
-## ✅ Checklist de Pull Request
+## Pull Request Checklist
 
-Antes de submeter, verifique:
+Before submitting, verify:
 
-### Código
+### Code
 
-- [ ] Código segue Clean Architecture (dependências corretas)
-- [ ] Ports e Adapters claramente separados
-- [ ] Type hints completos
-- [ ] Sem código comentado (remover ou documentar porquê)
-- [ ] Sem print() statements (usar logger)
-- [ ] Sem dependências circulares
+- [ ] Code follows Clean Architecture (correct dependencies)
+- [ ] Ports and Adapters clearly separated
+- [ ] Complete type hints
+- [ ] No commented-out code (remove or document why)
+- [ ] No print() statements (use logger)
+- [ ] No circular dependencies
 
-### Testes
+### Tests
 
-- [ ] Testes unitários escritos (≥90% coverage para novo código)
-- [ ] Testes passam localmente (`pytest`)
-- [ ] Testes cognitivos se aplicável (ForgeTestCase)
-- [ ] Não quebra testes existentes
+- [ ] Unit tests written (>=90% coverage for new code)
+- [ ] Tests pass locally (`pytest`)
+- [ ] Cognitive tests if applicable (ForgeTestCase)
+- [ ] Does not break existing tests
 
-### Documentação
+### Documentation
 
-- [ ] Docstrings reST em todas as classes/métodos públicos
-- [ ] Docstrings explicam "porquê", não apenas "o quê"
-- [ ] Exemplos de uso incluídos
-- [ ] README atualizado se necessário
-- [ ] CHANGELOG.md atualizado (seção Unreleased)
+- [ ] reST docstrings on all public classes/methods
+- [ ] Docstrings explain "why", not just "what"
+- [ ] Usage examples included
+- [ ] README updated if necessary
+- [ ] CHANGELOG.md updated (Unreleased section)
 
-### Observabilidade
+### Observability
 
-- [ ] Logging estruturado adicionado se aplicável
-- [ ] Métricas coletadas se aplicável
-- [ ] Erro handling apropriado
+- [ ] Structured logging added if applicable
+- [ ] Metrics collected if applicable
+- [ ] Appropriate error handling
 
-### Decisões Arquiteturais
+### Architectural Decisions
 
-- [ ] ADR criado se decisão significativa
-- [ ] Alternativas consideradas documentadas
+- [ ] ADR created if significant decision
+- [ ] Considered alternatives documented
 
 ---
 
-## 🧪 Padrões de Teste
+## Testing Patterns
 
-### Estrutura de Testes
+### Test Structure
 
 ```
 tests/
-├── unit/                    # Testes unitários (isolados)
+├── unit/                    # Unit tests (isolated)
 │   ├── domain/
 │   │   ├── test_entity.py
 │   │   └── test_value_object.py
@@ -321,14 +321,14 @@ tests/
 │   │   └── test_usecase.py
 │   └── infrastructure/
 │       └── test_repository.py
-├── integration/             # Testes de integração
+├── integration/             # Integration tests
 │   ├── test_yaml_sync.py
 │   └── test_sql_repository.py
-└── cognitive/              # Testes cognitivos
+└── cognitive/              # Cognitive tests
     └── test_create_user_cognitive.py
 ```
 
-### Exemplo de Teste Unitário
+### Unit Test Example
 
 ```python
 import unittest
@@ -359,7 +359,7 @@ class TestUser(unittest.TestCase):
             User(name="Alice", email="invalid-email")
 ```
 
-### Exemplo de Teste Cognitivo
+### Cognitive Test Example
 
 ```python
 from forge_base.testing import ForgeTestCase
@@ -406,33 +406,33 @@ class TestCreateUserCognitive(ForgeTestCase):
 
 ---
 
-## 📐 Padrões de Código
+## Code Patterns
 
 ### Clean Architecture
 
-**Regras de Dependência:**
+**Dependency Rules:**
 
 ```python
-# ✅ OK: Application → Domain
+# OK: Application -> Domain
 from forge_base.domain import EntityBase
 
 class CreateUserUseCase(UseCaseBase):
     pass
 
-# ✅ OK: Infrastructure → Application
+# OK: Infrastructure -> Application
 from forge_base.application import PortBase
 
 class JSONRepository(PortBase):
     pass
 
-# ❌ ERRADO: Domain → Application
-from forge_base.application import UseCaseBase  # NÃO!
+# WRONG: Domain -> Application
+from forge_base.application import UseCaseBase  # NO!
 
 class User(EntityBase):
     pass
 
-# ❌ ERRADO: Domain → Infrastructure
-from forge_base.infrastructure import JSONRepository  # NÃO!
+# WRONG: Domain -> Infrastructure
+from forge_base.infrastructure import JSONRepository  # NO!
 
 class User(EntityBase):
     pass
@@ -440,46 +440,46 @@ class User(EntityBase):
 
 ### Dependency Injection
 
-**Sempre use constructor injection:**
+**Always use constructor injection:**
 
 ```python
-# ✅ Correto
+# Correct
 class CreateUserUseCase(UseCaseBase):
     def __init__(
         self,
-        user_repository: UserRepositoryPort,  # Port, não adapter
+        user_repository: UserRepositoryPort,  # Port, not adapter
         logger: LoggerPort
     ):
         self.user_repository = user_repository
         self.logger = logger
 
-# ❌ Errado
+# Wrong
 class CreateUserUseCase(UseCaseBase):
     def __init__(self):
-        self.user_repository = JSONRepository()  # Acoplamento direto
+        self.user_repository = JSONRepository()  # Direct coupling
         self.logger = StdoutLogger()
 ```
 
 ### Naming Conventions
 
 ```python
-# Entities: Substantivos (singular)
+# Entities: Nouns (singular)
 class User(EntityBase): pass
 class Order(EntityBase): pass
 
-# ValueObjects: Substantivos compostos
+# ValueObjects: Compound nouns
 class EmailAddress(ValueObjectBase): pass
 class Money(ValueObjectBase): pass
 
-# UseCases: Verbo + Substantivo + "UseCase"
+# UseCases: Verb + Noun + "UseCase"
 class CreateUserUseCase(UseCaseBase): pass
 class PlaceOrderUseCase(UseCaseBase): pass
 
-# Ports: Substantivo + "Port"
+# Ports: Noun + "Port"
 class UserRepositoryPort(ABC): pass
 class NotificationServicePort(ABC): pass
 
-# Adapters: Tecnologia + Substantivo + "Adapter"
+# Adapters: Technology + Noun + "Adapter"
 class JSONUserRepository(UserRepositoryPort): pass
 class SMTPNotificationAdapter(NotificationServicePort): pass
 class HTTPAdapter(AdapterBase): pass
@@ -495,69 +495,69 @@ class CreateUserOutput(DTOBase): pass
 # Domain errors
 from forge_base.domain import ValidationError, BusinessRuleViolation
 
-# ValidationError: Dados inválidos
+# ValidationError: Invalid data
 if not email:
     raise ValidationError("Email cannot be empty")
 
-# BusinessRuleViolation: Regra de negócio violada
+# BusinessRuleViolation: Business rule violated
 if user_exists:
     raise BusinessRuleViolation(f"User with email {email} already exists")
 
 # Application errors
 from forge_base.application import UseCaseError
 
-# UseCaseError: Erro de orquestração
+# UseCaseError: Orchestration error
 if customer is None:
     raise UseCaseError(f"Customer not found: {customer_id}")
 ```
 
 ---
 
-## 📝 Documentação
+## Documentation
 
 ### ADRs (Architecture Decision Records)
 
-Para decisões arquiteturais significativas, crie um ADR:
+For significant architectural decisions, create an ADR:
 
 ```bash
-# Criar ADR
-vim docs/adr/007-minha-decisao.md
+# Create ADR
+vim docs/adr/007-my-decision.md
 ```
 
 **Template:**
 
 ```markdown
-# ADR-007: [Título da Decisão]
+# ADR-007: [Decision Title]
 
 ## Status
 
-**Proposta** | **Aceita** | **Superseded**
+**Proposed** | **Accepted** | **Superseded**
 
 ## Context
 
-[Contexto e problema que motivou a decisão]
+[Context and problem that motivated the decision]
 
 ## Decision
 
-[Decisão tomada]
+[Decision made]
 
 ## Consequences
 
-### Positivas
-- ✅ Benefício 1
-- ✅ Benefício 2
+### Positive
+- Benefit 1
+- Benefit 2
 
-### Negativas
-- ⚠️ Trade-off 1
-- ⚠️ Trade-off 2
+### Negative
+- Trade-off 1
+- Trade-off 2
 
 ## Alternatives Considered
 
-### Alternativa 1
-[Por que foi rejeitada]
+### Alternative 1
+[Why it was rejected]
 
-### Alternativa 2
-[Por que foi rejeitada]
+### Alternative 2
+[Why it was rejected]
 
 ## References
 
@@ -567,84 +567,84 @@ vim docs/adr/007-minha-decisao.md
 
 ---
 
-## 🔄 Processo de Review
+## Review Process
 
-### Para Reviewers
+### For Reviewers
 
-**O que avaliar:**
+**What to evaluate:**
 
-1. **Arquitetura**
-   - Clean Architecture respeitada?
-   - Dependências corretas?
-   - Ports/Adapters apropriados?
+1. **Architecture**
+   - Clean Architecture respected?
+   - Correct dependencies?
+   - Appropriate Ports/Adapters?
 
-2. **Código**
-   - Legibilidade e clareza
-   - Type hints completos
-   - Sem code smells
+2. **Code**
+   - Readability and clarity
+   - Complete type hints
+   - No code smells
 
-3. **Testes**
-   - Coverage adequado
-   - Testes passam
-   - Casos edge cobertos
+3. **Tests**
+   - Adequate coverage
+   - Tests pass
+   - Edge cases covered
 
-4. **Documentação**
-   - Docstrings presentes e completos
-   - Exemplos claros
-   - ADR se necessário
+4. **Documentation**
+   - Docstrings present and complete
+   - Clear examples
+   - ADR if necessary
 
-**Como dar feedback:**
+**How to give feedback:**
 
 ```markdown
-# ✅ Bom feedback (construtivo)
-"Boa implementação! Sugiro extrair essa validação para um validator reutilizável, pois pode ser útil em outros lugares. Exemplo: `DomainValidators.validate_email()`"
+# Good feedback (constructive)
+"Great implementation! I suggest extracting this validation into a reusable validator, as it could be useful elsewhere. Example: `DomainValidators.validate_email()`"
 
-# ❌ Feedback ruim (não construtivo)
-"Isso está errado."
+# Bad feedback (not constructive)
+"This is wrong."
 ```
 
-### Para Autores
+### For Authors
 
-**Respondendo a feedback:**
+**Responding to feedback:**
 
-- Seja receptivo
-- Pergunte se não entender
-- Não leve para o pessoal
-- Agradeça o tempo do reviewer
+- Be receptive
+- Ask if you don't understand
+- Don't take it personally
+- Thank the reviewer for their time
 
-**Iterando:**
+**Iterating:**
 
 ```bash
-# Fazer mudanças solicitadas
+# Make requested changes
 vim src/forge_base/domain/my_feature.py
 
-# Commit com referência ao PR
-git commit -m "fix: corrige validação conforme feedback do review
+# Commit with PR reference
+git commit -m "fix: correct validation per review feedback
 
 Ref #45 (comment)
 "
 
-# Push atualizado
-git push origin feature/minha-feature
+# Push update
+git push origin feature/my-feature
 ```
 
 ---
 
-## 🎓 Recursos para Contribuidores
+## Resources for Contributors
 
-### Documentação
+### Documentation
 
-- **[Getting Started](docs/getting-started.md)** — Tutorial inicial
-- **[Cookbook](docs/cookbook.md)** — Receitas práticas
-- **[ADRs](docs/adr/)** — Decisões arquiteturais
-- **[Testing Guide](docs/testing-guide.md)** — Como testar
+- **[Getting Started](docs/getting-started.md)** — Getting started tutorial
+- **[Cookbook](docs/cookbook.md)** — Practical recipes
+- **[ADRs](docs/adr/)** — Architectural decisions
+- **[Testing Guide](docs/testing-guide.md)** — How to test
 
-### Exemplos
+### Examples
 
-- `examples/complete_flow.py` — Exemplo completo
-- `examples/user_management/` — App de exemplo
+- `examples/complete_flow.py` — Complete example
+- `examples/user_management/` — Sample app
 
-### Leituras Recomendadas
+### Recommended Reading
 
 - **Clean Architecture** by Robert C. Martin
 - **Domain-Driven Design** by Eric Evans
@@ -653,53 +653,53 @@ git push origin feature/minha-feature
 
 ---
 
-## 🐛 Reportando Security Issues
+## Reporting Security Issues
 
-**NÃO** abra issue pública para problemas de segurança.
+**DO NOT** open a public issue for security problems.
 
-Envie email para: security@forgebase.dev
+Send an email to: security@forgebase.dev
 
 Include:
-- Descrição da vulnerabilidade
+- Vulnerability description
 - Steps to reproduce
-- Potencial impacto
-- Sugestão de fix (se tiver)
+- Potential impact
+- Fix suggestion (if available)
 
 ---
 
-## 💬 Comunidade
+## Community
 
-- **GitHub Discussions:** Para perguntas e discussões
-- **GitHub Issues:** Para bugs e features
-- **Pull Requests:** Para contribuições de código
-
----
-
-## ❓ FAQ
-
-**P: Posso contribuir se não sou expert em Clean Architecture?**
-R: Sim! Leia os ADRs e exemplos. Pedimos ajuda durante review.
-
-**P: Meu PR foi rejeitado. E agora?**
-R: Leia o feedback, pergunte se não entender, e itere. Nem todo PR é aceito na primeira tentativa.
-
-**P: Posso contribuir apenas com documentação?**
-R: Absolutamente! Docs são tão importantes quanto código.
-
-**P: Como sei se uma feature será aceita?**
-R: Abra uma issue de discussão antes de implementar. Podemos validar alinhamento com roadmap.
-
-**P: Posso usar lib X no meu PR?**
-R: Preferimos zero dependências externas. Se absolutamente necessário, justifique na discussão.
+- **GitHub Discussions:** For questions and discussions
+- **GitHub Issues:** For bugs and features
+- **Pull Requests:** For code contributions
 
 ---
 
-## 📜 Licença
+## FAQ
 
-Ao contribuir com ForgeBase, você concorda que suas contribuições serão licenciadas sob a mesma licença do projeto (MIT License).
+**Q: Can I contribute if I'm not an expert in Clean Architecture?**
+A: Yes! Read the ADRs and examples. We provide help during review.
+
+**Q: My PR was rejected. Now what?**
+A: Read the feedback, ask if you don't understand, and iterate. Not every PR is accepted on the first attempt.
+
+**Q: Can I contribute with documentation only?**
+A: Absolutely! Docs are as important as code.
+
+**Q: How do I know if a feature will be accepted?**
+A: Open a discussion issue before implementing. We can validate alignment with the roadmap.
+
+**Q: Can I use library X in my PR?**
+A: We prefer zero external dependencies. If absolutely necessary, justify it in the discussion.
 
 ---
 
-**Obrigado por contribuir! 🔨**
+## License
 
-*"Cada contribuição forja o futuro do framework."*
+By contributing to ForgeBase, you agree that your contributions will be licensed under the same project license (MIT License).
+
+---
+
+**Thank you for contributing!**
+
+*"Each contribution forges the framework's future."*

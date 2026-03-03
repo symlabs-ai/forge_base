@@ -2,76 +2,76 @@
 
 ## Status
 
-**Aceita** (2025-11-03)
+**Accepted** (2025-11-03)
 
 ## Context
 
-ForgeBase adota Clean Architecture ([ADR-001](001-clean-architecture-choice.md)) e Hexagonal Architecture ([ADR-002](002-hexagonal-ports-adapters.md)), o que significa que:
+ForgeBase adopts Clean Architecture ([ADR-001](001-clean-architecture-choice.md)) and Hexagonal Architecture ([ADR-002](002-hexagonal-ports-adapters.md)), which means that:
 
-- **UseCases dependem de Ports, não de Adapters concretos**
-- **Domain deve ser completamente independente de infraestrutura**
-- **Adapters podem ser trocados sem modificar o core**
+- **UseCases depend on Ports, not on concrete Adapters**
+- **Domain must be completely independent of infrastructure**
+- **Adapters can be swapped without modifying the core**
 
-Para isso funcionar, precisamos de um mecanismo para **injetar dependências** em tempo de execução. O desafio é escolher como fazer isso de forma que:
+For this to work, we need a mechanism to **inject dependencies** at runtime. The challenge is choosing how to do this in a way that:
 
-- Mantenha a arquitetura limpa
-- Seja testável
-- Seja configurável
-- Não adicione complexidade desnecessária
-- Seja explícito (não mágico)
+- Keeps the architecture clean
+- Is testable
+- Is configurable
+- Does not add unnecessary complexity
+- Is explicit (not magical)
 
-### Problema
+### Problem
 
 ```python
-# ❌ Problema: UseCase cria suas próprias dependências
+# ❌ Problem: UseCase creates its own dependencies
 class CreateUserUseCase:
     def __init__(self):
-        # Acoplamento direto
+        # Direct coupling
         self.repository = JSONRepository("/data/users.json")
         self.logger = StdoutLogger()
 
     def execute(self, input_dto):
-        # Impossível testar sem filesystem real
-        # Impossível trocar implementação
+        # Impossible to test without real filesystem
+        # Impossible to swap implementation
         ...
 ```
 
-### Necessidades
+### Needs
 
-1. **Inversão de Dependência**: UseCases dependem de abstrações (Ports)
-2. **Configurabilidade**: Escolher implementações via config
-3. **Testabilidade**: Injetar fakes em testes
-4. **Explicitness**: Dependências visíveis na assinatura
-5. **Lifecycle Management**: Criar/destruir dependências corretamente
+1. **Dependency Inversion**: UseCases depend on abstractions (Ports)
+2. **Configurability**: Choose implementations via config
+3. **Testability**: Inject fakes in tests
+4. **Explicitness**: Dependencies visible in the signature
+5. **Lifecycle Management**: Create/destroy dependencies correctly
 
-### Forças em Jogo
+### Forces at Play
 
-**Necessidades:**
-- Desacoplamento total entre layers
-- Testes rápidos com fakes
-- Flexibilidade de configuração
-- Reutilização de componentes
+**Needs:**
+- Total decoupling between layers
+- Fast tests with fakes
+- Configuration flexibility
+- Component reusability
 
-**Riscos:**
-- Complexidade de setup
-- "Magic" que dificulta debugging
-- Overhead de frameworks DI
-- Curva de aprendizado
+**Risks:**
+- Setup complexity
+- "Magic" that complicates debugging
+- DI framework overhead
+- Learning curve
 
 ## Decision
 
-**Adotamos Dependency Injection Manual (Constructor Injection) com DI Container Opcional.**
+**We adopted Manual Dependency Injection (Constructor Injection) with an Optional DI Container.**
 
-### Princípio: Constructor Injection
+### Principle: Constructor Injection
 
-**Todas as dependências são injetadas via construtor:**
+**All dependencies are injected via constructor:**
 
 ```python
-# ✅ Solução: Dependências injetadas
+# ✅ Solution: Injected dependencies
 class CreateUserUseCase(UseCaseBase):
     def __init__(
         self,
-        user_repository: UserRepositoryPort,  # Port, não adapter
+        user_repository: UserRepositoryPort,  # Port, not adapter
         logger: LoggerPort,
         metrics: TrackMetrics
     ):
@@ -80,19 +80,19 @@ class CreateUserUseCase(UseCaseBase):
         self.metrics = metrics
 
     def execute(self, input_dto: CreateUserInput) -> CreateUserOutput:
-        # Usa dependências injetadas
+        # Uses injected dependencies
         self.logger.info("Creating user", email=input_dto.email)
         ...
 ```
 
-**Benefícios:**
-- ✅ **Explícito**: Dependências visíveis na assinatura
-- ✅ **Testável**: Fácil injetar fakes
-- ✅ **Type-safe**: Type hints claros
-- ✅ **Zero magic**: Sem decorators ou metaclasses
-- ✅ **IDE-friendly**: Autocomplete funciona
+**Benefits:**
+- ✅ **Explicit**: Dependencies visible in the signature
+- ✅ **Testable**: Easy to inject fakes
+- ✅ **Type-safe**: Clear type hints
+- ✅ **Zero magic**: No decorators or metaclasses
+- ✅ **IDE-friendly**: Autocomplete works
 
-### Padrão de Injeção
+### Injection Pattern
 
 #### 1. UseCases (Application Layer)
 
@@ -101,7 +101,7 @@ class CreateUserUseCase(UseCaseBase):
     def __init__(
         self,
         user_repository: UserRepositoryPort,  # Required
-        logger: Optional[LoggerPort] = None,  # Optional com default
+        logger: Optional[LoggerPort] = None,  # Optional with default
         metrics: Optional[TrackMetrics] = None
     ):
         self.user_repository = user_repository
@@ -109,11 +109,11 @@ class CreateUserUseCase(UseCaseBase):
         self.metrics = metrics or NoOpMetrics()
 ```
 
-**Convenções:**
-- Dependências **obrigatórias** sem default
-- Dependências **opcionais** com default NoOp
-- Type hints sempre presentes
-- Nomes descritivos (não genéricos como `repo`)
+**Conventions:**
+- **Required** dependencies without default
+- **Optional** dependencies with NoOp default
+- Type hints always present
+- Descriptive names (not generic like `repo`)
 
 #### 2. Adapters
 
@@ -143,9 +143,9 @@ class SQLRepository(RepositoryBase[T]):
         self.logger = logger or NoOpLogger()
 ```
 
-### DI Container (Opcional)
+### DI Container (Optional)
 
-Para aplicações complexas, fornecemos um **DI Container simples**:
+For complex applications, we provide a **simple DI Container**:
 
 ```python
 # src/forge_base/infrastructure/di_container.py
@@ -186,7 +186,7 @@ class DIContainer:
         return instance
 ```
 
-**Uso:**
+**Usage:**
 
 ```python
 # Setup (application startup)
@@ -231,7 +231,7 @@ result = usecase.execute(input_dto)
 
 ### Configuration-Based DI
 
-Integração com ConfigLoader:
+Integration with ConfigLoader:
 
 ```yaml
 # config.yaml
@@ -256,7 +256,7 @@ usecases:
 ```
 
 ```python
-# Loader de config para DI
+# Config loader for DI
 class DIConfigLoader:
     def load_from_config(self, config_path: str) -> DIContainer:
         config = load_yaml(config_path)
@@ -276,7 +276,7 @@ class DIConfigLoader:
 ```python
 class TestCreateUserUseCase(unittest.TestCase):
     def setUp(self):
-        # Manual injection com fakes (sem DI container)
+        # Manual injection with fakes (no DI container)
         self.fake_repo = FakeRepository()
         self.fake_logger = FakeLogger()
         self.fake_metrics = FakeMetricsCollector()
@@ -290,32 +290,32 @@ class TestCreateUserUseCase(unittest.TestCase):
     def test_creates_user(self):
         result = self.usecase.execute(CreateUserInput(...))
 
-        # Validações
+        # Validations
         self.assertEqual(self.fake_repo.count(), 1)
         self.assertTrue(self.fake_logger.was_called('info'))
         self.assertTrue(self.fake_metrics.has_metric('create_user.count'))
 ```
 
-**Sem DI container em testes:**
-- Setup mais simples
-- Controle total
-- Sem surpresas
+**No DI container in tests:**
+- Simpler setup
+- Full control
+- No surprises
 
 ### Lifecycle Management
 
 ```python
 class DIContainer:
     def __enter__(self):
-        """Context manager para lifecycle."""
+        """Context manager for lifecycle."""
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """Cleanup de singletons."""
+        """Cleanup of singletons."""
         for instance in self._singletons.values():
             if hasattr(instance, 'close'):
                 instance.close()
 
-# Uso
+# Usage
 with DIContainer() as container:
     # Register & resolve
     usecase = container.resolve(CreateUserUseCase)
@@ -369,53 +369,53 @@ class ForgeBaseCore:
 
 ## Consequences
 
-### Positivas
+### Positive
 
-✅ **Testabilidade Máxima**
+✅ **Maximum Testability**
 ```python
-# Injetar fakes é trivial
+# Injecting fakes is trivial
 usecase = CreateUserUseCase(
     user_repository=FakeRepository(),
     logger=FakeLogger()
 )
 ```
 
-✅ **Flexibilidade de Configuração**
+✅ **Configuration Flexibility**
 ```yaml
-# Trocar implementações sem código
+# Swap implementations without code changes
 repository:
-  type: sql  # antes era "json"
+  type: sql  # was "json" before
 ```
 
 ✅ **Explicitness**
 ```python
-# Dependências visíveis na assinatura
+# Dependencies visible in the signature
 def __init__(self, user_repository: UserRepositoryPort, logger: LoggerPort):
     ...
 ```
 
 ✅ **Type Safety**
-- Type hints garantem contratos
-- IDE autocomplete funciona
-- Mypy detecta erros
+- Type hints ensure contracts
+- IDE autocomplete works
+- Mypy detects errors
 
 ✅ **Zero Magic**
-- Sem decorators @inject
-- Sem metaclasses
-- Debugging simples
+- No @inject decorators
+- No metaclasses
+- Simple debugging
 
-✅ **Reusabilidade**
+✅ **Reusability**
 ```python
-# Mesmo UseCase, múltiplos contextos
+# Same UseCase, multiple contexts
 prod_usecase = CreateUserUseCase(sql_repo, prod_logger)
 test_usecase = CreateUserUseCase(fake_repo, fake_logger)
 ```
 
-### Negativas
+### Negative
 
-⚠️ **Boilerplate de Wiring**
+⚠️ **Wiring Boilerplate**
 ```python
-# Precisa wirear manualmente
+# Need to wire manually
 usecase = CreateUserUseCase(
     user_repository=container.resolve(UserRepositoryPort),
     logger=container.resolve(LoggerPort),
@@ -423,45 +423,45 @@ usecase = CreateUserUseCase(
 )
 ```
 
-**Mitigation**: DI Container automatiza wiring
+**Mitigation**: DI Container automates wiring
 
-⚠️ **Setup Inicial Verboso**
-- Muitos `container.register()` calls
-- Config YAML pode ficar extensa
+⚠️ **Verbose Initial Setup**
+- Many `container.register()` calls
+- Config YAML can get extensive
 
-**Mitigation**: Defaults sensatos, auto-discovery
+**Mitigation**: Sensible defaults, auto-discovery
 
 ⚠️ **Constructor Bloat**
 ```python
-# Muitas dependências = construtor grande
+# Too many dependencies = large constructor
 def __init__(self, dep1, dep2, dep3, dep4, dep5):
     ...
 ```
 
-**Mitigation**: Se >5 dependências, refatorar UseCase
+**Mitigation**: If >5 dependencies, refactor the UseCase
 
-### Mitigações Implementadas
+### Implemented Mitigations
 
-1. **Defaults NoOp**
+1. **NoOp Defaults**
    ```python
    def __init__(self, logger: Optional[LoggerPort] = None):
        self.logger = logger or NoOpLogger()
    ```
 
-2. **Container Simplificado**
-   - Não é framework complexo (Guice, Spring)
+2. **Simplified Container**
+   - Not a complex framework (Guice, Spring)
    - ~200 LOC total
-   - Fácil entender e debugar
+   - Easy to understand and debug
 
 3. **Config-Driven**
-   - YAML define wiring
-   - Código apenas implementa
-   - Switching sem rebuild
+   - YAML defines wiring
+   - Code only implements
+   - Switching without rebuild
 
 4. **Generators**
    ```bash
    forge_base generate usecase CreateUser --with-di
-   # Gera UseCase com DI correto
+   # Generates UseCase with correct DI
    ```
 
 ## Alternatives Considered
@@ -476,19 +476,19 @@ class CreateUserUseCase:
         ...
 ```
 
-**Rejeitado porque:**
-- Dependências ocultas
-- Dificulta testes
-- Estado global
-- Não type-safe
+**Rejected because:**
+- Hidden dependencies
+- Complicates tests
+- Global state
+- Not type-safe
 
-### 2. Frameworks DI Pesados (Injector, Dependency-Injector)
+### 2. Heavy DI Frameworks (Injector, Dependency-Injector)
 
-**Rejeitado porque:**
-- Overhead desnecessário
-- Magic demais (decorators, metaclasses)
-- Curva de aprendizado
-- ForgeBase quer ser simples
+**Rejected because:**
+- Unnecessary overhead
+- Too much magic (decorators, metaclasses)
+- Learning curve
+- ForgeBase aims to be simple
 
 ### 3. Function-based DI
 
@@ -500,10 +500,10 @@ def create_user(
     ...
 ```
 
-**Rejeitado porque:**
-- Específico de frameworks web (FastAPI)
-- Não se aplica bem a UseCases
-- Mistura concerns
+**Rejected because:**
+- Specific to web frameworks (FastAPI)
+- Does not apply well to UseCases
+- Mixes concerns
 
 ### 4. Property Injection
 
@@ -514,29 +514,29 @@ class CreateUserUseCase:
         self.repository = repo
 ```
 
-**Rejeitado porque:**
-- Menos explícito que constructor
-- Permite objeto em estado inválido
-- Mais verboso
+**Rejected because:**
+- Less explicit than constructor
+- Allows object in invalid state
+- More verbose
 
-### 5. Monkey Patching para Testes
+### 5. Monkey Patching for Tests
 
 ```python
-# Em testes
+# In tests
 CreateUserUseCase.repository = FakeRepository()
 ```
 
-**Rejeitado porque:**
-- Estado global
+**Rejected because:**
+- Global state
 - Race conditions
-- Não isolado entre testes
-- Horrível
+- Not isolated between tests
+- Terrible
 
 ## Implementation Guidelines
 
-### Para Desenvolvedores de UseCases
+### For UseCase Developers
 
-**Sempre use constructor injection:**
+**Always use constructor injection:**
 ```python
 class MyUseCase(UseCaseBase):
     def __init__(
@@ -548,15 +548,15 @@ class MyUseCase(UseCaseBase):
         self.optional_port = optional_port or NoOpPort()
 ```
 
-**Regras:**
-1. Dependências obrigatórias primeiro
-2. Dependências opcionais com defaults
-3. Type hints sempre
-4. Nomes descritivos
+**Rules:**
+1. Required dependencies first
+2. Optional dependencies with defaults
+3. Type hints always
+4. Descriptive names
 
-### Para Integração
+### For Integration
 
-**Use DI Container para apps:**
+**Use DI Container for apps:**
 ```python
 # main.py
 container = DIContainer()
@@ -564,7 +564,7 @@ container = DIContainer()
 usecase = container.resolve(CreateUserUseCase)
 ```
 
-**Use manual injection para testes:**
+**Use manual injection for tests:**
 ```python
 # test_*.py
 usecase = CreateUserUseCase(
@@ -576,7 +576,7 @@ usecase = CreateUserUseCase(
 ## References
 
 - **Dependency Injection Principles, Practices, and Patterns** by Steven van Deursen & Mark Seemann
-- **Clean Architecture** by Robert C. Martin (Capítulo sobre DI)
+- **Clean Architecture** by Robert C. Martin (chapter on DI)
 - **Inversion of Control Containers and the Dependency Injection pattern** by Martin Fowler
 
 ## Related ADRs

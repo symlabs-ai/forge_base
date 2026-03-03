@@ -1,71 +1,71 @@
-# Início Rápido com ForgeBase
+# Quick Start with ForgeBase
 
-> "Forjar é transformar pensamento em estrutura."
+> "To forge is to transform thought into structure."
 
-Este guia vai levá-lo do zero até sua primeira aplicação funcional em ~30 minutos.
-
----
-
-## Pré-requisitos
-
-- **Python 3.11+** instalado
-- **pip** para gerenciar pacotes
-- **Git** para clonar o repositório
-- Editor de código (VS Code, PyCharm, etc.)
+This guide will take you from zero to your first working application in ~30 minutes.
 
 ---
 
-## Instalação
+## Prerequisites
 
-### Opção 1: Instalação via pip (produção)
+- **Python 3.11+** installed
+- **pip** for package management
+- **Git** for cloning the repository
+- Code editor (VS Code, PyCharm, etc.)
+
+---
+
+## Installation
+
+### Option 1: Install via pip (production)
 
 ```bash
-# Instalar última versão do main
+# Install latest version from main
 pip install git+https://github.com/symlabs-ai/forge_base.git
 
-# Verificar instalação
-python -c "from forge_base.dev.api import QualityChecker; print('ForgeBase instalado!')"
+# Verify installation
+python -c "from forge_base.dev.api import QualityChecker; print('ForgeBase installed!')"
 ```
 
-### Opção 2: Instalação para desenvolvimento
+### Option 2: Install for development
 
 ```bash
-# Clonar e instalar em modo editável
+# Clone and install in editable mode
 git clone https://github.com/symlabs-ai/forge_base.git
 cd forge_base
 
-# Criar ambiente virtual
+# Create virtual environment
 python -m venv .venv
 source .venv/bin/activate  # Linux/macOS
-# ou: .venv\Scripts\activate  # Windows
+# or: .venv\Scripts\activate  # Windows
 
-# Instalar com dependências de desenvolvimento
+# Install with development dependencies
 pip install -e ".[dev]"
 ```
 
-### Opção 3: Com dependências opcionais
+### Option 3: With optional dependencies
 
 ```bash
-# Com suporte a SQL (SQLAlchemy)
+# With SQL support (SQLAlchemy)
 pip install "forge_base[sql] @ git+https://github.com/symlabs-ai/forge_base.git"
 
-# Com todas as dependências
+# With all dependencies
 pip install "forge_base[all] @ git+https://github.com/symlabs-ai/forge_base.git"
 ```
 
 ---
 
-## Seu Primeiro UseCase
+## Your First UseCase
 
-Vamos criar uma aplicação simples de gerenciamento de tarefas usando ForgeBase.
+Let's create a simple task management application using ForgeBase.
 
-### Estrutura do Projeto
+### Project Structure
 
 ```bash
-mkdir minha-app-forge
-cd minha-app-forge
+mkdir my-forge-app
+cd my-forge-app
 
-# Criar estrutura de diretórios
+# Create directory structure
 mkdir -p src/domain
 mkdir -p src/application
 mkdir -p src/infrastructure
@@ -77,11 +77,11 @@ touch src/application/__init__.py
 touch src/infrastructure/__init__.py
 ```
 
-### 1. Camada de Domínio: Entidade Task
+### 1. Domain Layer: Task Entity
 
 ```python
 # src/domain/task.py
-"""Entidade de domínio: Task."""
+"""Domain entity: Task."""
 
 from datetime import datetime
 from forge_base.domain import EntityBase, ValidationError
@@ -89,10 +89,10 @@ from forge_base.domain import EntityBase, ValidationError
 
 class Task(EntityBase):
     """
-    Entidade Task.
+    Task Entity.
 
-    Uma tarefa tem título, descrição opcional e status de conclusão.
-    Tarefas são criadas como incompletas por padrão.
+    A task has a title, optional description, and completion status.
+    Tasks are created as incomplete by default.
     """
 
     def __init__(
@@ -111,19 +111,19 @@ class Task(EntityBase):
         self.validate()
 
     def validate(self) -> None:
-        """Validar invariantes da tarefa."""
+        """Validate task invariants."""
         if not self.title or not self.title.strip():
-            raise ValidationError("Título da tarefa não pode ser vazio")
+            raise ValidationError("Task title cannot be empty")
 
         if len(self.title) > 200:
-            raise ValidationError("Título muito longo (máximo 200 caracteres)")
+            raise ValidationError("Title too long (maximum 200 characters)")
 
     def complete(self) -> None:
-        """Marcar tarefa como concluída."""
+        """Mark task as completed."""
         self.completed = True
 
     def uncomplete(self) -> None:
-        """Marcar tarefa como incompleta."""
+        """Mark task as incomplete."""
         self.completed = False
 
     def __str__(self) -> str:
@@ -131,17 +131,17 @@ class Task(EntityBase):
         return f"{status} {self.title}"
 ```
 
-### 2. Camada de Aplicação: DTOs e Port
+### 2. Application Layer: DTOs and Port
 
 ```python
 # src/application/task_dtos.py
-"""DTOs para gerenciamento de Task."""
+"""DTOs for Task management."""
 
 from forge_base.application import DTOBase
 
 
 class CreateTaskInput(DTOBase):
-    """Input para criar uma tarefa."""
+    """Input for creating a task."""
 
     def __init__(self, title: str, description: str = ""):
         self.title = title
@@ -149,7 +149,7 @@ class CreateTaskInput(DTOBase):
 
     def validate(self) -> None:
         if not self.title:
-            raise ValueError("Título é obrigatório")
+            raise ValueError("Title is required")
 
     def to_dict(self) -> dict:
         return {
@@ -166,7 +166,7 @@ class CreateTaskInput(DTOBase):
 
 
 class CreateTaskOutput(DTOBase):
-    """Output da criação de tarefa."""
+    """Output from task creation."""
 
     def __init__(self, task_id: str, title: str, created_at: str):
         self.task_id = task_id
@@ -194,7 +194,7 @@ class CreateTaskOutput(DTOBase):
 
 ```python
 # src/application/task_repository_port.py
-"""Port de repositório para entidade Task."""
+"""Repository port for the Task entity."""
 
 from abc import ABC, abstractmethod
 from src.domain.task import Task
@@ -202,43 +202,43 @@ from src.domain.task import Task
 
 class TaskRepositoryPort(ABC):
     """
-    Port para persistência de Task.
+    Port for Task persistence.
 
-    Define o contrato para armazenar e recuperar tarefas,
-    sem especificar detalhes de implementação.
+    Defines the contract for storing and retrieving tasks,
+    without specifying implementation details.
     """
 
     @abstractmethod
     def save(self, task: Task) -> None:
-        """Salvar uma tarefa."""
+        """Save a task."""
         pass
 
     @abstractmethod
     def find_by_id(self, task_id: str) -> Task | None:
-        """Buscar tarefa por ID."""
+        """Find a task by ID."""
         pass
 
     @abstractmethod
     def find_all(self) -> list[Task]:
-        """Buscar todas as tarefas."""
+        """Find all tasks."""
         pass
 
     @abstractmethod
     def delete(self, task_id: str) -> None:
-        """Remover uma tarefa."""
+        """Remove a task."""
         pass
 
     @abstractmethod
     def exists(self, task_id: str) -> bool:
-        """Verificar se tarefa existe."""
+        """Check if a task exists."""
         pass
 ```
 
-### 3. Camada de Aplicação: UseCase
+### 3. Application Layer: UseCase
 
 ```python
 # src/application/create_task_usecase.py
-"""UseCase para criar uma nova tarefa."""
+"""UseCase for creating a new task."""
 
 from forge_base.application import UseCaseBase
 from src.domain.task import Task
@@ -248,18 +248,18 @@ from src.application.task_repository_port import TaskRepositoryPort
 
 class CreateTaskUseCase(UseCaseBase):
     """
-    Criar uma nova tarefa.
+    Create a new task.
 
-    Orquestra a criação de uma entidade tarefa e sua persistência.
+    Orchestrates the creation of a task entity and its persistence.
 
-    Exemplo::
+    Example::
 
         usecase = CreateTaskUseCase(task_repository=repository)
         output = usecase.execute(CreateTaskInput(
-            title="Aprender ForgeBase",
-            description="Seguir o guia de início rápido"
+            title="Learn ForgeBase",
+            description="Follow the quick start guide"
         ))
-        print(f"Tarefa criada: {output.task_id}")
+        print(f"Task created: {output.task_id}")
     """
 
     def __init__(self, task_repository: TaskRepositoryPort):
@@ -267,27 +267,27 @@ class CreateTaskUseCase(UseCaseBase):
 
     def execute(self, input_dto: CreateTaskInput) -> CreateTaskOutput:
         """
-        Executar criação de tarefa.
+        Execute task creation.
 
-        :param input_dto: Dados da tarefa
-        :return: Informações da tarefa criada
+        :param input_dto: Task data
+        :return: Created task information
         """
-        # Validar input
+        # Validate input
         input_dto.validate()
 
-        # Criar entidade de domínio
+        # Create domain entity
         task = Task(
             title=input_dto.title,
             description=input_dto.description
         )
 
-        # Validar regras de domínio
+        # Validate domain rules
         task.validate()
 
-        # Persistir
+        # Persist
         self.task_repository.save(task)
 
-        # Retornar output
+        # Return output
         return CreateTaskOutput(
             task_id=task.id,
             title=task.title,
@@ -295,11 +295,11 @@ class CreateTaskUseCase(UseCaseBase):
         )
 ```
 
-### 4. Camada de Infraestrutura: Repositório In-Memory
+### 4. Infrastructure Layer: In-Memory Repository
 
 ```python
 # src/infrastructure/in_memory_task_repository.py
-"""Implementação in-memory do TaskRepositoryPort."""
+"""In-memory implementation of TaskRepositoryPort."""
 
 from src.application.task_repository_port import TaskRepositoryPort
 from src.domain.task import Task
@@ -307,9 +307,9 @@ from src.domain.task import Task
 
 class InMemoryTaskRepository(TaskRepositoryPort):
     """
-    Repositório de tarefas in-memory.
+    In-memory task repository.
 
-    Armazena tarefas em um dicionário. Útil para testes e prototipagem.
+    Stores tasks in a dictionary. Useful for testing and prototyping.
     """
 
     def __init__(self):
@@ -333,15 +333,15 @@ class InMemoryTaskRepository(TaskRepositoryPort):
         return task_id in self._storage
 
     def count(self) -> int:
-        """Retornar número de tarefas."""
+        """Return the number of tasks."""
         return len(self._storage)
 ```
 
-### 5. Executando Seu UseCase
+### 5. Running Your UseCase
 
 ```python
 # main.py
-"""Ponto de entrada da aplicação."""
+"""Application entry point."""
 
 from src.application.create_task_usecase import CreateTaskUseCase
 from src.application.task_dtos import CreateTaskInput
@@ -349,51 +349,51 @@ from src.infrastructure.in_memory_task_repository import InMemoryTaskRepository
 
 
 def main():
-    # Configurar dependências
+    # Set up dependencies
     repository = InMemoryTaskRepository()
 
-    # Criar use case
+    # Create use case
     usecase = CreateTaskUseCase(task_repository=repository)
 
-    # Executar
+    # Execute
     output = usecase.execute(CreateTaskInput(
-        title="Aprender ForgeBase",
-        description="Completar o guia de início rápido"
+        title="Learn ForgeBase",
+        description="Complete the quick start guide"
     ))
 
-    # Exibir resultado
-    print(f"Tarefa criada!")
+    # Display result
+    print(f"Task created!")
     print(f"  ID: {output.task_id}")
-    print(f"  Título: {output.title}")
-    print(f"  Criada em: {output.created_at}")
+    print(f"  Title: {output.title}")
+    print(f"  Created at: {output.created_at}")
 
 
 if __name__ == "__main__":
     main()
 ```
 
-Execute:
+Run it:
 
 ```bash
 python main.py
 ```
 
-Output esperado:
+Expected output:
 
 ```
-Tarefa criada!
+Task created!
   ID: 550e8400-e29b-41d4-a716-446655440000
-  Título: Aprender ForgeBase
-  Criada em: 2025-11-03T10:30:00
+  Title: Learn ForgeBase
+  Created at: 2025-11-03T10:30:00
 ```
 
 ---
 
-## Testando Seu UseCase
+## Testing Your UseCase
 
 ```python
 # tests/test_create_task_usecase.py
-"""Testes para CreateTaskUseCase."""
+"""Tests for CreateTaskUseCase."""
 
 import unittest
 from src.application.create_task_usecase import CreateTaskUseCase
@@ -406,26 +406,26 @@ class TestCreateTaskUseCase(unittest.TestCase):
         self.repository = InMemoryTaskRepository()
         self.usecase = CreateTaskUseCase(task_repository=self.repository)
 
-    def test_cria_tarefa(self):
-        """Testar que tarefa é criada com sucesso."""
-        # Executar
+    def test_creates_task(self):
+        """Test that a task is created successfully."""
+        # Execute
         output = self.usecase.execute(CreateTaskInput(
-            title="Tarefa de teste",
-            description="Descrição de teste"
+            title="Test task",
+            description="Test description"
         ))
 
-        # Asserções
+        # Assertions
         self.assertIsNotNone(output.task_id)
-        self.assertEqual(output.title, "Tarefa de teste")
+        self.assertEqual(output.title, "Test task")
 
-        # Verificar persistência
+        # Verify persistence
         self.assertEqual(self.repository.count(), 1)
         task = self.repository.find_by_id(output.task_id)
         self.assertIsNotNone(task)
-        self.assertEqual(task.title, "Tarefa de teste")
+        self.assertEqual(task.title, "Test task")
 
-    def test_rejeita_titulo_vazio(self):
-        """Testar que título vazio é rejeitado."""
+    def test_rejects_empty_title(self):
+        """Test that an empty title is rejected."""
         with self.assertRaises(ValueError):
             self.usecase.execute(CreateTaskInput(title=""))
 
@@ -434,7 +434,7 @@ if __name__ == "__main__":
     unittest.main()
 ```
 
-Execute os testes:
+Run the tests:
 
 ```bash
 python -m pytest tests/
@@ -442,9 +442,9 @@ python -m pytest tests/
 
 ---
 
-## Usando as APIs Programáticas
+## Using the Programmatic APIs
 
-ForgeBase oferece APIs para automatização:
+ForgeBase offers APIs for automation:
 
 ```python
 from forge_base.dev.api import (
@@ -454,65 +454,65 @@ from forge_base.dev.api import (
     TestRunner
 )
 
-# 1. Verificar qualidade do código
+# 1. Check code quality
 checker = QualityChecker()
 results = checker.run_all()
 for tool, result in results.items():
-    status = "OK" if result.passed else "ERRO"
+    status = "OK" if result.passed else "ERROR"
     print(f"{tool}: {status}")
 
-# 2. Gerar boilerplate
+# 2. Generate boilerplate
 generator = ScaffoldGenerator()
 result = generator.create_usecase(
     name="DeleteTask",
     input_type="DeleteTaskInput",
     output_type="DeleteTaskOutput"
 )
-print(f"Código gerado em: {result.file_path}")
+print(f"Code generated at: {result.file_path}")
 
-# 3. Descobrir componentes
+# 3. Discover components
 discovery = ComponentDiscovery()
 components = discovery.scan_project()
-print(f"Encontrados: {len(components.entities)} entidades")
+print(f"Found: {len(components.entities)} entities")
 
-# 4. Executar testes
+# 4. Run tests
 runner = TestRunner()
 results = runner.run_all()
 ```
 
 ---
 
-## Próximos Passos
+## Next Steps
 
-1. **Adicionar mais UseCases**: UpdateTask, DeleteTask, ListTasks
-2. **Trocar repositório**: Use `JSONRepository` ou `SQLRepository`
-3. **Adicionar observabilidade**: Logging e métricas
-4. **Ler a documentação completa**: Veja [docs/](../README.md)
+1. **Add more UseCases**: UpdateTask, DeleteTask, ListTasks
+2. **Swap the repository**: Use `JSONRepository` or `SQLRepository`
+3. **Add observability**: Logging and metrics
+4. **Read the full documentation**: See [docs/](../README.md)
 
 ---
 
-## Problemas Comuns
+## Common Issues
 
 ### Import Error: "No module named 'forge_base'"
 
 ```bash
-# Instale ForgeBase
+# Install ForgeBase
 pip install git+https://github.com/symlabs-ai/forge_base.git
 
-# Ou adicione ao PYTHONPATH
+# Or add to PYTHONPATH
 export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
 ```
 
-### ValidationError: "Título da tarefa não pode ser vazio"
+### ValidationError: "Task title cannot be empty"
 
-Isso é esperado! Entidades de domínio validam suas invariantes. Sempre passe dados válidos:
+This is expected! Domain entities validate their invariants. Always pass valid data:
 
 ```python
-# Vai falhar
+# Will fail
 task = Task(title="")
 
-# Correto
-task = Task(title="Título válido")
+# Correct
+task = Task(title="Valid title")
 ```
 
 ### git: command not found
@@ -527,15 +527,15 @@ brew install git
 
 ---
 
-## Recursos Adicionais
+## Additional Resources
 
-- [Receitas](receitas.md) — Padrões e exemplos práticos
-- [Guia de Testes](guia-de-testes.md) — Como escrever testes cognitivos
-- [ForgeProcess](../referencia/forge-process.md) — Ciclo cognitivo completo
-- [Arquitetura](../referencia/arquitetura.md) — Estrutura do framework
+- [Recipes](recipes.md) -- Patterns and practical examples
+- [Testing Guide](testing-guide.md) -- How to write cognitive tests
+- [ForgeProcess](../reference/forge-process.md) -- Complete cognitive cycle
+- [Architecture](../reference/architecture.md) -- Framework structure
 
 ---
 
-**Feliz Forjamento!**
+**Happy Forging!**
 
-*"Cada linha de código carrega intenção, medição e capacidade de auto-explicação."*
+*"Every line of code carries intention, measurement, and the ability to self-explain."*

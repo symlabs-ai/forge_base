@@ -2,81 +2,81 @@
 
 ## Status
 
-**Aceita** (2025-11-03)
+**Accepted** (2025-11-03)
 
 ## Context
 
-Complementando a Clean Architecture ([ADR-001](001-clean-architecture-choice.md)), precisávamos de um padrão claro para definir **como** a aplicação se comunica com o mundo externo:
+Complementing Clean Architecture ([ADR-001](001-clean-architecture-choice.md)), we needed a clear pattern to define **how** the application communicates with the external world:
 
-- Bancos de dados (persistência)
-- APIs externas (HTTP, gRPC)
-- Interfaces de usuário (CLI, Web)
-- Sistemas de mensageria
-- LLMs e serviços de IA
+- Databases (persistence)
+- External APIs (HTTP, gRPC)
+- User interfaces (CLI, Web)
+- Messaging systems
+- LLMs and AI services
 
-O desafio era criar um padrão que:
-- Isolasse a lógica de aplicação de detalhes de implementação
-- Permitisse trocar implementações sem modificar o core
-- Facilitasse testes com mocks/fakes
-- Mantivesse o domínio "puro" e independente
-- Tornasse explícitos os pontos de integração
+The challenge was to create a pattern that:
+- Isolated application logic from implementation details
+- Allowed swapping implementations without modifying the core
+- Facilitated testing with mocks/fakes
+- Kept the domain "pure" and independent
+- Made integration points explicit
 
-### Forças em Jogo
+### Forces at Play
 
-**Necessidades:**
-- Múltiplos adapters para o mesmo port (ex: JSON, SQL, MongoDB para persistência)
-- Testes sem dependências reais (fakes, mocks)
-- Evolução independente de adapters
-- Clareza sobre boundaries de integração
+**Needs:**
+- Multiple adapters for the same port (e.g., JSON, SQL, MongoDB for persistence)
+- Tests without real dependencies (fakes, mocks)
+- Independent adapter evolution
+- Clarity about integration boundaries
 
-**Riscos:**
-- Proliferação de interfaces desnecessárias
-- Overhead de criar ports para tudo
-- Confusão entre driving e driven ports
+**Risks:**
+- Proliferation of unnecessary interfaces
+- Overhead of creating ports for everything
+- Confusion between driving and driven ports
 
 ## Decision
 
-**Adotamos Hexagonal Architecture (Ports & Adapters) como padrão de integração.**
+**We adopted Hexagonal Architecture (Ports & Adapters) as the integration pattern.**
 
-### Conceitos Fundamentais
+### Fundamental Concepts
 
-#### 1. Ports (Interfaces/Contratos)
+#### 1. Ports (Interfaces/Contracts)
 
-**Ports são contratos abstratos** definidos pela aplicação que especificam **o que** precisa ser feito, sem se preocupar com **como**.
+**Ports are abstract contracts** defined by the application that specify **what** needs to be done, without worrying about **how**.
 
-**Tipos de Ports:**
+**Types of Ports:**
 
-**Driving Ports (Primary)** — "Quem usa a aplicação"
-- Interfaces que disparam a aplicação (entrada)
-- Exemplos: UseCases, Command Handlers
-- Definidos pela application layer
-- Implementados por adapters externos
+**Driving Ports (Primary)** — "Who uses the application"
+- Interfaces that trigger the application (input)
+- Examples: UseCases, Command Handlers
+- Defined by the application layer
+- Implemented by external adapters
 
-**Driven Ports (Secondary)** — "O que a aplicação usa"
-- Interfaces que a aplicação chama (saída)
-- Exemplos: RepositoryPort, LoggerPort, NotificationPort
-- Definidos pela application layer
-- Implementados pela infrastructure layer
+**Driven Ports (Secondary)** — "What the application uses"
+- Interfaces that the application calls (output)
+- Examples: RepositoryPort, LoggerPort, NotificationPort
+- Defined by the application layer
+- Implemented by the infrastructure layer
 
-#### 2. Adapters (Implementações Concretas)
+#### 2. Adapters (Concrete Implementations)
 
-**Adapters são implementações específicas** dos ports, traduzindo entre o domínio e tecnologias externas.
+**Adapters are specific implementations** of ports, translating between the domain and external technologies.
 
 **Driving Adapters (Primary):**
 ```python
-# CLIAdapter: Interpreta comandos CLI → chama UseCases
-# HTTPAdapter: Recebe requests HTTP → chama UseCases
-# AIAdapter: Processa instruções LLM → chama UseCases
+# CLIAdapter: Interprets CLI commands → calls UseCases
+# HTTPAdapter: Receives HTTP requests → calls UseCases
+# AIAdapter: Processes LLM instructions → calls UseCases
 ```
 
 **Driven Adapters (Secondary):**
 ```python
-# JSONRepository: Implementa RepositoryPort → salva em JSON
-# SQLRepository: Implementa RepositoryPort → salva em SQL
-# StdoutLogger: Implementa LoggerPort → loga no stdout
+# JSONRepository: Implements RepositoryPort → saves to JSON
+# SQLRepository: Implements RepositoryPort → saves to SQL
+# StdoutLogger: Implements LoggerPort → logs to stdout
 ```
 
-### Arquitetura Hexagonal do ForgeBase
+### ForgeBase Hexagonal Architecture
 
 ```
                     ┌─────────────────┐
@@ -108,7 +108,7 @@ O desafio era criar um padrão que:
    Adapter     Adapter     Adapter
 ```
 
-### Implementação no ForgeBase
+### Implementation in ForgeBase
 
 #### Driving Ports (Primary)
 
@@ -116,24 +116,24 @@ O desafio era criar um padrão que:
 # src/forge_base/application/usecase_base.py
 class UseCaseBase(ABC):
     """
-    Driving Port — entrada para a aplicação.
-    Adapters chamam execute() para disparar lógica.
+    Driving Port — entry point to the application.
+    Adapters call execute() to trigger logic.
     """
     @abstractmethod
     def execute(self, *args, **kwargs) -> Any:
         pass
 ```
 
-**Adapters que implementam:**
-- `CLIAdapter` — traduz comandos CLI → `execute()`
-- `HTTPAdapter` — traduz HTTP requests → `execute()`
+**Adapters that implement it:**
+- `CLIAdapter` — translates CLI commands → `execute()`
+- `HTTPAdapter` — translates HTTP requests → `execute()`
 
 #### Driven Ports (Secondary)
 
 ```python
 # src/forge_base/application/port_base.py
 class PortBase(ABC):
-    """Base para todos os driven ports."""
+    """Base for all driven ports."""
     @abstractmethod
     def info(self) -> dict:
         pass
@@ -141,8 +141,8 @@ class PortBase(ABC):
 # src/forge_base/infrastructure/repository/repository_base.py
 class RepositoryBase(PortBase, Generic[T]):
     """
-    Driven Port — persistência.
-    UseCases dependem desta interface, não de implementações.
+    Driven Port — persistence.
+    UseCases depend on this interface, not on implementations.
     """
     @abstractmethod
     def save(self, entity: T) -> None:
@@ -156,55 +156,55 @@ class RepositoryBase(PortBase, Generic[T]):
 class LoggerPort(PortBase):
     """
     Driven Port — logging.
-    UseCases logam através desta interface.
+    UseCases log through this interface.
     """
     @abstractmethod
     def info(self, message: str, **context) -> None:
         pass
 ```
 
-**Adapters que implementam:**
-- `JSONRepository(RepositoryBase)` — salva em JSON
-- `SQLRepository(RepositoryBase)` — salva em SQL
-- `StdoutLogger(LoggerPort)` — loga no stdout
-- `FileLogger(LoggerPort)` — loga em arquivo
+**Adapters that implement them:**
+- `JSONRepository(RepositoryBase)` — saves to JSON
+- `SQLRepository(RepositoryBase)` — saves to SQL
+- `StdoutLogger(LoggerPort)` — logs to stdout
+- `FileLogger(LoggerPort)` — logs to file
 
-### Regras de Implementação
+### Implementation Rules
 
-1. **Ports são definidos pela Application**, não por Adapters
-2. **Adapters nunca são importados diretamente por UseCases**
-3. **Dependency Injection injeta adapters concretos** ([ADR-005](005-dependency-injection.md))
-4. **Um UseCase depende de Ports, nunca de Adapters**
-5. **Múltiplos Adapters podem implementar o mesmo Port**
+1. **Ports are defined by the Application**, not by Adapters
+2. **Adapters are never imported directly by UseCases**
+3. **Dependency Injection injects concrete adapters** ([ADR-005](005-dependency-injection.md))
+4. **A UseCase depends on Ports, never on Adapters**
+5. **Multiple Adapters can implement the same Port**
 
-### Exemplo Completo
+### Complete Example
 
 ```python
-# Application Layer — Define o Port
+# Application Layer — Defines the Port
 class UserRepositoryPort(ABC):
     @abstractmethod
     def save(self, user: User) -> None:
         pass
 
-# Use Case — Depende do Port
+# Use Case — Depends on the Port
 class CreateUserUseCase(UseCaseBase):
     def __init__(self, user_repository: UserRepositoryPort):
-        self.user_repository = user_repository  # Port, não adapter
+        self.user_repository = user_repository  # Port, not adapter
 
     def execute(self, input_dto: CreateUserInput) -> CreateUserOutput:
         user = User(name=input_dto.name, email=input_dto.email)
-        self.user_repository.save(user)  # Chama o port
+        self.user_repository.save(user)  # Calls the port
         return CreateUserOutput(user_id=user.id)
 
-# Infrastructure — Implementa o Port
+# Infrastructure — Implements the Port
 class JSONUserRepository(UserRepositoryPort):
     def save(self, user: User) -> None:
-        # Implementação específica JSON
+        # JSON-specific implementation
         pass
 
 class SQLUserRepository(UserRepositoryPort):
     def save(self, user: User) -> None:
-        # Implementação específica SQL
+        # SQL-specific implementation
         pass
 
 # Adapter — Driving (CLI)
@@ -212,18 +212,18 @@ class CLIAdapter:
     def run_command(self, command: str):
         # Parse command
         usecase = CreateUserUseCase(
-            user_repository=injected_repository  # DI injeta adapter
+            user_repository=injected_repository  # DI injects adapter
         )
         usecase.execute(input_dto)
 ```
 
 ## Consequences
 
-### Positivas
+### Positive
 
-✅ **Testabilidade Máxima**
+✅ **Maximum Testability**
 ```python
-# Testes usam FakeRepository, não SQL real
+# Tests use FakeRepository, not real SQL
 def test_create_user():
     fake_repo = FakeRepository()
     usecase = CreateUserUseCase(user_repository=fake_repo)
@@ -231,132 +231,132 @@ def test_create_user():
     assert fake_repo.count() == 1
 ```
 
-✅ **Troca de Implementação Sem Mudança no Core**
+✅ **Implementation Swap Without Core Changes**
 ```python
-# Trocar de JSON para SQL — zero mudanças no UseCase
+# Switch from JSON to SQL — zero changes in the UseCase
 # config.yaml
-repository: sql  # antes era "json"
+repository: sql  # was "json" before
 ```
 
-✅ **Múltiplas Implementações do Mesmo Port**
+✅ **Multiple Implementations of the Same Port**
 ```python
-# Mesmo port, múltiplos adapters
+# Same port, multiple adapters
 - JSONRepository(RepositoryPort)
 - SQLRepository(RepositoryPort)
 - MongoRepository(RepositoryPort)
 - InMemoryRepository(RepositoryPort)
 ```
 
-✅ **Clareza sobre Boundaries**
-- Fácil ver "o que entra" (driving ports)
-- Fácil ver "o que sai" (driven ports)
-- Boundaries explícitos no código
+✅ **Clarity About Boundaries**
+- Easy to see "what comes in" (driving ports)
+- Easy to see "what goes out" (driven ports)
+- Explicit boundaries in code
 
-✅ **Evolução Independente**
-- Adapter pode evoluir sem afetar aplicação
-- Novo adapter não requer mudança no core
-- Deprecar adapter sem breaking changes
+✅ **Independent Evolution**
+- Adapter can evolve without affecting the application
+- New adapter does not require core changes
+- Deprecate adapter without breaking changes
 
-### Negativas
+### Negative
 
-⚠️ **Overhead de Abstrações**
-- Um port para cada dependência externa
-- Código de "plumbing" (DI, wiring)
-- Mais arquivos para navegar
+⚠️ **Abstraction Overhead**
+- One port for each external dependency
+- "Plumbing" code (DI, wiring)
+- More files to navigate
 
-⚠️ **Confusão Inicial**
-- Diferença entre port e adapter não é óbvia
-- Tentação de "pular" o port e usar adapter diretamente
-- Curva de aprendizado
+⚠️ **Initial Confusion**
+- Difference between port and adapter is not obvious
+- Temptation to "skip" the port and use the adapter directly
+- Learning curve
 
-⚠️ **Over-Engineering em Casos Simples**
-- Para dependências estáveis (ex: Python stdlib), port pode ser overhead
-- Nem tudo precisa de abstração
+⚠️ **Over-Engineering in Simple Cases**
+- For stable dependencies (e.g., Python stdlib), a port can be overhead
+- Not everything needs an abstraction
 
-### Mitigações
+### Mitigations
 
-1. **Convenção de Nomes Clara**
-   - Ports: `*Port` (ex: `RepositoryPort`, `LoggerPort`)
-   - Adapters: `*Adapter` (ex: `CLIAdapter`, `HTTPAdapter`)
-   - Implementações: `*Repository`, `*Logger` (ex: `JSONRepository`)
+1. **Clear Naming Convention**
+   - Ports: `*Port` (e.g., `RepositoryPort`, `LoggerPort`)
+   - Adapters: `*Adapter` (e.g., `CLIAdapter`, `HTTPAdapter`)
+   - Implementations: `*Repository`, `*Logger` (e.g., `JSONRepository`)
 
-2. **Documentação com Exemplos**
-   - Complete flow example mostrando port + adapter
-   - Cookbook com receitas comuns
-   - ADRs explicando "porquê"
+2. **Documentation with Examples**
+   - Complete flow example showing port + adapter
+   - Cookbook with common recipes
+   - ADRs explaining "why"
 
 3. **Tooling**
-   - Scaffold automático de port + adapter
-   - Linting para validar boundaries
+   - Automatic scaffold of port + adapter
+   - Linting to validate boundaries
    - Code generators
 
-4. **Regra de Pragmatismo**
-   - "Se a dependência é estável e controlada por nós, port pode ser opcional"
-   - "Se a dependência é externa ou pode mudar, port é obrigatório"
+4. **Pragmatism Rule**
+   - "If the dependency is stable and controlled by us, a port can be optional"
+   - "If the dependency is external or can change, a port is mandatory"
 
 ## Alternatives Considered
 
-### 1. Acoplamento Direto (sem Ports)
+### 1. Direct Coupling (without Ports)
 
 ```python
-# UseCase importa adapter diretamente
+# UseCase imports adapter directly
 from infrastructure.json_repository import JSONRepository
 
 class CreateUserUseCase:
     def __init__(self):
-        self.repo = JSONRepository()  # Acoplamento direto
+        self.repo = JSONRepository()  # Direct coupling
 ```
 
-**Rejeitado porque:**
-- Impossível trocar implementação sem modificar UseCase
-- Testes requerem JSON real (lento, frágil)
-- Violação de Clean Architecture
-- Domínio acoplado a infraestrutura
+**Rejected because:**
+- Impossible to swap implementation without modifying UseCase
+- Tests require real JSON (slow, fragile)
+- Violation of Clean Architecture
+- Domain coupled to infrastructure
 
 ### 2. Service Locator Pattern
 
 ```python
-# UseCase pede dependência a um locator global
+# UseCase requests dependency from a global locator
 class CreateUserUseCase:
     def execute(self, input_dto):
         repo = ServiceLocator.get('repository')  # Global
 ```
 
-**Rejeitado porque:**
-- Dependências ocultas (não explícitas na assinatura)
-- Dificulta testes (estado global)
-- Acoplamento implícito
-- Dificulta rastreamento de dependências
+**Rejected because:**
+- Hidden dependencies (not explicit in signature)
+- Complicates tests (global state)
+- Implicit coupling
+- Complicates dependency tracing
 
 ### 3. Concrete Dependencies Everywhere
 
 ```python
-# Cada UseCase cria suas próprias dependências
+# Each UseCase creates its own dependencies
 class CreateUserUseCase:
     def execute(self, input_dto):
         repo = JSONRepository(path="/data/users.json")  # Hardcoded
 ```
 
-**Rejeitado porque:**
-- Zero flexibilidade
-- Testes impossíveis sem sistema de arquivos real
-- Configuração hardcoded
-- Violação de Single Responsibility
+**Rejected because:**
+- Zero flexibility
+- Tests impossible without real filesystem
+- Hardcoded configuration
+- Violation of Single Responsibility
 
-### 4. Ports apenas para "coisas grandes"
+### 4. Ports Only for "Big Things"
 
-**Rejeitado porque:**
-- Inconsistência arquitetural
-- Linha tênue entre "grande" e "pequeno"
-- Tende a degradar com o tempo
-- Melhor ter regra clara: "toda dependência externa = port"
+**Rejected because:**
+- Architectural inconsistency
+- Thin line between "big" and "small"
+- Tends to degrade over time
+- Better to have a clear rule: "every external dependency = port"
 
 ## References
 
 - **Hexagonal Architecture** (Ports & Adapters) by Alistair Cockburn
-- **Clean Architecture** by Robert C. Martin (Capítulo sobre boundaries)
+- **Clean Architecture** by Robert C. Martin (chapter on boundaries)
 - **Growing Object-Oriented Software, Guided by Tests** by Freeman & Pryce
-- ForgeBase complete_flow.py — Exemplo prático de ports & adapters
+- ForgeBase complete_flow.py — Practical example of ports & adapters
 
 ## Related ADRs
 

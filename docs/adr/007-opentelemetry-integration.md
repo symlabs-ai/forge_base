@@ -2,125 +2,125 @@
 
 ## Status
 
-**Aceita** (2025-11-05)
+**Accepted** (2025-11-05)
 
 ## Context
 
-ForgeBase foi projetado com observabilidade nativa desde o início (ver [ADR-003](003-observability-first.md)). Atualmente, o framework possui:
+ForgeBase was designed with native observability from the start (see [ADR-003](003-observability-first.md)). Currently, the framework has:
 
-1. **Implementações próprias**:
-   - `InMemoryTracer` — tracing para dev/testes
-   - `NoOpTracer` — zero overhead em produção
-   - `StdoutLogger` — logging estruturado JSON
-   - `TrackMetrics` — coleta de métricas in-memory
+1. **Custom implementations**:
+   - `InMemoryTracer` — tracing for dev/tests
+   - `NoOpTracer` — zero overhead in production
+   - `StdoutLogger` — structured JSON logging
+   - `TrackMetrics` — in-memory metrics collection
 
-2. **Abstrações OpenTelemetry-compatible**:
-   - `TracerPort` — interface compatível com OTel
-   - `LoggerPort` — suporte a structured logging
+2. **OpenTelemetry-compatible abstractions**:
+   - `TracerPort` — OTel-compatible interface
+   - `LoggerPort` — structured logging support
    - W3C Trace Context format support
 
-3. **Zero dependências obrigatórias** (apenas `pyyaml`)
+3. **Zero mandatory dependencies** (only `pyyaml`)
 
-### Necessidades Emergentes
+### Emerging Needs
 
-À medida que ForgeBase é usado em ambientes de produção mais complexos, surgem necessidades:
+As ForgeBase is used in more complex production environments, new needs arise:
 
-**1. Integração com Infraestrutura Existente**
-- Empresas já usam Jaeger, Zipkin, Prometheus, Grafana
-- APMs comerciais (DataDog, New Relic, Dynatrace)
-- SIEM systems que esperam formato OTel/OTLP
+**1. Integration with Existing Infrastructure**
+- Companies already use Jaeger, Zipkin, Prometheus, Grafana
+- Commercial APMs (DataDog, New Relic, Dynatrace)
+- SIEM systems that expect OTel/OTLP format
 
-**2. Auto-Instrumentação**
-- Rastrear automaticamente: requests HTTP, queries SQL, chamadas Redis, mensagens Kafka
-- Sem necessidade de instrumentar manualmente cada biblioteca
+**2. Auto-Instrumentation**
+- Automatically trace: HTTP requests, SQL queries, Redis calls, Kafka messages
+- Without the need to manually instrument each library
 
-**3. Correlação Automática**
-- Correlação automática entre logs, métricas e traces
-- Propagação de trace context entre microserviços
-- Baggage propagation para contexto cross-service
+**3. Automatic Correlation**
+- Automatic correlation between logs, metrics, and traces
+- Trace context propagation between microservices
+- Baggage propagation for cross-service context
 
-**4. Exporters Battle-Tested**
-- Exporters mantidos pela comunidade para 20+ backends
-- Protocolos otimizados (OTLP, gRPC, HTTP/protobuf)
-- Retry logic, buffering, batching já implementados
+**4. Battle-Tested Exporters**
+- Community-maintained exporters for 20+ backends
+- Optimized protocols (OTLP, gRPC, HTTP/protobuf)
+- Retry logic, buffering, batching already implemented
 
 **5. Semantic Conventions**
-- Naming consistente seguindo padrões da indústria
-- Atributos padronizados (`http.method`, `db.system`, etc.)
-- Compatibilidade com ferramentas de análise
+- Consistent naming following industry standards
+- Standardized attributes (`http.method`, `db.system`, etc.)
+- Compatibility with analysis tools
 
-### Forças em Jogo
+### Forces at Play
 
-**Necessidades:**
-- ✅ Integração com infraestrutura observability existente
-- ✅ Auto-instrumentação de bibliotecas populares
-- ✅ Exporters para 20+ backends (Jaeger, Prometheus, etc.)
-- ✅ Correlação automática logs+metrics+traces
-- ✅ Standards da indústria (W3C, OTel semantic conventions)
-- ✅ Ecossistema rico e battle-tested
+**Needs:**
+- ✅ Integration with existing observability infrastructure
+- ✅ Auto-instrumentation of popular libraries
+- ✅ Exporters for 20+ backends (Jaeger, Prometheus, etc.)
+- ✅ Automatic logs+metrics+traces correlation
+- ✅ Industry standards (W3C, OTel semantic conventions)
+- ✅ Rich and battle-tested ecosystem
 
-**Riscos:**
-- ⚠️ Dependências pesadas (~10+ packages)
-- ⚠️ Complexidade de configuração
-- ⚠️ Overhead de performance (pequeno mas mensurável)
-- ⚠️ Curva de aprendizado
-- ⚠️ Vendor lock-in potencial se mal implementado
-- ⚠️ Perder simplicidade do "lightweight by default"
+**Risks:**
+- ⚠️ Heavy dependencies (~10+ packages)
+- ⚠️ Configuration complexity
+- ⚠️ Performance overhead (small but measurable)
+- ⚠️ Learning curve
+- ⚠️ Potential vendor lock-in if poorly implemented
+- ⚠️ Losing the "lightweight by default" simplicity
 
-**Restrições:**
-- 🔒 **Não** pode quebrar filosofia "zero deps obrigatórias"
-- 🔒 **Não** pode tornar OTel obrigatório
-- 🔒 Sistema cognitivo único (FeedbackManager, IntentTracker) deve ser preservado
-- 🔒 Implementações lightweight devem continuar como padrão
+**Constraints:**
+- **Must not** break the "zero mandatory deps" philosophy
+- **Must not** make OTel mandatory
+- Unique cognitive system (FeedbackManager, IntentTracker) must be preserved
+- Lightweight implementations must remain the default
 
 ## Decision
 
-**Adotamos OpenTelemetry como opção de integração OPCIONAL, não obrigatória.**
+**We adopted OpenTelemetry as an OPTIONAL integration option, not mandatory.**
 
-### Princípios da Integração
+### Integration Principles
 
 1. **Opt-In, Not Mandatory**
-   - OTel é instalado via `pip install forge_base[otel]`
-   - Usuário sem OTel: funciona perfeitamente com implementações builtin
-   - Usuário com OTel: ativa via configuração
+   - OTel is installed via `pip install forge_base[otel]`
+   - User without OTel: works perfectly with builtin implementations
+   - User with OTel: activates via configuration
 
 2. **Adapter Pattern**
-   - OTel implementa interfaces existentes (`TracerPort`, `LoggerPort`)
-   - Não quebra abstrações atuais
-   - Intercambiável via configuração
+   - OTel implements existing interfaces (`TracerPort`, `LoggerPort`)
+   - Does not break current abstractions
+   - Interchangeable via configuration
 
 3. **Lightweight by Default**
-   - Instalação padrão: zero deps OTel
-   - Dev/testes: InMemoryTracer, FakeLogger
-   - Produção simples: StdoutLogger, NoOpTracer
-   - Produção complexa: OtelTracer, OtelLogger
+   - Standard installation: zero OTel deps
+   - Dev/tests: InMemoryTracer, FakeLogger
+   - Simple production: StdoutLogger, NoOpTracer
+   - Complex production: OtelTracer, OtelLogger
 
 4. **Preserve Cognitive System**
-   - `FeedbackManager` e `IntentTracker` continuam únicos
-   - Podem INTEGRAR com OTel (criar spans) mas não são substituídos
-   - Sistema cognitivo é diferencial competitivo
+   - `FeedbackManager` and `IntentTracker` remain unique
+   - They can INTEGRATE with OTel (create spans) but are not replaced
+   - The cognitive system is a competitive differentiator
 
-### Arquitetura da Integração
+### Integration Architecture
 
 ```
 src/forge_base/observability/
-├── tracer_port.py           # Interface abstrata (já existe)
-├── logger_port.py           # Interface abstrata (já existe)
-├── track_metrics.py         # Implementação builtin (já existe)
+├── tracer_port.py           # Abstract interface (already exists)
+├── logger_port.py           # Abstract interface (already exists)
+├── track_metrics.py         # Builtin implementation (already exists)
 │
-└── otel/                    # Novo módulo (opcional)
+└── otel/                    # New module (optional)
     ├── __init__.py
-    ├── otel_tracer.py       # Implementa TracerPort via OTel
-    ├── otel_logger.py       # Implementa LoggerPort via OTel
-    ├── otel_metrics.py      # Implementa TrackMetrics via OTel
-    ├── auto_instrument.py   # Auto-instrumentação de libs
-    └── providers.py         # Setup de TracerProvider, etc.
+    ├── otel_tracer.py       # Implements TracerPort via OTel
+    ├── otel_logger.py       # Implements LoggerPort via OTel
+    ├── otel_metrics.py      # Implements TrackMetrics via OTel
+    ├── auto_instrument.py   # Auto-instrumentation for libs
+    └── providers.py         # TracerProvider setup, etc.
 ```
 
-### Configuração Declarativa
+### Declarative Configuration
 
 ```yaml
-# config-lightweight.yaml (padrão)
+# config-lightweight.yaml (default)
 observability:
   level: standard
 
@@ -135,7 +135,7 @@ observability:
 
 ---
 
-# config-otel.yaml (opcional)
+# config-otel.yaml (optional)
 observability:
   level: standard
 
@@ -160,7 +160,7 @@ observability:
       endpoint: http://localhost:9090
       interval: 60  # seconds
 
-  # Auto-instrumentação (opcional)
+  # Auto-instrumentation (optional)
   auto_instrument:
     - requests      # HTTP client
     - sqlalchemy    # Database
@@ -168,9 +168,9 @@ observability:
     - flask         # Web framework
 ```
 
-### Implementação de Adapters
+### Adapter Implementation
 
-#### OtelTracer (implementa TracerPort)
+#### OtelTracer (implements TracerPort)
 
 ```python
 # src/forge_base/observability/otel/otel_tracer.py
@@ -314,16 +314,16 @@ def auto_instrument(config: dict) -> None:
     # ... more instrumentations
 ```
 
-### Integração com Sistema Cognitivo
+### Integration with the Cognitive System
 
-FeedbackManager e IntentTracker **integram** com OTel mas não são substituídos:
+FeedbackManager and IntentTracker **integrate** with OTel but are not replaced:
 
 ```python
 # src/forge_base/observability/feedback_manager.py
 
 class FeedbackManager:
     def __init__(self, tracer: TracerPort):
-        self._tracer = tracer  # Pode ser OtelTracer ou InMemoryTracer
+        self._tracer = tracer  # Can be OtelTracer or InMemoryTracer
 
     def capture_intent(self, description: str, **context):
         """Capture intent and create trace span."""
@@ -333,7 +333,7 @@ class FeedbackManager:
             span.set_attribute("intent.description", description)
             span.set_attribute("intent.source", "forgeprocess")
 
-            # Lógica cognitiva única do ForgeBase
+            # Unique ForgeBase cognitive logic
             intent_record = self._create_intent_record(description, context)
 
             # If using OTel, this span will be exported to Jaeger/etc
@@ -342,22 +342,22 @@ class FeedbackManager:
             return intent_record
 ```
 
-**Diferencial:** Sistema cognitivo cria spans especiais com semântica única:
+**Differentiator:** The cognitive system creates special spans with unique semantics:
 - `cognitive.capture_intent`
 - `cognitive.validate_coherence`
 - `cognitive.feedback_loop`
 
-Estes não existem no OTel padrão — são inovação do ForgeBase.
+These do not exist in standard OTel — they are ForgeBase innovations.
 
-### Instalação e Setup
+### Installation and Setup
 
-#### Instalação Padrão (Lightweight)
+#### Standard Installation (Lightweight)
 ```bash
 # Zero OTel dependencies
 pip install forge_base
 ```
 
-#### Instalação com OTel
+#### Installation with OTel
 ```bash
 # OTel SDK only
 pip install forge_base[otel]
@@ -406,30 +406,30 @@ all = [
 
 ## Consequences
 
-### Positivas
+### Positive
 
-✅ **Integração Enterprise-Ready**
-- Conecta com infraestrutura observability existente
-- Suporta Jaeger, Zipkin, Prometheus, Grafana, APMs comerciais
-- OTLP protocol para interoperabilidade
+✅ **Enterprise-Ready Integration**
+- Connects with existing observability infrastructure
+- Supports Jaeger, Zipkin, Prometheus, Grafana, commercial APMs
+- OTLP protocol for interoperability
 
-✅ **Auto-Instrumentação Zero-Code**
+✅ **Zero-Code Auto-Instrumentation**
 ```python
-# Antes: instrumentar manualmente
+# Before: manual instrumentation
 span = tracer.start_span("http_request")
 response = requests.get(url)
 span.end()
 
-# Depois (com OTel auto-instrument): automático!
-response = requests.get(url)  # Span criado automaticamente
+# After (with OTel auto-instrument): automatic!
+response = requests.get(url)  # Span created automatically
 ```
 
-✅ **Correlação Automática**
+✅ **Automatic Correlation**
 ```json
 {
   "timestamp": "2025-11-05T10:30:00Z",
   "message": "User created",
-  "trace_id": "abc123",        // ← Correlação automática
+  "trace_id": "abc123",        // ← Automatic correlation
   "span_id": "def456",
   "service.name": "forge_base-api",
   "usecase.name": "CreateUser"
@@ -437,39 +437,39 @@ response = requests.get(url)  # Span criado automaticamente
 ```
 
 ✅ **Semantic Conventions**
-- Naming consistente seguindo padrões OTel
-- Atributos padronizados reconhecidos por ferramentas
-- Melhor análise e queries
+- Consistent naming following OTel standards
+- Standardized attributes recognized by tools
+- Better analysis and queries
 
 ✅ **Battle-Tested Exporters**
-- Mantidos pela comunidade CNCF
-- Otimizados (batching, compression, retry)
-- Produção-ready
+- Maintained by the CNCF community
+- Optimized (batching, compression, retry)
+- Production-ready
 
-✅ **Ecosystem Rico**
-- Instrumentação para 100+ bibliotecas
-- Integração com APMs comerciais
-- Ferramentas de análise e visualização
+✅ **Rich Ecosystem**
+- Instrumentation for 100+ libraries
+- Integration with commercial APMs
+- Analysis and visualization tools
 
-✅ **Mantém Filosofia Original**
-- Zero deps obrigatórias ✅
+✅ **Maintains Original Philosophy**
+- Zero mandatory deps ✅
 - Lightweight by default ✅
-- Opt-in, não mandatory ✅
-- Sistema cognitivo preservado ✅
+- Opt-in, not mandatory ✅
+- Cognitive system preserved ✅
 
-### Negativas
+### Negative
 
-⚠️ **Dependências Pesadas (quando ativado)**
+⚠️ **Heavy Dependencies (when activated)**
 ```bash
 # OTel SDK + exporters + instrumentations
-~15-20 packages adicionais
-~50MB de dependências
+~15-20 additional packages
+~50MB of dependencies
 ```
-**Mitigation:** Opcional, não instalado por padrão
+**Mitigation:** Optional, not installed by default
 
-⚠️ **Complexidade de Setup**
+⚠️ **Setup Complexity**
 ```python
-# Setup OTel não é trivial
+# OTel setup is not trivial
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
@@ -480,150 +480,150 @@ processor = BatchSpanProcessor(JaegerExporter(...))
 provider.add_span_processor(processor)
 trace.set_tracer_provider(provider)
 ```
-**Mitigation:** ForgeBase abstrai setup via configuração YAML
+**Mitigation:** ForgeBase abstracts setup via YAML configuration
 
-⚠️ **Overhead de Performance**
-- ~1-5ms por span
-- Memória para buffering
-- CPU para serialização
+⚠️ **Performance Overhead**
+- ~1-5ms per span
+- Memory for buffering
+- CPU for serialization
 
 **Mitigation:**
-- Sampling configurável (ex: 10% de requests)
+- Configurable sampling (e.g., 10% of requests)
 - Batch processing
 - Async exporters
 
-⚠️ **Curva de Aprendizado**
-- Conceitos: Providers, Exporters, Processors, Context, Baggage
-- Configuração de exporters
-- Debugging de problemas OTel
+⚠️ **Learning Curve**
+- Concepts: Providers, Exporters, Processors, Context, Baggage
+- Exporter configuration
+- Debugging OTel issues
 
 **Mitigation:**
-- Documentação clara
-- Exemplos práticos
-- Defaults sensatos
+- Clear documentation
+- Practical examples
+- Sensible defaults
 
-⚠️ **Manutenção de Adapter**
-- Precisa acompanhar updates OTel API
-- Mapear conceitos ForgeBase ↔ OTel
-- Testes de compatibilidade
+⚠️ **Adapter Maintenance**
+- Need to keep up with OTel API updates
+- Map ForgeBase ↔ OTel concepts
+- Compatibility tests
 
 **Mitigation:**
-- Tests automatizados
-- CI/CD para verificar compatibilidade
-- Versionamento semântico
+- Automated tests
+- CI/CD for compatibility verification
+- Semantic versioning
 
-### Neutras
+### Neutral
 
-📊 **Escolha de Backend**
-- Usuário decide: Jaeger, Prometheus, DataDog, etc.
-- ForgeBase não opina sobre backend
-- Configuração por arquivo YAML
+**Backend Choice**
+- User decides: Jaeger, Prometheus, DataDog, etc.
+- ForgeBase does not have an opinion on backend
+- Configuration via YAML file
 
-📊 **Coexistência de Implementações**
-- Builtin e OTel coexistem
-- Escolha por ambiente (dev vs prod)
-- Transição gradual possível
+**Implementation Coexistence**
+- Builtin and OTel coexist
+- Choice per environment (dev vs prod)
+- Gradual transition possible
 
 ## Alternatives Considered
 
-### 1. OTel Obrigatório (Rejected ❌)
+### 1. Mandatory OTel (Rejected)
 
-**Abordagem:** Tornar OTel dependência obrigatória.
+**Approach:** Make OTel a mandatory dependency.
 
 ```toml
 dependencies = [
     "pyyaml>=6.0",
-    "opentelemetry-api>=1.20.0",  # ← Obrigatório
+    "opentelemetry-api>=1.20.0",  # ← Mandatory
     "opentelemetry-sdk>=1.20.0",
 ]
 ```
 
-**Rejeitado porque:**
-- ❌ Quebra filosofia "lightweight by default"
-- ❌ Força usuários simples a carregar 50MB+ deps
-- ❌ Contra princípio "zero deps obrigatórias"
-- ❌ Overkill para uso local/dev/testes
-- ❌ Vendor lock-in (mesmo que open source)
+**Rejected because:**
+- Breaks the "lightweight by default" philosophy
+- Forces simple users to load 50MB+ deps
+- Against the "zero mandatory deps" principle
+- Overkill for local/dev/test usage
+- Vendor lock-in (even if open source)
 
-### 2. Substituir Implementações Builtin (Rejected ❌)
+### 2. Replace Builtin Implementations (Rejected)
 
-**Abordagem:** Remover InMemoryTracer, StdoutLogger; usar apenas OTel.
+**Approach:** Remove InMemoryTracer, StdoutLogger; use only OTel.
 
-**Rejeitado porque:**
-- ❌ Perde simplicidade para casos básicos
-- ❌ Testes ficam mais lentos (setup OTel)
-- ❌ Dev experience degrada (precisa subir Jaeger local)
-- ❌ Contra princípio de autonomia
+**Rejected because:**
+- Loses simplicity for basic use cases
+- Tests become slower (OTel setup)
+- Dev experience degrades (need to run Jaeger locally)
+- Against the autonomy principle
 
-### 3. Fork OTel (Rejected ❌)
+### 3. Fork OTel (Rejected)
 
-**Abordagem:** Criar fork do OTel customizado para ForgeBase.
+**Approach:** Create a custom OTel fork for ForgeBase.
 
-**Rejeitado porque:**
-- ❌ Manutenção pesada
-- ❌ Perde updates da comunidade
-- ❌ Fragmenta ecossistema
-- ❌ Reinventando a roda
+**Rejected because:**
+- Heavy maintenance
+- Loses community updates
+- Fragments the ecosystem
+- Reinventing the wheel
 
-### 4. Apenas Protocolo OTLP (Considered, but insufficient)
+### 4. OTLP Protocol Only (Considered, but insufficient)
 
-**Abordagem:** Suportar apenas export via OTLP protocol, sem OTel SDK.
+**Approach:** Support only export via OTLP protocol, without OTel SDK.
 
 ```python
-# Exportar spans no formato OTLP sem SDK
+# Export spans in OTLP format without SDK
 def export_otlp(spans: List[Span]):
     payload = serialize_to_otlp(spans)
     requests.post("http://collector:4318/v1/traces", json=payload)
 ```
 
-**Parcialmente rejeitado porque:**
-- ✅ Leve (zero deps OTel)
-- ❌ Perde auto-instrumentação
-- ❌ Perde context propagation automática
-- ❌ Perde semantic conventions helpers
-- ❌ Perde ecosystem de instrumentations
+**Partially rejected because:**
+- ✅ Lightweight (zero OTel deps)
+- Does not have auto-instrumentation
+- Does not have automatic context propagation
+- Does not have semantic convention helpers
+- Does not have instrumentation ecosystem
 
-**Decisão:** Usar este approach para implementações builtin (export OTLP direto), mas também oferecer OTel completo como opção.
+**Decision:** Use this approach for builtin implementations (direct OTLP export), but also offer full OTel as an option.
 
-### 5. Abordagem Híbrida (Accepted ✅)
+### 5. Hybrid Approach (Accepted)
 
-**Nossa decisão:**
-- ✅ Builtin implementations (lightweight, padrão)
-- ✅ OTel adapter (opcional, enterprise)
-- ✅ OTLP export direto (builtin, sem deps)
-- ✅ Configuração declarativa
-- ✅ Preserva sistema cognitivo único
+**Our decision:**
+- ✅ Builtin implementations (lightweight, default)
+- ✅ OTel adapter (optional, enterprise)
+- ✅ Direct OTLP export (builtin, no deps)
+- ✅ Declarative configuration
+- ✅ Preserves unique cognitive system
 
-**Melhor dos mundos:**
-- Simples quando não precisa
-- Poderoso quando precisa
-- Transição gradual possível
+**Best of both worlds:**
+- Simple when you don't need it
+- Powerful when you do
+- Gradual transition possible
 
 ## Implementation Notes
 
-### Fase 1: Fundação (Dias 1-2)
+### Phase 1: Foundation (Days 1-2)
 
 ```bash
-# Criar estrutura de módulo OTel
+# Create OTel module structure
 src/forge_base/observability/otel/
 ├── __init__.py
-├── otel_tracer.py      # Implementa TracerPort
-├── otel_logger.py      # Implementa LoggerPort
-├── otel_metrics.py     # Implementa TrackMetrics
-├── providers.py        # Setup de providers
+├── otel_tracer.py      # Implements TracerPort
+├── otel_logger.py      # Implements LoggerPort
+├── otel_metrics.py     # Implements TrackMetrics
+├── providers.py        # Provider setup
 └── auto_instrument.py  # Auto-instrumentation
 ```
 
-**Critérios de aceite:**
-- [ ] OtelTracer implementa TracerPort completamente
-- [ ] Lazy import (funciona sem OTel instalado)
-- [ ] Docstrings explicando uso
-- [ ] Tests com OTel mock
+**Acceptance criteria:**
+- [ ] OtelTracer fully implements TracerPort
+- [ ] Lazy import (works without OTel installed)
+- [ ] Docstrings explaining usage
+- [ ] Tests with OTel mock
 
-### Fase 2: Configuração (Dia 3)
+### Phase 2: Configuration (Day 3)
 
 ```yaml
-# Adicionar ao config schema
+# Add to config schema
 observability:
   tracing:
     provider: opentelemetry | inmemory | noop
@@ -634,16 +634,16 @@ observability:
       sampling_rate: float
 ```
 
-**Critérios de aceite:**
-- [ ] ConfigLoader valida schema OTel
-- [ ] Bootstrap cria OtelTracer se configurado
-- [ ] Fallback para InMemory se OTel não instalado
-- [ ] Erro claro se config incompleta
+**Acceptance criteria:**
+- [ ] ConfigLoader validates OTel schema
+- [ ] Bootstrap creates OtelTracer if configured
+- [ ] Fallback to InMemory if OTel is not installed
+- [ ] Clear error if config is incomplete
 
-### Fase 3: Auto-Instrumentation (Dias 4-5)
+### Phase 3: Auto-Instrumentation (Days 4-5)
 
 ```python
-# Implementar auto-instrumentation
+# Implement auto-instrumentation
 auto_instrument({
     "requests": True,
     "flask": True,
@@ -651,26 +651,26 @@ auto_instrument({
 })
 ```
 
-**Critérios de aceite:**
-- [ ] Suporte para 5+ bibliotecas populares
-- [ ] Documentação de quais libraries suportadas
-- [ ] Tests com instrumentação ativa
+**Acceptance criteria:**
+- [ ] Support for 5+ popular libraries
+- [ ] Documentation of supported libraries
+- [ ] Tests with active instrumentation
 - [ ] Performance benchmarks
 
-### Fase 4: Integração Sistema Cognitivo (Dia 6)
+### Phase 4: Cognitive System Integration (Day 6)
 
 ```python
-# FeedbackManager integra com OTel
+# FeedbackManager integrates with OTel
 feedback = FeedbackManager(tracer=OtelTracer())
 ```
 
-**Critérios de aceite:**
-- [ ] FeedbackManager funciona com OtelTracer
-- [ ] IntentTracker funciona com OtelTracer
-- [ ] Spans cognitivos aparecem em Jaeger
-- [ ] Attributes customizados preservados
+**Acceptance criteria:**
+- [ ] FeedbackManager works with OtelTracer
+- [ ] IntentTracker works with OtelTracer
+- [ ] Cognitive spans appear in Jaeger
+- [ ] Custom attributes preserved
 
-### Fase 5: Exemplos e Docs (Dia 7)
+### Phase 5: Examples and Docs (Day 7)
 
 ```markdown
 # docs/otel-integration.md
@@ -681,13 +681,13 @@ feedback = FeedbackManager(tracer=OtelTracer())
 - Troubleshooting common issues
 ```
 
-**Critérios de aceite:**
-- [ ] Exemplo completo end-to-end
-- [ ] Documentação clara
-- [ ] Screenshots de Jaeger/Prometheus
+**Acceptance criteria:**
+- [ ] Complete end-to-end example
+- [ ] Clear documentation
+- [ ] Screenshots of Jaeger/Prometheus
 - [ ] Troubleshooting guide
 
-### Fase 6: Testing (Dia 8)
+### Phase 6: Testing (Day 8)
 
 ```python
 # tests/integration/test_otel_integration.py
@@ -701,33 +701,33 @@ def test_exporter_integration():
     """Verify export to Jaeger works."""
 ```
 
-**Critérios de aceite:**
-- [ ] Tests de compatibilidade TracerPort
-- [ ] Tests de auto-instrumentation
-- [ ] Tests de exporters (mock)
+**Acceptance criteria:**
+- [ ] TracerPort compatibility tests
+- [ ] Auto-instrumentation tests
+- [ ] Exporter tests (mock)
 - [ ] Coverage ≥80%
 
-### Timeline Estimado
+### Estimated Timeline
 
-| Fase | Dias | Complexidade |
-|------|------|--------------|
-| 1. Fundação | 2 | Alta |
-| 2. Configuração | 1 | Média |
-| 3. Auto-Instrumentation | 2 | Alta |
-| 4. Integração Cognitiva | 1 | Média |
-| 5. Exemplos e Docs | 1 | Baixa |
-| 6. Testing | 1 | Média |
-| **Total** | **8 dias** | - |
+| Phase | Days | Complexity |
+|-------|------|------------|
+| 1. Foundation | 2 | High |
+| 2. Configuration | 1 | Medium |
+| 3. Auto-Instrumentation | 2 | High |
+| 4. Cognitive Integration | 1 | Medium |
+| 5. Examples and Docs | 1 | Low |
+| 6. Testing | 1 | Medium |
+| **Total** | **8 days** | - |
 
 ### Risks & Mitigations
 
-| Risco | Impacto | Probabilidade | Mitigation |
-|-------|---------|---------------|------------|
-| Breaking changes OTel API | Alto | Baixa | Pin versions, CI tests |
-| Performance overhead alto | Médio | Média | Benchmarks, sampling |
-| Complexidade assusta users | Médio | Alta | Docs claras, defaults sensatos |
-| Manutenção de adapter | Médio | Média | Tests, semantic versioning |
-| Bugs em instrumentations | Baixo | Média | Community mantém, reportar upstream |
+| Risk | Impact | Probability | Mitigation |
+|------|--------|-------------|------------|
+| OTel API breaking changes | High | Low | Pin versions, CI tests |
+| High performance overhead | Medium | Medium | Benchmarks, sampling |
+| Complexity scares users | Medium | High | Clear docs, sensible defaults |
+| Adapter maintenance | Medium | Medium | Tests, semantic versioning |
+| Instrumentation bugs | Low | Medium | Community maintains, report upstream |
 
 ## References
 
@@ -746,24 +746,24 @@ def test_exporter_integration():
 
 ### ForgeBase Related
 
-- **ADR-003: Observability First** — Filosofia de observabilidade nativa
+- **ADR-003: Observability First** — Native observability philosophy
 - **TracerPort Implementation** — `src/forge_base/observability/tracer_port.py`
-- **FeedbackManager** — Sistema cognitivo único
+- **FeedbackManager** — Unique cognitive system
 
 ## Related ADRs
 
-- [ADR-003: Observability First](003-observability-first.md) — Base filosófica
+- [ADR-003: Observability First](003-observability-first.md) — Philosophical foundation
 - [ADR-001: Clean Architecture Choice](001-clean-architecture-choice.md) — Boundaries
 - [ADR-002: Hexagonal Ports-Adapters](002-hexagonal-ports-adapters.md) — Adapter pattern
 - [ADR-005: Dependency Injection](005-dependency-injection.md) — DI container
-- [ADR-006: ForgeProcess Integration](006-forgeprocess-integration.md) — Sistema cognitivo
+- [ADR-006: ForgeProcess Integration](006-forgeprocess-integration.md) — Cognitive system
 
 ---
 
 **Author:** ForgeBase Development Team
 **Date:** 2025-11-05
 **Version:** 1.0
-**Status:** Aceita para implementação
+**Status:** Accepted for implementation
 
 ---
 
@@ -773,7 +773,7 @@ def test_exporter_integration():
 |---------|-------------------|------------------|
 | **Dependencies** | Zero | ~15 packages |
 | **Setup Complexity** | Trivial | Medium |
-| **Auto-Instrumentation** | ❌ Manual | ✅ Automático |
+| **Auto-Instrumentation** | Manual | ✅ Automatic |
 | **Exporters** | JSON, Memory | 20+ backends |
 | **Context Propagation** | Basic | W3C standard |
 | **Semantic Conventions** | Custom | OTel standard |
@@ -846,24 +846,24 @@ observability:
 
 ## Appendix C: Migration Path
 
-### Para usuários atuais do ForgeBase
+### For Current ForgeBase Users
 
-**Step 1: Continue usando builtin (nada muda)**
+**Step 1: Continue using builtin (nothing changes)**
 ```bash
-# Seu código continua funcionando
+# Your code continues working
 pip install forge_base==0.1.4
 ```
 
-**Step 2: Experimente OTel localmente**
+**Step 2: Try OTel locally**
 ```bash
 pip install forge_base[otel]
-# Update config.yaml para usar OTel
-# Suba Jaeger local: docker run -p 16686:16686 jaegertracing/all-in-one
+# Update config.yaml to use OTel
+# Run Jaeger locally: docker run -p 16686:16686 jaegertracing/all-in-one
 ```
 
-**Step 3: Deploy gradual em staging**
+**Step 3: Gradual staging deployment**
 ```yaml
-# Staging: 10% de traces via OTel, resto builtin
+# Staging: 10% of traces via OTel, rest builtin
 observability:
   tracing:
     provider: opentelemetry
@@ -871,18 +871,18 @@ observability:
       sampling_rate: 0.1
 ```
 
-**Step 4: Rollout production**
+**Step 4: Production rollout**
 ```yaml
-# Production: OTel full
+# Production: full OTel
 observability:
   tracing:
     provider: opentelemetry
 ```
 
-**Rollback é trivial:** Mudar `provider: opentelemetry` → `provider: inmemory` no config.
+**Rollback is trivial:** Change `provider: opentelemetry` → `provider: inmemory` in the config.
 
 ---
 
-*"Observabilidade não é uma camada adicional, mas uma propriedade intrínseca do código cognitivo."*
+*"Observability is not an additional layer, but an intrinsic property of cognitive code."*
 
 **— Jorge, The Forge**

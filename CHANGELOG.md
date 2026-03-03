@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Detects `BuilderBase` subclasses (builders)
   - Detects `BuildSpecBase` subclasses (specs)
 
-- **Composition Guide** (`docs/usuarios/composition-guide.md`)
+- **Composition Guide** (`docs/users/composition-guide.md`)
   - Complete guide for using the composition module
   - Examples for BuildSpec, PluginRegistry, BuildContext, Builder
   - Best practices and patterns
@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Generalized `ComponentDiscovery` to support scanning arbitrary app packages via `package_name`, enabling apps that depend on ForgeBase to expose a standardized discovery API for their own components.
-- New user guide `docs/usuarios/apps-derivados-forgebase.md` documenting how to build ForgeBase-derived apps that are friendly to AI coding agents.
+- New user guide `docs/users/forgebase-derived-apps.md` documenting how to build ForgeBase-derived apps that are friendly to AI coding agents.
 
 ### Changed
 - Updated embedded AI Agent Quick Start docs to show how agents can use `ComponentDiscovery(package_name="meu_app")` in apps built on top of ForgeBase.
@@ -42,11 +42,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Documentation Reorganization** 📚
-  - New structure: `docs/usuarios/`, `docs/agentes-ia/`, `docs/referencia/`
+  - New structure: `docs/users/`, `docs/ai-agents/`, `docs/reference/`
   - Separated documentation by audience (developers vs AI agents)
   - All documentation in Portuguese
 
-- **ForgeBase Rules Guide** (`docs/usuarios/forgebase-rules.md`)
+- **ForgeBase Rules Guide** (`docs/users/forgebase-rules.md`)
   - Comprehensive guide consolidating all development practices
   - Architecture layers and dependency rules
   - Domain exceptions hierarchy and when to use each
@@ -54,7 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Anti-patterns to avoid with examples
   - Feature development checklist
 
-- **CLI First Philosophy** (`docs/usuarios/cli-first.md`)
+- **CLI First Philosophy** (`docs/users/cli-first.md`)
   - Documented CLI First development approach
   - Every UseCase must be testable via CLI before HTTP
   - Examples and workflow patterns

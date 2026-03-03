@@ -9,7 +9,7 @@
 # Usage:
 #   ./scripts/sync_docs.sh
 #
-# Or use as pre-commit hook (see docs/referencia/acesso-documentacao.md)
+# Or use as pre-commit hook (see docs/reference/documentation-access.md)
 
 set -e
 
@@ -23,11 +23,11 @@ echo "📚 Syncing embedded documentation..."
 mkdir -p "$DOCS_DIR"
 
 # Sync key documentation files for AI agents
-cp "$PROJECT_ROOT/docs/agentes-ia/inicio-rapido.md" "$DOCS_DIR/AI_AGENT_QUICK_START.md"
+cp "$PROJECT_ROOT/docs/ai-agents/quick-start.md" "$DOCS_DIR/AI_AGENT_QUICK_START.md"
 cp "$PROJECT_ROOT/README.md" "$DOCS_DIR/"
 
 echo "✅ Synced files:"
-echo "  - docs/agentes-ia/inicio-rapido.md -> AI_AGENT_QUICK_START.md"
+echo "  - docs/ai-agents/quick-start.md -> AI_AGENT_QUICK_START.md"
 echo "  - README.md"
 
 # Verify

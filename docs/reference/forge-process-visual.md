@@ -1,24 +1,24 @@
-# ForgeProcess: Guia Visual Completo
+# ForgeProcess: Complete Visual Guide
 
-**Aprenda o ciclo cognitivo através de diagramas, exemplos e visualizações práticas.**
-
----
-
-## 🎨 Índice Visual
-
-1. [O Ciclo Completo (Diagrama Macro)](#ciclo-completo)
-2. [Fase 1: MDD (Market Driven)](#fase-1-mdd)
-3. [Transição Crítica: MDD → BDD](#transição-mdd-bdd)
-4. [Fase 2: BDD (Behavior Driven)](#fase-2-bdd)
-5. [Fase 3: TDD (Test Driven)](#fase-3-tdd)
-6. [Fase 4: CLI (Interface Cognitiva)](#fase-4-cli)
-7. [Fase 5: Feedback (Reflexão)](#fase-5-feedback)
-8. [Exemplo Completo: Do Valor ao Feedback](#exemplo-completo)
+**Learn the cognitive cycle through diagrams, examples, and practical visualizations.**
 
 ---
 
-<a name="ciclo-completo"></a>
-## 🔄 O Ciclo Completo (Diagrama Macro)
+## Visual Index
+
+1. [The Complete Cycle (Macro Diagram)](#complete-cycle)
+2. [Phase 1: MDD (Market Driven)](#phase-1-mdd)
+3. [Critical Transition: MDD → BDD](#transition-mdd-bdd)
+4. [Phase 2: BDD (Behavior Driven)](#phase-2-bdd)
+5. [Phase 3: TDD (Test Driven)](#phase-3-tdd)
+6. [Phase 4: CLI (Cognitive Interface)](#phase-4-cli)
+7. [Phase 5: Feedback (Reflection)](#phase-5-feedback)
+8. [Complete Example: From Value to Feedback](#complete-example)
+
+---
+
+<a name="complete-cycle"></a>
+## The Complete Cycle (Macro Diagram)
 
 ```
                           FORGE PROCESS
@@ -26,105 +26,105 @@
 
 ┌─────────────────────────────────────────────────────┐
 │                                                     │
-│  Fase 1: MDD (Market Driven Development)           │
-│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━         │
-│  PERGUNTA: "PORQUÊ este sistema deve existir?"     │
+│  Phase 1: MDD (Market Driven Development)           │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━          │
+│  QUESTION: "WHY should this system exist?"          │
 │                                                     │
-│  Artefato: forge.yaml                               │
+│  Artifact: forge.yaml                               │
 │  Output: ValueTracks, Value KPIs                    │
 │                                                     │
-│  Exemplo:                                           │
+│  Example:                                           │
 │    ValueTrack: "ProcessOrder"                       │
-│    KPI: "< 2 minutos por pedido"                    │
+│    KPI: "< 2 minutes per order"                     │
 │                                                     │
 └──────────────────────┬──────────────────────────────┘
                        │
-                       │ TRADUÇÃO COGNITIVA
-                       │ (Valor → Comportamento)
+                       │ COGNITIVE TRANSLATION
+                       │ (Value → Behavior)
                        ▼
 ┌─────────────────────────────────────────────────────┐
 │                                                     │
-│  Fase 2: BDD (Behavior Driven Development)         │
-│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━         │
-│  PERGUNTA: "O QUÊ o sistema faz?"                   │
+│  Phase 2: BDD (Behavior Driven Development)         │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━          │
+│  QUESTION: "WHAT does the system do?"               │
 │                                                     │
-│  Artefato: process_order.feature                    │
+│  Artifact: process_order.feature                    │
 │  Output: Scenarios (Given/When/Then)                │
 │                                                     │
-│  Exemplo:                                           │
-│    Given um pedido válido                           │
-│    When eu processar                                │
-│    Then deve concluir em < 2 min                    │
+│  Example:                                           │
+│    Given a valid order                              │
+│    When I process it                                │
+│    Then it should complete in < 2 min               │
 │                                                     │
 └──────────────────────┬──────────────────────────────┘
                        │
-                       │ ESPECIFICAÇÃO TÉCNICA
+                       │ TECHNICAL SPECIFICATION
                        ▼
 ┌─────────────────────────────────────────────────────┐
 │                                                     │
-│  Fase 3: TDD (Test Driven Development)             │
-│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━         │
-│  PERGUNTA: "COMO implementar? (com prova)"         │
+│  Phase 3: TDD (Test Driven Development)             │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━          │
+│  QUESTION: "HOW to implement? (with proof)"         │
 │                                                     │
-│  Artefato: test_process_order.py                    │
-│  Output: Código testado                             │
+│  Artifact: test_process_order.py                    │
+│  Output: Tested code                                │
 │                                                     │
-│  Exemplo:                                           │
+│  Example:                                           │
 │    def test_should_process_in_2_minutes():          │
 │        # Red → Green → Refactor                     │
 │                                                     │
 └──────────────────────┬──────────────────────────────┘
                        │
-                       │ MANIFESTAÇÃO EXECUTÁVEL
+                       │ EXECUTABLE MANIFESTATION
                        ▼
 ┌─────────────────────────────────────────────────────┐
 │                                                     │
-│  Fase 4: CLI (Interface Cognitiva)                 │
-│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━         │
-│  PERGUNTA: "Executar e observar?"                   │
+│  Phase 4: CLI (Cognitive Interface)                 │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━          │
+│  QUESTION: "Execute and observe?"                   │
 │                                                     │
-│  Artefato: forge_base CLI                           │
-│  Output: Logs, Métricas, Traces                     │
+│  Artifact: forge_base CLI                           │
+│  Output: Logs, Metrics, Traces                      │
 │                                                     │
-│  Exemplo:                                           │
+│  Example:                                           │
 │    $ forge_base execute ProcessOrder                │
-│    ⏱️  Duration: 1.8 minutes ✅                      │
+│    Duration: 1.8 minutes ✅                          │
 │                                                     │
 └──────────────────────┬──────────────────────────────┘
                        │
-                       │ COLETA DE EVIDÊNCIAS
+                       │ EVIDENCE COLLECTION
                        ▼
 ┌─────────────────────────────────────────────────────┐
 │                                                     │
-│  Fase 5: Feedback (Reflexão)                       │
-│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━         │
-│  PERGUNTA: "Aprender e ajustar?"                    │
+│  Phase 5: Feedback (Reflection)                     │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━          │
+│  QUESTION: "Learn and adjust?"                      │
 │                                                     │
-│  Artefato: feedback_report.jsonl                    │
+│  Artifact: feedback_report.jsonl                    │
 │  Output: Insights, Recommendations                  │
 │                                                     │
-│  Exemplo:                                           │
+│  Example:                                           │
 │    KPI Target: < 2 min                              │
-│    Actual: 1.8 min (✅ Cumprido!)                   │
-│    Recommendation: Manter estratégia                │
+│    Actual: 1.8 min (✅ Met!)                         │
+│    Recommendation: Maintain strategy                │
 │                                                     │
 └──────────────────────┬──────────────────────────────┘
                        │
-                       │ LOOP DE APRENDIZADO
+                       │ LEARNING LOOP
                        └──────────────────┐
                                           │
                   ┌───────────────────────┘
                   ▼
-         Volta para MDD
-       (Ajusta forge.yaml)
+         Back to MDD
+       (Adjust forge.yaml)
 ```
 
 ---
 
-<a name="fase-1-mdd"></a>
-## 📊 Fase 1: MDD (Market Driven Development)
+<a name="phase-1-mdd"></a>
+## Phase 1: MDD (Market Driven Development)
 
-### Diagrama de Artefatos
+### Artifact Diagram
 
 ```
 forge.yaml
@@ -133,7 +133,7 @@ forge.yaml
 │   ├── vision
 │   └── value_proposition
 │
-├── value_tracks                  ← Fluxos que entregam valor
+├── value_tracks                  ← Flows that deliver value
 │   ├── ProcessOrder
 │   │   ├── description
 │   │   ├── value_metric
@@ -144,51 +144,51 @@ forge.yaml
 │       ├── value_metric
 │       └── stakeholders
 │
-├── support_tracks                ← Fluxos de suporte
+├── support_tracks                ← Support flows
 │   ├── ManageInventory
 │   └── CalculateTaxes
 │
-└── kpis                          ← Métricas de valor
+└── kpis                          ← Value metrics
     ├── Order Processing Time
     └── Invoice Error Rate
 ```
 
-### Exemplo Completo: forge.yaml
+### Complete Example: forge.yaml
 
 ```yaml
 # forge.yaml
 project:
   name: "EcommerceSystem"
-  vision: "Facilitar vendas online com agilidade e segurança"
+  vision: "Facilitate online sales with agility and security"
   value_proposition:
-    - "Processar pedidos 50% mais rápido"
-    - "Zero erros em notas fiscais"
-    - "Rastreamento em tempo real"
+    - "Process orders 50% faster"
+    - "Zero errors in invoices"
+    - "Real-time tracking"
 
 value_tracks:
   - name: "ProcessOrder"
-    description: "Processar pedido do início ao fim"
-    value_metric: "Tempo médio < 2 minutos"
+    description: "Process an order from start to finish"
+    value_metric: "Average time < 2 minutes"
     stakeholders:
-      - "Vendedor"
-      - "Cliente"
-    business_value: "Aumenta conversão e satisfação"
+      - "Seller"
+      - "Customer"
+    business_value: "Increases conversion and satisfaction"
 
   - name: "IssueInvoice"
-    description: "Emitir nota fiscal automaticamente"
-    value_metric: "0% de erros em cálculo"
+    description: "Issue invoices automatically"
+    value_metric: "0% errors in calculation"
     stakeholders:
-      - "Vendedor"
-      - "Contador"
-    business_value: "Evita multas fiscais"
+      - "Seller"
+      - "Accountant"
+    business_value: "Avoids tax fines"
 
 support_tracks:
   - name: "ManageInventory"
-    description: "Controlar estoque"
+    description: "Control inventory"
     supports: ["ProcessOrder"]
 
   - name: "CalculateTaxes"
-    description: "Calcular impostos"
+    description: "Calculate taxes"
     supports: ["IssueInvoice"]
 
 kpis:
@@ -203,18 +203,18 @@ kpis:
     priority: "high"
 ```
 
-### Visualização: ValueTracks vs SupportTracks
+### Visualization: ValueTracks vs SupportTracks
 
 ```
 VALUE TRACKS                SUPPORT TRACKS
-(Entregam valor direto)     (Suportam value tracks)
+(Deliver direct value)      (Support value tracks)
 
 ┌─────────────────┐         ┌─────────────────┐
 │  ProcessOrder   │◄────────│ ManageInventory │
 │  (VALUE)        │         │  (SUPPORT)      │
 └─────────────────┘         └─────────────────┘
         │
-        │ usa
+        │ uses
         ▼
 ┌─────────────────┐         ┌─────────────────┐
 │  IssueInvoice   │◄────────│  CalculateTaxes │
@@ -224,155 +224,155 @@ VALUE TRACKS                SUPPORT TRACKS
 
 ---
 
-<a name="transição-mdd-bdd"></a>
-## 🔀 Transição Crítica: MDD → BDD
+<a name="transition-mdd-bdd"></a>
+## Critical Transition: MDD → BDD
 
-**O momento onde pensamento abstrato vira ação concreta.**
+**The moment where abstract thought becomes concrete action.**
 
-### Visualização da Tradução
+### Translation Visualization
 
 ```
-MDD (Abstrato)                    BDD (Concreto)
+MDD (Abstract)                    BDD (Concrete)
 ══════════════                    ══════════════
 
 ValueTrack:                       Feature:
-"ProcessOrder"        ─────────>  "Processar pedido completo"
-                     tradução
+"ProcessOrder"        ─────────>  "Process complete order"
+                     translation
                                   Scenario:
-Value Metric:                     "Dado pedido válido"
-"< 2 minutos"         ─────────>  "When processar"
-                     especifica   "Then concluir < 2 min"
+Value Metric:                     "Given a valid order"
+"< 2 minutes"         ─────────>  "When I process it"
+                     specifies    "Then it completes in < 2 min"
 
 Stakeholder:                      Actor:
-"Vendedor"            ─────────>  "Como um vendedor"
-                     personifica
+"Seller"              ─────────>  "As a seller"
+                     personifies
 
 Business Value:                   Acceptance Criteria:
-"Aumenta conversão"   ─────────>  "Pedido processado com sucesso"
-                     verifica     "Tempo registrado em métrica"
+"Increases conversion" ─────────>  "Order processed successfully"
+                     verifies     "Time recorded in metric"
 ```
 
-### Exemplo Lado a Lado
+### Side-by-Side Example
 
 #### MDD (forge.yaml)
 ```yaml
 value_tracks:
   - name: "CreateUser"
-    description: "Cadastro rápido e seguro"
-    value_metric: "95% completam em < 30s"
-    stakeholders: ["Novo usuário"]
+    description: "Fast and secure registration"
+    value_metric: "95% complete in < 30s"
+    stakeholders: ["New user"]
 ```
 
 #### BDD (.feature)
 ```gherkin
-Feature: Cadastro rápido e seguro de usuários
-  Para que novos usuários comecem rápido
-  Como um visitante
-  Eu quero me cadastrar facilmente
+Feature: Fast and secure user registration
+  So that new users can get started quickly
+  As a visitor
+  I want to register easily
 
-  Scenario: Cadastro bem-sucedido
-    Given que estou na página de cadastro
-    And preencho dados válidos
-    When clico em "Criar conta"
-    Then minha conta deve ser criada
-    And o processo deve durar < 30 segundos
-    And devo receber email de confirmação
+  Scenario: Successful registration
+    Given I am on the registration page
+    And I fill in valid data
+    When I click "Create account"
+    Then my account should be created
+    And the process should take < 30 seconds
+    And I should receive a confirmation email
 ```
 
-#### Mapeamento Completo
+#### Complete Mapping
 
 | MDD | → | BDD |
 |-----|---|-----|
 | ValueTrack name | → | Feature title |
 | description | → | Feature description |
 | value_metric | → | Acceptance criteria (Then steps) |
-| stakeholders | → | Actors (Como um...) |
-| business_value | → | Para que... (benefit) |
+| stakeholders | → | Actors (As a...) |
+| business_value | → | So that... (benefit) |
 
 ---
 
-<a name="fase-2-bdd"></a>
-## 🎭 Fase 2: BDD (Behavior Driven Development)
+<a name="phase-2-bdd"></a>
+## Phase 2: BDD (Behavior Driven Development)
 
-### Anatomia de um Feature File
+### Anatomy of a Feature File
 
 ```
 ┌────────────────────────────────────────────────────┐
-│ Feature: [Título do comportamento]                 │  ← O QUÊ
-│   [Narrativa em 3 linhas]                          │
-│   Para que [benefício]                             │  ← PORQUÊ
-│   Como um [ator]                                   │  ← QUEM
-│   Eu quero [ação]                                  │  ← O QUÊ
+│ Feature: [Behavior title]                          │  ← WHAT
+│   [3-line narrative]                               │
+│   So that [benefit]                                │  ← WHY
+│   As a [actor]                                     │  ← WHO
+│   I want [action]                                  │  ← WHAT
 ├────────────────────────────────────────────────────┤
-│ Background:                                        │  ← Contexto comum
-│   Given [pré-condição comum]                       │
+│ Background:                                        │  ← Common context
+│   Given [common precondition]                      │
 ├────────────────────────────────────────────────────┤
-│ Scenario: [Caso específico]                        │  ← Exemplo concreto
-│   Given [contexto]                                 │  ← Estado inicial
-│   And [mais contexto]                              │
-│   When [ação]                                      │  ← Ação do usuário
-│   Then [resultado esperado]                        │  ← Comportamento
-│   And [verificação adicional]                      │  ← Mais verificações
+│ Scenario: [Specific case]                          │  ← Concrete example
+│   Given [context]                                  │  ← Initial state
+│   And [more context]                               │
+│   When [action]                                    │  ← User action
+│   Then [expected result]                           │  ← Behavior
+│   And [additional verification]                    │  ← More checks
 ├────────────────────────────────────────────────────┤
-│ Business Rules:                                    │  ← Regras documentadas
-│   - [Regra 1]                                      │
-│   - [Regra 2]                                      │
+│ Business Rules:                                    │  ← Documented rules
+│   - [Rule 1]                                       │
+│   - [Rule 2]                                       │
 └────────────────────────────────────────────────────┘
 ```
 
-### Exemplo Visual: IssueInvoice
+### Visual Example: IssueInvoice
 
 ```gherkin
 ┌─────────────────────────────────────────────────────┐
-│ Feature: Emissão de nota fiscal                     │
-│   Para que lojistas possam faturar vendas           │
-│   Como um sistema de gestão                         │
-│   Eu devo emitir notas automaticamente              │
+│ Feature: Invoice issuance                            │
+│   So that merchants can bill their sales             │
+│   As a management system                             │
+│   I should issue invoices automatically              │
 ├─────────────────────────────────────────────────────┤
 │ Background:                                         │
-│   Given sistema configurado para NF-e              │
-│   And credenciais SEFAZ válidas                     │
+│   Given system configured for NF-e                  │
+│   And valid SEFAZ credentials                       │
 ├─────────────────────────────────────────────────────┤
-│ Scenario: Emissão bem-sucedida                      │
+│ Scenario: Successful issuance                        │
 │                                                     │
 │   ┌─────────────────────────────────────┐          │
-│   │ GIVEN (Estado inicial)              │          │
-│   │  - Pedido válido R$ 1000            │          │
-│   │  - Cliente com CPF                  │          │
-│   │  - Produto tributável               │          │
+│   │ GIVEN (Initial state)              │          │
+│   │  - Valid order R$ 1000             │          │
+│   │  - Customer with CPF              │          │
+│   │  - Taxable product                │          │
 │   └─────────────────────────────────────┘          │
 │                ↓                                    │
 │   ┌─────────────────────────────────────┐          │
-│   │ WHEN (Ação)                         │          │
-│   │  - Emitir nota fiscal               │          │
+│   │ WHEN (Action)                      │          │
+│   │  - Issue invoice                   │          │
 │   └─────────────────────────────────────┘          │
 │                ↓                                    │
 │   ┌─────────────────────────────────────┐          │
-│   │ THEN (Resultado esperado)           │          │
-│   │  ✅ ICMS = R$ 180 (18%)             │          │
-│   │  ✅ XML gerado                      │          │
-│   │  ✅ Log registrado                  │          │
-│   │  ✅ Enviado para SEFAZ              │          │
-│   │  ✅ DANFE enviado por email         │          │
+│   │ THEN (Expected result)             │          │
+│   │  ✅ ICMS = R$ 180 (18%)            │          │
+│   │  ✅ XML generated                  │          │
+│   │  ✅ Log recorded                   │          │
+│   │  ✅ Sent to SEFAZ                  │          │
+│   │  ✅ DANFE sent by email            │          │
 │   └─────────────────────────────────────┘          │
 ├─────────────────────────────────────────────────────┤
 │ Business Rules:                                     │
-│   1. Produtos devem ter NCM válido                  │
-│   2. ICMS conforme tabela da UF                     │
-│   3. Numeração sequencial obrigatória               │
-│   4. Retry automático em falhas (3x)                │
+│   1. Products must have a valid NCM                 │
+│   2. ICMS per state tax table                       │
+│   3. Sequential numbering required                  │
+│   4. Automatic retry on failures (3x)               │
 └─────────────────────────────────────────────────────┘
 ```
 
 ---
 
-<a name="fase-3-tdd"></a>
-## 🧪 Fase 3: TDD (Test Driven Development)
+<a name="phase-3-tdd"></a>
+## Phase 3: TDD (Test Driven Development)
 
-### Ciclo Red-Green-Refactor
+### Red-Green-Refactor Cycle
 
 ```
-Fase RED (Teste falha)
+RED Phase (Test fails)
 ┌────────────────────────────────┐
 │ def test_icms_calculation():   │
 │     usecase = IssueInvoice()   │
@@ -380,11 +380,11 @@ Fase RED (Teste falha)
 │         order_value=1000,      │
 │         uf="SP"                │
 │     )                          │
-│     assert result.icms == 180  │  ← ❌ FALHA
-│                                │     (código não existe)
+│     assert result.icms == 180  │  ← FAILS
+│                                │     (code doesn't exist)
 └────────────────────────────────┘
             ↓
-Fase GREEN (Código mínimo)
+GREEN Phase (Minimum code)
 ┌────────────────────────────────┐
 │ class IssueInvoiceUseCase:     │
 │     def execute(self, input):  │
@@ -392,10 +392,10 @@ Fase GREEN (Código mínimo)
 │                0.18            │
 │         return Output(         │
 │             icms=icms          │
-│         )                      │  ← ✅ PASSA
+│         )                      │  ← PASSES
 └────────────────────────────────┘
             ↓
-Fase REFACTOR (Melhoria)
+REFACTOR Phase (Improvement)
 ┌────────────────────────────────┐
 │ class IssueInvoiceUseCase:     │
 │     ICMS_TABLE = {             │
@@ -410,54 +410,54 @@ Fase REFACTOR (Melhoria)
 │                rate            │
 │         return Output(         │
 │             icms=icms          │
-│         )                      │  ← ✅ PASSA (melhorado)
+│         )                      │  ← PASSES (improved)
 └────────────────────────────────┘
 ```
 
-### Mapeamento BDD → TDD
+### BDD → TDD Mapping
 
 ```
 BDD Scenario                          TDD Test
 ════════════════                      ═════════
 
-Given um pedido de R$ 1000            order = Order(value=1000, uf="SP")
-When emitir nota                      result = usecase.execute(order)
-Then ICMS deve ser R$ 180             assert result.icms == 180.00
+Given an order of R$ 1000             order = Order(value=1000, uf="SP")
+When I issue the invoice              result = usecase.execute(order)
+Then ICMS should be R$ 180            assert result.icms == 180.00
 
 
 BDD Scenario                          TDD Test
 ════════════════                      ═════════
 
-Given produto sem NCM                 product = Product(ncm=None)
-When tentar emitir nota               with pytest.raises(ValidationError):
-Then deve rejeitar                        usecase.execute(product)
+Given product without NCM             product = Product(ncm=None)
+When I try to issue the invoice       with pytest.raises(ValidationError):
+Then it should reject                     usecase.execute(product)
 ```
 
-### Pirâmide de Testes ForgeBase
+### ForgeBase Test Pyramid
 
 ```
                     ▲
                    ╱ ╲
                   ╱   ╲
-                 ╱  E2E ╲           ← 10% (poucos, lentos)
+                 ╱  E2E ╲           ← 10% (few, slow)
                 ╱ (CLI)  ╲
                ╱───────────╲
               ╱             ╲
-             ╱  Integration  ╲      ← 20% (médios)
+             ╱  Integration  ╲      ← 20% (medium)
             ╱  (Repositories) ╲
            ╱───────────────────╲
           ╱                     ╲
-         ╱      Unit Tests       ╲  ← 70% (muitos, rápidos)
+         ╱      Unit Tests       ╲  ← 70% (many, fast)
         ╱     (UseCases)          ╲
        ╱───────────────────────────╲
 ```
 
 ---
 
-<a name="fase-4-cli"></a>
-## 💻 Fase 4: CLI (Interface Cognitiva)
+<a name="phase-4-cli"></a>
+## Phase 4: CLI (Cognitive Interface)
 
-### Fluxo de Execução via CLI
+### Execution Flow via CLI
 
 ```
 Terminal                  CLI               ForgeBase
@@ -491,13 +491,13 @@ $ forge_base execute  ─────>  Parse command
                               │
                               ▼
 ◄─────────────────────  Display results
-📊 Metrics:
+Metrics:
    Duration: 1.2s
    ICMS: R$ 180
 ✅ Success
 ```
 
-### Exemplo de Output CLI
+### CLI Output Example
 
 ```bash
 $ forge_base execute IssueInvoiceUseCase \
@@ -508,9 +508,9 @@ $ forge_base execute IssueInvoiceUseCase \
 ║  ForgeBase CLI - UseCase Execution                ║
 ╚═══════════════════════════════════════════════════╝
 
-⏱️  Starting IssueInvoiceUseCase...
-📊 Observability enabled
-🔍 Tracing ID: exec-abc123
+Starting IssueInvoiceUseCase...
+Observability enabled
+Tracing ID: exec-abc123
 
 ┌─────────────────────────────────────────────────┐
 │ PHASE 1: Validation                             │
@@ -545,7 +545,7 @@ $ forge_base execute IssueInvoiceUseCase \
     "duration_ms": 1247
   }
 
-📈 METRICS
+METRICS
   Duration: 1.247s
   Success: true
   ICMS calculated: R$ 180.00
@@ -555,55 +555,55 @@ $ forge_base execute IssueInvoiceUseCase \
 
 ---
 
-<a name="fase-5-feedback"></a>
-## 📈 Fase 5: Feedback (Reflexão)
+<a name="phase-5-feedback"></a>
+## Phase 5: Feedback (Reflection)
 
-### Dois Tipos de Feedback
+### Two Types of Feedback
 
 ```
 ┌────────────────────────────────────────────────────┐
-│ FEEDBACK OPERACIONAL                               │
-│ (Métricas técnicas)                                │
+│ OPERATIONAL FEEDBACK                               │
+│ (Technical metrics)                                │
 ├────────────────────────────────────────────────────┤
 │                                                    │
-│  Fonte: Logs, Métricas, Traces                     │
+│  Source: Logs, Metrics, Traces                     │
 │                                                    │
-│  Exemplo:                                          │
+│  Example:                                          │
 │  - Duration: 1.2s (target: < 2s) ✅               │
 │  - Error rate: 0.1% (target: 0%) ⚠️               │
 │  - Throughput: 100 req/s                           │
 │  - P95 latency: 1.8s                               │
 │                                                    │
-│  Ação:                                             │
-│  → Adicionar retry logic                           │
-│  → Otimizar cálculo de ICMS                        │
+│  Action:                                           │
+│  → Add retry logic                                 │
+│  → Optimize ICMS calculation                       │
 │                                                    │
 └────────────────────────────────────────────────────┘
 
 ┌────────────────────────────────────────────────────┐
-│ FEEDBACK DE VALOR                                  │
-│ (Validação de negócio)                             │
+│ VALUE FEEDBACK                                     │
+│ (Business validation)                              │
 ├────────────────────────────────────────────────────┤
 │                                                    │
-│  Fonte: Stakeholders, KPIs, Usuários               │
+│  Source: Stakeholders, KPIs, Users                 │
 │                                                    │
-│  Exemplo:                                          │
-│  - KPI Target: 0% erros                            │
-│  - KPI Actual: 0.1% erros ⚠️                       │
-│  - User feedback: "Cálculo demora muito"           │
+│  Example:                                          │
+│  - KPI Target: 0% errors                           │
+│  - KPI Actual: 0.1% errors ⚠️                      │
+│  - User feedback: "Calculation takes too long"     │
 │                                                    │
-│  Ação:                                             │
-│  → Revisar regras de cálculo                       │
-│  → Ajustar ValueTrack no MDD                       │
-│  → Adicionar scenario no BDD                       │
+│  Action:                                           │
+│  → Review calculation rules                        │
+│  → Adjust ValueTrack in MDD                        │
+│  → Add scenario in BDD                             │
 │                                                    │
 └────────────────────────────────────────────────────┘
 ```
 
-### Fluxo de Feedback Completo
+### Complete Feedback Flow
 
 ```
-Execução (CLI)
+Execution (CLI)
       ↓
 ┌─────────────────┐
 │ Collect Metrics │
@@ -645,104 +645,104 @@ Execução (CLI)
 
 ---
 
-<a name="exemplo-completo"></a>
-## 🎬 Exemplo Completo: Do Valor ao Feedback
+<a name="complete-example"></a>
+## Complete Example: From Value to Feedback
 
-### Visualização End-to-End
+### End-to-End Visualization
 
 ```
-SEMANA 1: MDD
-─────────────
-📝 forge.yaml criado
+WEEK 1: MDD
+───────────
+forge.yaml created
    ValueTrack: "IssueInvoice"
-   KPI: "0% erros em cálculo"
+   KPI: "0% errors in calculation"
    ↓
 ─────────────────────────────────────
 
-SEMANA 2: BDD
-─────────────
-📄 issue_invoice.feature criado
-   Scenario: Cálculo correto de ICMS
-   Given pedido R$ 1000 em SP
-   Then ICMS deve ser R$ 180
+WEEK 2: BDD
+───────────
+issue_invoice.feature created
+   Scenario: Correct ICMS calculation
+   Given order R$ 1000 in SP
+   Then ICMS should be R$ 180
    ↓
 ─────────────────────────────────────
 
-SEMANA 3: TDD
-─────────────
-🧪 test_issue_invoice.py criado
-   ❌ RED: Teste falha
-   ✅ GREEN: Código passa
-   🔵 REFACTOR: Código melhorado
+WEEK 3: TDD
+───────────
+test_issue_invoice.py created
+   RED: Test fails
+   GREEN: Code passes
+   REFACTOR: Code improved
    ↓
 ─────────────────────────────────────
 
-SEMANA 4: CLI
-─────────────
-💻 Teste manual via CLI
+WEEK 4: CLI
+───────────
+Manual test via CLI
    $ forge_base execute IssueInvoice
-   ✅ ICMS: R$ 180 (correto!)
-   ⏱️  Duration: 1.2s
+   ✅ ICMS: R$ 180 (correct!)
+   Duration: 1.2s
    ↓
 ─────────────────────────────────────
 
-SEMANA 5-8: PRODUÇÃO
-────────────────────
-🚀 Sistema em produção
-   1000 notas emitidas
-   3 erros encontrados (0.3%)
+WEEKS 5-8: PRODUCTION
+─────────────────────
+System in production
+   1000 invoices issued
+   3 errors found (0.3%)
    ↓
 ─────────────────────────────────────
 
-SEMANA 9: FEEDBACK
-──────────────────
-📊 Análise de feedback
-   KPI Target: 0% erros
-   KPI Actual: 0.3% erros ⚠️
+WEEK 9: FEEDBACK
+────────────────
+Feedback analysis
+   KPI Target: 0% errors
+   KPI Actual: 0.3% errors ⚠️
 
-   Causa: Casos especiais de
-          substituição tributária
+   Cause: Edge cases in
+          tax substitution
 
-   Recomendação:
-   - Adicionar regra no MDD
-   - Adicionar scenario no BDD
-   - Implementar com TDD
+   Recommendation:
+   - Add rule in MDD
+   - Add scenario in BDD
+   - Implement with TDD
    ↓
 ─────────────────────────────────────
 
-SEMANA 10: AJUSTE
-─────────────────
-🔄 Ciclo reinicia
-   forge.yaml atualizado
-   Nova feature adicionada
-   Testes expandidos
+WEEK 10: ADJUSTMENT
+───────────────────
+Cycle restarts
+   forge.yaml updated
+   New feature added
+   Tests expanded
    ↓
 ─────────────────────────────────────
 
-RESULTADO: MELHORIA CONTÍNUA
-────────────────────────────
-✅ Sistema aprende com erros
-✅ Documentação sempre atualizada
-✅ Qualidade aumenta continuamente
+RESULT: CONTINUOUS IMPROVEMENT
+──────────────────────────────
+✅ System learns from errors
+✅ Documentation always up to date
+✅ Quality continuously increases
 ```
 
-### Timeline Visual
+### Visual Timeline
 
 ```
-Tempo │
+Time  │
 ═════════════════════════════════════════════════════
       │
-S1-2  │ ███ MDD + BDD (Especificação)
+W1-2  │ ███ MDD + BDD (Specification)
       │
-S3    │     ███ TDD (Implementação)
+W3    │     ███ TDD (Implementation)
       │
-S4    │         ██ CLI (Validação)
+W4    │         ██ CLI (Validation)
       │
-S5-8  │            ████████████ Produção
+W5-8  │            ████████████ Production
       │
-S9    │                        ███ Feedback
+W9    │                        ███ Feedback
       │
-S10+  │                           ████ Ciclo 2
+W10+  │                           ████ Cycle 2
       │                               (MDD → BDD → ...)
       │
       └────────────────────────────────────────────>
@@ -750,53 +750,53 @@ S10+  │                           ████ Ciclo 2
 
 ---
 
-## 🎯 Checklist: Como Saber Se Você Está Usando ForgeProcess Corretamente
+## Checklist: How to Know If You Are Using ForgeProcess Correctly
 
-### ✅ MDD
-- [ ] Tem forge.yaml com ValueTracks definidos?
-- [ ] Cada ValueTrack tem um Value KPI mensurável?
-- [ ] Stakeholders estão identificados?
-- [ ] Você sabe explicar PORQUÊ o sistema existe?
+### MDD
+- [ ] Do you have a forge.yaml with defined ValueTracks?
+- [ ] Does each ValueTrack have a measurable Value KPI?
+- [ ] Are stakeholders identified?
+- [ ] Can you explain WHY the system exists?
 
-### ✅ BDD
-- [ ] Cada ValueTrack tem um .feature file?
-- [ ] Scenarios usam Given/When/Then?
-- [ ] Business rules estão documentadas?
-- [ ] Qualquer stakeholder pode ler e entender?
+### BDD
+- [ ] Does each ValueTrack have a .feature file?
+- [ ] Do Scenarios use Given/When/Then?
+- [ ] Are business rules documented?
+- [ ] Can any stakeholder read and understand them?
 
-### ✅ TDD
-- [ ] Cada Scenario tem testes automatizados?
-- [ ] Você escreve teste ANTES do código?
-- [ ] Ciclo Red-Green-Refactor é seguido?
-- [ ] Cobertura > 90%?
+### TDD
+- [ ] Does each Scenario have automated tests?
+- [ ] Do you write the test BEFORE the code?
+- [ ] Is the Red-Green-Refactor cycle followed?
+- [ ] Coverage > 90%?
 
-### ✅ CLI
-- [ ] UseCases podem ser executados via CLI?
-- [ ] Logs e métricas são coletados?
-- [ ] IA pode explorar behaviors via CLI?
-- [ ] Debugging é fácil?
+### CLI
+- [ ] Can UseCases be executed via CLI?
+- [ ] Are logs and metrics collected?
+- [ ] Can AI explore behaviors via CLI?
+- [ ] Is debugging easy?
 
-### ✅ Feedback
-- [ ] Métricas operacionais são coletadas?
-- [ ] Value KPIs são medidos regularmente?
-- [ ] Feedback volta para MDD e BDD?
-- [ ] Sistema melhora continuamente?
-
----
-
-## 📚 Próximos Passos
-
-1. **Leia o documento completo**: [docs/FORGE_PROCESS.md](FORGE_PROCESS.md)
-2. **Veja a integração técnica**: [docs/adr/006-forgeprocess-integration.md](adr/006-forgeprocess-integration.md)
-3. **Experimente**: Crie seu primeiro forge.yaml
-4. **Pratique**: Escreva uma .feature para um ValueTrack
-5. **Implemente**: Use TDD para desenvolver
-6. **Observe**: Execute via CLI e colete feedback
+### Feedback
+- [ ] Are operational metrics collected?
+- [ ] Are Value KPIs measured regularly?
+- [ ] Does feedback flow back to MDD and BDD?
+- [ ] Does the system continuously improve?
 
 ---
 
-**Autor**: ForgeBase Development Team
-**Data**: 2025-11-04
-**Versão**: 1.0
+## Next Steps
 
-> *"Um diagrama vale mais que mil palavras. Mil execuções valem mais que um diagrama."*
+1. **Read the complete document**: [docs/FORGE_PROCESS.md](FORGE_PROCESS.md)
+2. **See the technical integration**: [docs/adr/006-forgeprocess-integration.md](adr/006-forgeprocess-integration.md)
+3. **Experiment**: Create your first forge.yaml
+4. **Practice**: Write a .feature for a ValueTrack
+5. **Implement**: Use TDD to develop
+6. **Observe**: Execute via CLI and collect feedback
+
+---
+
+**Author**: ForgeBase Development Team
+**Date**: 2025-11-04
+**Version**: 1.0
+
+> *"A diagram is worth a thousand words. A thousand executions are worth more than a diagram."*

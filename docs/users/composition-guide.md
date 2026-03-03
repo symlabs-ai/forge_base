@@ -1,36 +1,36 @@
-# Guia de Composition Root
+# Composition Root Guide
 
-> "Quem usa, nao cria. Quem cria, nao usa."
+> "Those who use, don't create. Those who create, don't use."
 
-O modulo `composition` implementa o padrao **Composition Root** para montagem declarativa de objetos complexos a partir de arquivos de configuracao (YAML, JSON, TOML).
-
----
-
-## Conceitos Fundamentais
-
-### O Que e Composition Root?
-
-Composition Root e o padrao onde **toda a montagem de objetos** acontece em um unico lugar, separando claramente:
-
-- **Quem cria**: O Builder monta objetos a partir de specs
-- **Quem usa**: O restante do codigo recebe objetos prontos
-
-### Componentes do Modulo
-
-| Componente | Responsabilidade |
-|------------|------------------|
-| `BuildSpecBase` | Especificacao declarativa (YAML/JSON/TOML) |
-| `PluginRegistryBase` | Registro de plugins (kind, type_id) -> classe |
-| `BuildContextBase` | Contexto de build com cache e env vars |
-| `BuilderBase` | Orquestra montagem de objetos |
-| `LoggerProtocol` | Protocolo para loggers (baixo acoplamento) |
-| `MetricsProtocol` | Protocolo para metricas (baixo acoplamento) |
+The `composition` module implements the **Composition Root** pattern for declarative assembly of complex objects from configuration files (YAML, JSON, TOML).
 
 ---
 
-## Instalacao
+## Fundamental Concepts
 
-O modulo `composition` faz parte do ForgeBase:
+### What Is Composition Root?
+
+Composition Root is the pattern where **all object assembly** happens in a single place, clearly separating:
+
+- **Who creates**: The Builder assembles objects from specs
+- **Who uses**: The rest of the code receives ready-made objects
+
+### Module Components
+
+| Component | Responsibility |
+|-----------|----------------|
+| `BuildSpecBase` | Declarative specification (YAML/JSON/TOML) |
+| `PluginRegistryBase` | Plugin registry (kind, type_id) -> class |
+| `BuildContextBase` | Build context with cache and env vars |
+| `BuilderBase` | Orchestrates object assembly |
+| `LoggerProtocol` | Protocol for loggers (low coupling) |
+| `MetricsProtocol` | Protocol for metrics (low coupling) |
+
+---
+
+## Installation
+
+The `composition` module is part of ForgeBase:
 
 ```python
 from forge_base.composition import (
@@ -45,11 +45,11 @@ from forge_base.composition import (
 
 ---
 
-## Uso Basico
+## Basic Usage
 
-### 1. Definir um BuildSpec
+### 1. Define a BuildSpec
 
-O BuildSpec define a estrutura da sua configuracao:
+The BuildSpec defines the structure of your configuration:
 
 ```python
 from dataclasses import dataclass, field
@@ -61,7 +61,7 @@ from forge_base.domain.exceptions import ConfigurationError
 
 @dataclass
 class ServiceSpec(BuildSpecBase):
-    """Especificacao para criar um servico."""
+    """Specification for creating a service."""
 
     service: dict[str, Any] = field(default_factory=dict)
     database: dict[str, Any] = field(default_factory=dict)
@@ -88,9 +88,9 @@ class ServiceSpec(BuildSpecBase):
             raise ConfigurationError("service.type is required")
 ```
 
-### 2. Criar um PluginRegistry
+### 2. Create a PluginRegistry
 
-O Registry mapeia tipos para classes concretas:
+The Registry maps types to concrete classes:
 
 ```python
 from forge_base.composition import PluginRegistryBase
@@ -107,24 +107,24 @@ class PostgresDB:
 
 
 class ServiceRegistry(PluginRegistryBase):
-    """Registry para servicos."""
+    """Registry for services."""
 
     def register_defaults(self) -> None:
-        # Registrar plugins padrao
+        # Register default plugins
         self.register("service", "dummy", DummyService)
         self.register("database", "postgres", PostgresDB)
 ```
 
-### 3. Implementar um Builder
+### 3. Implement a Builder
 
-O Builder orquestra a montagem:
+The Builder orchestrates the assembly:
 
 ```python
 from forge_base.composition import BuilderBase, BuildContextBase
 
 
 class ServiceBuilder(BuilderBase[ServiceSpec, ServiceRegistry, BuildContextBase, DummyService]):
-    """Builder para servicos."""
+    """Builder for services."""
 
     def create_registry(self) -> ServiceRegistry:
         return ServiceRegistry()
@@ -133,49 +133,49 @@ class ServiceBuilder(BuilderBase[ServiceSpec, ServiceRegistry, BuildContextBase,
         return BuildContextBase(spec=spec, registry=self.registry)
 
     def build(self, spec: ServiceSpec) -> DummyService:
-        # Validar spec
+        # Validate spec
         spec.validate()
 
-        # Criar contexto
+        # Create context
         ctx = self.create_context(spec)
 
-        # Resolver plugin do registry
+        # Resolve plugin from registry
         service_type = ctx.get("service.type", "dummy")
         service_cls = ctx.resolve("service", service_type)
 
-        # Criar instancia
+        # Create instance
         name = ctx.get("service.name", "default")
         return service_cls(name=name)
 ```
 
-### 4. Usar o Builder
+### 4. Use the Builder
 
 ```python
-# A partir de dicionario
+# From dictionary
 builder = ServiceBuilder()
 service = builder.build_from_dict(
     {"service": {"type": "dummy", "name": "my-service"}},
     ServiceSpec
 )
 
-# A partir de YAML
+# From YAML
 service = builder.build_from_yaml("config.yaml", ServiceSpec)
 
-# A partir de JSON
+# From JSON
 service = builder.build_from_json("config.json", ServiceSpec)
 
-# A partir de TOML
+# From TOML
 service = builder.build_from_toml("config.toml", ServiceSpec)
 
-# Auto-detectar formato pela extensao
+# Auto-detect format by extension
 service = builder.build_from_file("config.yaml", ServiceSpec)
 ```
 
 ---
 
-## Arquivo de Configuracao
+## Configuration File
 
-### YAML (Recomendado)
+### YAML (Recommended)
 
 ```yaml
 # config.yaml
@@ -225,56 +225,56 @@ type = "postgres"
 
 ---
 
-## Recursos Avancados
+## Advanced Features
 
-### Navegacao por Path (Dot Notation)
+### Path Navigation (Dot Notation)
 
-O `BuildContext` permite acessar valores aninhados usando notacao de ponto:
+The `BuildContext` allows accessing nested values using dot notation:
 
 ```python
 ctx = BuildContextBase(spec=spec, registry=registry)
 
-# Acesso simples
+# Simple access
 ctx.get("service")  # {"type": "dummy", "name": "my-service"}
 
-# Acesso aninhado
+# Nested access
 ctx.get("service.type")  # "dummy"
 ctx.get("service.port")  # 8080
 
-# Com valor default
-ctx.get("service.timeout", 30)  # 30 (se nao existir)
+# With default value
+ctx.get("service.timeout", 30)  # 30 (if it doesn't exist)
 ```
 
-### Cache de Objetos
+### Object Cache
 
-O contexto mantem cache para evitar recriacao:
+The context maintains a cache to avoid recreation:
 
 ```python
-# Primeira vez: cria
+# First time: creates
 if ctx.get_cached("db_connection") is None:
     conn = create_connection()
     ctx.set_cached("db_connection", conn)
 
-# Segunda vez: reutiliza
+# Second time: reuses
 conn = ctx.get_cached("db_connection")
 ```
 
-### Variaveis de Ambiente
+### Environment Variables
 
-Resolucao de variaveis de ambiente com precedencia:
+Environment variable resolution with precedence:
 
 ```python
-# Sistema de prioridades:
-# 1. env_overrides (para testes)
-# 2. os.environ (sistema)
+# Priority system:
+# 1. env_overrides (for tests)
+# 2. os.environ (system)
 
-# Variavel obrigatoria (raise se nao existir)
+# Required variable (raises if not found)
 api_key = ctx.resolve_env("API_KEY")
 
-# Variavel opcional
+# Optional variable
 debug = ctx.resolve_env("DEBUG", required=False)
 
-# Criar novo contexto com overrides (para testes)
+# Create new context with overrides (for tests)
 test_ctx = ctx.with_env(
     API_KEY="test-key",
     DEBUG="true"
@@ -283,14 +283,14 @@ test_ctx = ctx.with_env(
 
 ### Observability via Protocols
 
-O Builder usa Protocols para baixo acoplamento:
+The Builder uses Protocols for low coupling:
 
 ```python
 from forge_base.composition import LoggerProtocol, MetricsProtocol
 
 
 class MyLogger:
-    """Logger customizado."""
+    """Custom logger."""
 
     def info(self, message: str, **kwargs) -> None:
         print(f"INFO: {message}")
@@ -306,7 +306,7 @@ class MyLogger:
 
 
 class MyMetrics:
-    """Metricas customizadas."""
+    """Custom metrics."""
 
     def increment(self, name: str, value: int = 1, **tags) -> None:
         print(f"METRIC: {name} += {value}")
@@ -315,7 +315,7 @@ class MyMetrics:
         print(f"TIMING: {name} = {value}ms")
 
 
-# Usar com Builder
+# Use with Builder
 builder = ServiceBuilder(
     log=MyLogger(),
     metrics=MyMetrics()
@@ -324,9 +324,9 @@ builder = ServiceBuilder(
 
 ---
 
-## Padrao para Apps Derivados
+## Pattern for Derived Apps
 
-Apps que dependem do ForgeBase podem expor sua propria Discovery API:
+Apps that depend on ForgeBase can expose their own Discovery API:
 
 ```python
 # my_app/discovery.py
@@ -334,18 +334,18 @@ from forge_base.dev.api import ComponentDiscovery
 
 
 class MyAppDiscovery(ComponentDiscovery):
-    """Discovery para minha aplicacao."""
+    """Discovery for my application."""
 
     def __init__(self):
-        # Escanear apenas o pacote instalado
+        # Scan only the installed package
         super().__init__(package_name="my_app")
 
 
-# Uso por agentes IA
+# Usage by AI agents
 discovery = MyAppDiscovery()
 result = discovery.scan_project()
 
-# Ver componentes de composition
+# View composition components
 print(f"Registries: {len(result.registries)}")
 print(f"Builders: {len(result.builders)}")
 print(f"Specs: {len(result.specs)}")
@@ -353,10 +353,10 @@ print(f"Specs: {len(result.specs)}")
 
 ---
 
-## Exemplo Completo
+## Complete Example
 
 ```python
-"""Exemplo completo de uso do modulo composition."""
+"""Complete example of using the composition module."""
 
 from dataclasses import dataclass, field
 from typing import Any
@@ -370,7 +370,7 @@ from forge_base.composition import (
 from forge_base.domain.exceptions import ConfigurationError
 
 
-# 1. Servico de dominio
+# 1. Domain service
 class APIService:
     def __init__(self, name: str, port: int = 8080):
         self.name = name
@@ -430,26 +430,26 @@ class APIBuilder(BuilderBase[APISpec, APIRegistry, BuildContextBase, APIService]
         )
 
 
-# 5. Uso
+# 5. Usage
 if __name__ == "__main__":
-    # Criar builder
+    # Create builder
     builder = APIBuilder()
 
-    # Construir a partir de dict
+    # Build from dict
     api = builder.build_from_dict(
         {"api": {"name": "my-api", "port": 3000}},
         APISpec
     )
 
-    # Usar
+    # Use
     api.start()  # Starting my-api on port 3000
 ```
 
 ---
 
-## Descoberta de Componentes
+## Component Discovery
 
-O `ComponentDiscovery` detecta automaticamente componentes de composition:
+`ComponentDiscovery` automatically detects composition components:
 
 ```python
 from forge_base.dev.api import ComponentDiscovery
@@ -457,41 +457,41 @@ from forge_base.dev.api import ComponentDiscovery
 discovery = ComponentDiscovery()
 result = discovery.scan_project()
 
-# Listar registries
+# List registries
 for reg in result.registries:
-    print(f"Registry: {reg.name} em {reg.file_path}:{reg.line_number}")
+    print(f"Registry: {reg.name} at {reg.file_path}:{reg.line_number}")
 
-# Listar builders
+# List builders
 for builder in result.builders:
-    print(f"Builder: {builder.name} em {builder.file_path}:{builder.line_number}")
+    print(f"Builder: {builder.name} at {builder.file_path}:{builder.line_number}")
 
-# Listar specs
+# List specs
 for spec in result.specs:
-    print(f"Spec: {spec.name} em {spec.file_path}:{spec.line_number}")
+    print(f"Spec: {spec.name} at {spec.file_path}:{spec.line_number}")
 ```
 
 ---
 
-## Boas Praticas
+## Best Practices
 
-1. **Um Builder por Dominio**: Crie builders especificos para cada dominio (ServiceBuilder, PipelineBuilder, etc.)
+1. **One Builder per Domain**: Create specific builders for each domain (ServiceBuilder, PipelineBuilder, etc.)
 
-2. **Specs Validaveis**: Sempre implemente `validate()` para detectar erros cedo
+2. **Validatable Specs**: Always implement `validate()` to detect errors early
 
-3. **Defaults Sensiveis**: Registre plugins padrao em `register_defaults()`
+3. **Sensible Defaults**: Register default plugins in `register_defaults()`
 
-4. **Testes com env_overrides**: Use `with_env()` para injetar variaveis em testes
+4. **Tests with env_overrides**: Use `with_env()` to inject variables in tests
 
-5. **Protocols para Observability**: Use `LoggerProtocol` e `MetricsProtocol` para baixo acoplamento
-
----
-
-## Proximos Passos
-
-- [Arquitetura](../referencia/arquitetura.md) — Estrutura do framework
-- [ForgeProcess](../referencia/forge-process.md) — Ciclo cognitivo completo
-- [Receitas](receitas.md) — Padroes e exemplos praticos
+5. **Protocols for Observability**: Use `LoggerProtocol` and `MetricsProtocol` for low coupling
 
 ---
 
-**"Composicao e o segredo da modularidade."**
+## Next Steps
+
+- [Architecture](../reference/architecture.md) -- Framework structure
+- [ForgeProcess](../reference/forge-process.md) -- Complete cognitive cycle
+- [Recipes](recipes.md) -- Patterns and practical examples
+
+---
+
+**"Composition is the secret of modularity."**

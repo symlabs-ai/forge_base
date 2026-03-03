@@ -1,37 +1,37 @@
-# ForgePulse — Quick Start
+# ForgePulse -- Quick Start
 
-Observabilidade nativa para UseCases em 5 minutos.
-
----
-
-## O que e ForgePulse
-
-ForgePulse instrumenta automaticamente a execucao de UseCases, capturando
-metricas (contagem, duracao, erros), spans internos e snapshots — sem
-alterar a logica de negocio. Basta envolver o UseCase com `UseCaseRunner`
-e escolher um `MonitoringLevel`.
-
-**Conceitos-chave:**
-
-| Conceito | Descricao |
-|----------|-----------|
-| `MonitoringLevel` | Controla a granularidade: OFF, BASIC, STANDARD, DETAILED, DIAGNOSTIC |
-| `UseCaseRunner` | Wrapper que executa o UseCase e coleta observabilidade |
-| `BasicCollector` | Coletor que emite metricas e gera snapshots |
-| `PulseSnapshot` | Foto do estado acumulado (execucoes, contadores, histogramas) |
-| `pulse_span` | Context manager para medir trechos internos do `execute()` |
+Native observability for UseCases in 5 minutes.
 
 ---
 
-## Setup minimo
+## What Is ForgePulse
 
-Instale forge_base (ForgePulse faz parte do pacote):
+ForgePulse automatically instruments UseCase execution, capturing
+metrics (count, duration, errors), internal spans, and snapshots -- without
+changing the business logic. Simply wrap the UseCase with `UseCaseRunner`
+and choose a `MonitoringLevel`.
+
+**Key concepts:**
+
+| Concept | Description |
+|---------|-------------|
+| `MonitoringLevel` | Controls granularity: OFF, BASIC, STANDARD, DETAILED, DIAGNOSTIC |
+| `UseCaseRunner` | Wrapper that executes the UseCase and collects observability |
+| `BasicCollector` | Collector that emits metrics and generates snapshots |
+| `PulseSnapshot` | Photo of accumulated state (executions, counters, histograms) |
+| `pulse_span` | Context manager to measure internal sections of `execute()` |
+
+---
+
+## Minimum Setup
+
+Install forge_base (ForgePulse is part of the package):
 
 ```bash
 pip install forge_base
 ```
 
-Imports necessarios para o exemplo:
+Required imports for the example:
 
 ```python
 from forge_base.application import UseCaseBase
@@ -45,9 +45,9 @@ from forge_base.pulse import (
 
 ---
 
-## Exemplo completo
+## Complete Example
 
-### 1. Defina um UseCase
+### 1. Define a UseCase
 
 ```python
 class EchoInput:
@@ -59,8 +59,8 @@ class EchoOutput:
         self.reply = reply
 
 class EchoUseCase(UseCaseBase[EchoInput, EchoOutput]):
-    # UseCaseBase exige 3 hooks de lifecycle.
-    # Para exemplos simples basta implementar como pass.
+    # UseCaseBase requires 3 lifecycle hooks.
+    # For simple examples, just implement them as pass.
     def _before_execute(self) -> None:
         pass
 
@@ -74,11 +74,11 @@ class EchoUseCase(UseCaseBase[EchoInput, EchoOutput]):
         return EchoOutput(reply=f"echo: {input_dto.message}")
 ```
 
-### 2. Execute com monitoramento
+### 2. Execute with monitoring
 
-> **Importante:** o `level` do `BasicCollector` e do `UseCaseRunner` devem
-> ser iguais. O collector usa o level para decidir quais labels/campos
-> emitir; o runner usa para decidir se instrumenta a execucao.
+> **Important:** the `level` of `BasicCollector` and `UseCaseRunner` must
+> be the same. The collector uses the level to decide which labels/fields
+> to emit; the runner uses it to decide whether to instrument the execution.
 
 ```python
 metrics = FakeMetricsCollector()
@@ -94,30 +94,30 @@ result = runner.run(EchoInput("hello"))
 print(result.reply)  # echo: hello
 ```
 
-### 3. Tire um snapshot
+### 3. Take a snapshot
 
 ```python
 snapshot = collector.snapshot()
 
-print(f"Execucoes: {len(snapshot.executions)}")
-print(f"Contadores: {snapshot.counters}")
-print(f"Histogramas: {list(snapshot.histograms.keys())}")
+print(f"Executions: {len(snapshot.executions)}")
+print(f"Counters: {snapshot.counters}")
+print(f"Histograms: {list(snapshot.histograms.keys())}")
 ```
 
-Saida esperada:
+Expected output:
 
 ```
-Execucoes: 1
-Contadores: {'pulse.execution.count{use_case=EchoUseCase,value_track=legacy}': 1, ...}
-Histogramas: ['pulse.execution.duration_ms{use_case=EchoUseCase,value_track=legacy}']
+Executions: 1
+Counters: {'pulse.execution.count{use_case=EchoUseCase,value_track=legacy}': 1, ...}
+Histograms: ['pulse.execution.duration_ms{use_case=EchoUseCase,value_track=legacy}']
 ```
 
 ---
 
-## Monitorando erros
+## Monitoring Errors
 
-Quando `execute()` lanca uma excecao, o runner chama `collector.on_error`
-antes de re-lancar. O snapshot registra `error_type`:
+When `execute()` throws an exception, the runner calls `collector.on_error`
+before re-raising. The snapshot records `error_type`:
 
 ```python
 class FailUseCase(UseCaseBase[EchoInput, EchoOutput]):
@@ -149,11 +149,11 @@ print(exec_record["error_type"])  # ValueError
 
 ---
 
-## Adicionando spans
+## Adding Spans
 
-`pulse_span` mede trechos internos do `execute()`. Funciona como
-context manager e so tem custo quando executado dentro de um `UseCaseRunner`
-com level != OFF.
+`pulse_span` measures internal sections of `execute()`. It works as a
+context manager and only has cost when executed inside a `UseCaseRunner`
+with level != OFF.
 
 ```python
 from forge_base.pulse import pulse_span
@@ -188,19 +188,19 @@ for span in snapshot.executions[0]["spans"]:
     print(f"{span['name']}: {span['duration_ms']:.2f}ms")
 ```
 
-Fora do runner, `pulse_span` e no-op (yield `None`, zero overhead).
+Outside the runner, `pulse_span` is a no-op (yields `None`, zero overhead).
 
 ---
 
-## Proximos passos
+## Next Steps
 
-Para ir alem do basico:
+To go beyond the basics:
 
-- **Monitoring Levels** — controle fino de granularidade (STANDARD, DETAILED, DIAGNOSTIC)
-- **ValueTrackRegistry** — mapeamento de UseCases via YAML
-- **@pulse_meta** — metadados estaticos por UseCase
-- **SamplingPolicy** — amostragem probabilistica
-- **ExportPipeline** — exportacao assincrona (JSON Lines, custom)
-- **DashboardSummary** — metricas agregadas com p95
+- **Monitoring Levels** -- fine-grained granularity control (STANDARD, DETAILED, DIAGNOSTIC)
+- **ValueTrackRegistry** -- UseCase mapping via YAML
+- **@pulse_meta** -- static metadata per UseCase
+- **SamplingPolicy** -- probabilistic sampling
+- **ExportPipeline** -- asynchronous export (JSON Lines, custom)
+- **DashboardSummary** -- aggregated metrics with p95
 
-Tudo isso no [Cookbook](pulse_cookbook.md).
+All of this in the [Cookbook](pulse_cookbook.md).

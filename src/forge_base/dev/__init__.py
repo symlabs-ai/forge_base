@@ -61,9 +61,9 @@ def get_agent_quickstart() -> str:
             'AI_AGENT_QUICK_START.md'
         ).decode('utf-8')
     except (FileNotFoundError, ModuleNotFoundError, AttributeError):
-        # Fallback: read from docs/agentes-ia/ if in development
+        # Fallback: read from docs/ai-agents/ if in development
         project_root = Path(__file__).parent.parent.parent.parent
-        quickstart_path = project_root / 'docs' / 'agentes-ia' / 'inicio-rapido.md'
+        quickstart_path = project_root / 'docs' / 'ai-agents' / 'quick-start.md'
         if quickstart_path.exists():
             return quickstart_path.read_text(encoding='utf-8')
         # Legacy fallback

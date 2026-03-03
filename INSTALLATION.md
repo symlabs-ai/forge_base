@@ -1,12 +1,12 @@
-# Instalação do ForgeBase
+# ForgeBase Installation
 
-## Instalação Rápida
+## Quick Installation
 
 ```bash
 pip install git+https://github.com/symlabs-ai/forge_base.git
 ```
 
-## Instalação para Desenvolvimento
+## Development Installation
 
 ```bash
 git clone https://github.com/symlabs-ai/forge_base.git
@@ -16,7 +16,7 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
 ```
 
-## Documentação Completa
+## Full Documentation
 
-- **[Início Rápido](docs/usuarios/inicio-rapido.md)** — Instalação, primeiro uso e exemplos
-- **[Ambiente e Scripts](docs/usuarios/ambiente_e_scripts.md)** — Setup de venv, lint (Ruff), pre-commit hooks
+- **[Quick Start](docs/users/quick-start.md)** — Installation, first use, and examples
+- **[Environment and Scripts](docs/users/environment-and-scripts.md)** — venv setup, lint (Ruff), pre-commit hooks

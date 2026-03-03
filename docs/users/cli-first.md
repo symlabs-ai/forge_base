@@ -1,40 +1,40 @@
-# CLI First — Filosofia de Desenvolvimento
+# CLI First -- Development Philosophy
 
-> "Se não funciona no terminal, não funciona em lugar nenhum."
+> "If it doesn't work in the terminal, it doesn't work anywhere."
 
-## O Princípio
+## The Principle
 
-**CLI First** significa que todo UseCase deve ser validado via linha de comando antes de ser exposto via API HTTP, WebSocket, ou qualquer outra interface.
-
-```
-UseCase → CLIAdapter → Validado? → HTTPAdapter/WebUI
-```
-
-## Por que CLI First?
-
-| Benefício | Descrição |
-|-----------|-----------|
-| **Testabilidade** | CLI é trivial de automatizar em scripts e CI/CD |
-| **Rapidez** | Testar sem subir servidor, banco, frontend |
-| **Isolamento** | Valida lógica de negócio sem dependências de UI |
-| **Automação** | Integração com pipelines, cron jobs, scripts |
-| **Debug** | Output direto, sem camadas de abstração |
-| **Documentação viva** | `--help` documenta o que o sistema faz |
-
-## Fluxo de Desenvolvimento
+**CLI First** means that every UseCase must be validated via command line before being exposed via HTTP API, WebSocket, or any other interface.
 
 ```
-1. Escrever UseCase (domain + application)
-2. Expor via CLIAdapter
-3. Testar manualmente no terminal
-4. Automatizar testes CLI
-5. Validar com usuário/stakeholder via CLI
-6. Só então criar HTTPAdapter/API/UI
+UseCase → CLIAdapter → Validated? → HTTPAdapter/WebUI
 ```
 
-## Implementação no ForgeBase
+## Why CLI First?
 
-### 1. Criar o UseCase
+| Benefit | Description |
+|---------|-------------|
+| **Testability** | CLI is trivial to automate in scripts and CI/CD |
+| **Speed** | Test without spinning up a server, database, or frontend |
+| **Isolation** | Validates business logic without UI dependencies |
+| **Automation** | Integration with pipelines, cron jobs, scripts |
+| **Debug** | Direct output, without abstraction layers |
+| **Living documentation** | `--help` documents what the system does |
+
+## Development Flow
+
+```
+1. Write UseCase (domain + application)
+2. Expose via CLIAdapter
+3. Test manually in the terminal
+4. Automate CLI tests
+5. Validate with user/stakeholder via CLI
+6. Only then create HTTPAdapter/API/UI
+```
+
+## Implementation in ForgeBase
+
+### 1. Create the UseCase
 
 ```python
 # src/application/usecases/create_order.py
@@ -57,11 +57,11 @@ class CreateOrderUseCase(UseCaseBase[CreateOrderInput, CreateOrderOutput]):
         self.product_repo = product_repo
 
     def execute(self, input: CreateOrderInput) -> CreateOrderOutput:
-        # Validação
+        # Validation
         if not input.items:
-            raise ValidationError("Pedido deve ter pelo menos um item")
+            raise ValidationError("Order must have at least one item")
 
-        # Lógica de negócio
+        # Business logic
         order = Order.create(
             customer_id=input.customer_id,
             items=input.items
@@ -75,7 +75,7 @@ class CreateOrderUseCase(UseCaseBase[CreateOrderInput, CreateOrderOutput]):
         )
 ```
 
-### 2. Expor via CLIAdapter
+### 2. Expose via CLIAdapter
 
 ```python
 # src/cli.py
@@ -83,11 +83,11 @@ from forge_base.adapters.cli import CLIAdapter
 from application.usecases.create_order import CreateOrderUseCase
 from infrastructure.repositories import OrderRepository, ProductRepository
 
-# Inicializar dependências
+# Initialize dependencies
 order_repo = OrderRepository()
 product_repo = ProductRepository()
 
-# Registrar UseCases
+# Register UseCases
 cli = CLIAdapter(usecases={
     'create_order': CreateOrderUseCase(order_repo, product_repo),
     'list_orders': ListOrdersUseCase(order_repo),
@@ -98,13 +98,13 @@ if __name__ == '__main__':
     cli.run()
 ```
 
-### 3. Testar no Terminal
+### 3. Test in the Terminal
 
 ```bash
-# Listar comandos disponíveis
+# List available commands
 python src/cli.py list
 
-# Criar pedido
+# Create an order
 python src/cli.py exec create_order --json '{
   "customer_id": "cust-123",
   "items": [
@@ -113,7 +113,7 @@ python src/cli.py exec create_order --json '{
   ]
 }'
 
-# Output (JSON estruturado)
+# Output (structured JSON)
 {
   "result": {
     "order_id": "ord-abc-123",
@@ -122,7 +122,7 @@ python src/cli.py exec create_order --json '{
 }
 ```
 
-### 4. Automatizar Testes
+### 4. Automate Tests
 
 ```python
 # tests/cli/test_create_order_cli.py
@@ -130,7 +130,7 @@ import subprocess
 import json
 
 def test_create_order_via_cli():
-    """Teste end-to-end via CLI."""
+    """End-to-end test via CLI."""
     result = subprocess.run(
         [
             'python', 'src/cli.py', 'exec', 'create_order',
@@ -145,7 +145,7 @@ def test_create_order_via_cli():
     assert 'order_id' in output['result']
 
 def test_create_order_empty_items_fails():
-    """Pedido sem itens deve falhar."""
+    """Order without items should fail."""
     result = subprocess.run(
         [
             'python', 'src/cli.py', 'exec', 'create_order',
@@ -156,10 +156,10 @@ def test_create_order_empty_items_fails():
     )
 
     assert result.returncode == 1
-    assert 'pelo menos um item' in result.stderr
+    assert 'at least one item' in result.stderr
 ```
 
-### 5. Só Depois: HTTP/API
+### 5. Only After: HTTP/API
 
 ```python
 # src/api.py
@@ -170,46 +170,46 @@ app = FastAPI()
 
 @app.post("/orders")
 def create_order(input: CreateOrderInput):
-    # Mesmo UseCase, diferente adapter
+    # Same UseCase, different adapter
     usecase = CreateOrderUseCase(order_repo, product_repo)
     result = usecase.execute(input)
     return {"order_id": result.order_id, "total": result.total}
 ```
 
-## Padrão de Projeto
+## Project Pattern
 
 ```
 src/
-├── domain/              # Entidades, regras de negócio
+├── domain/              # Entities, business rules
 ├── application/
-│   └── usecases/        # UseCases puros
-├── infrastructure/      # Repositórios, configs
+│   └── usecases/        # Pure UseCases
+├── infrastructure/      # Repositories, configs
 ├── adapters/
-│   ├── cli/             # CLI (primeiro!)
-│   └── http/            # HTTP (depois)
-└── cli.py               # Entry point CLI
+│   ├── cli/             # CLI (first!)
+│   └── http/            # HTTP (after)
+└── cli.py               # CLI entry point
 ```
 
-## Checklist CLI First
+## CLI First Checklist
 
-Antes de criar API HTTP, valide:
+Before creating an HTTP API, validate:
 
-- [ ] UseCase funciona via CLI?
-- [ ] Erros retornam mensagens claras?
-- [ ] Output é JSON estruturado?
-- [ ] `--help` documenta os parâmetros?
-- [ ] Testes CLI passam?
-- [ ] Stakeholder validou o comportamento?
+- [ ] Does the UseCase work via CLI?
+- [ ] Do errors return clear messages?
+- [ ] Is the output structured JSON?
+- [ ] Does `--help` document the parameters?
+- [ ] Do CLI tests pass?
+- [ ] Has the stakeholder validated the behavior?
 
-## Benefícios em Produção
+## Benefits in Production
 
-### Scripts de Manutenção
+### Maintenance Scripts
 
 ```bash
-# Cron job para limpeza
+# Cron job for cleanup
 0 2 * * * python cli.py exec cleanup_old_orders --json '{"days": 90}'
 
-# Script de migração
+# Migration script
 python cli.py exec migrate_users --json '{"batch_size": 100}'
 ```
 
@@ -223,59 +223,59 @@ python cli.py exec migrate_users --json '{"batch_size": 100}'
     python cli.py exec create_order --json '{"customer_id": "test", "items": [...]}'
 ```
 
-### Debug em Produção
+### Debugging in Production
 
 ```bash
-# SSH no servidor
+# SSH into the server
 python cli.py exec get_order --json '{"order_id": "ord-123"}'
 python cli.py exec retry_payment --json '{"order_id": "ord-123"}'
 ```
 
 ## Anti-patterns
 
-### ❌ Errado: HTTP First
+### Wrong: HTTP First
 
 ```python
-# Criar API sem validar UseCase
+# Creating API without validating UseCase
 @app.post("/orders")
 def create_order(req):
-    # Lógica misturada com HTTP
-    # Difícil de testar
-    # Difícil de reusar
+    # Logic mixed with HTTP
+    # Hard to test
+    # Hard to reuse
     pass
 ```
 
-### ✅ Correto: CLI First
+### Correct: CLI First
 
 ```python
-# 1. UseCase puro
+# 1. Pure UseCase
 class CreateOrderUseCase:
     def execute(self, input): ...
 
-# 2. CLI valida
+# 2. CLI validates
 cli.run(['exec', 'create_order', '--json', '...'])
 
-# 3. HTTP reusa
+# 3. HTTP reuses
 @app.post("/orders")
 def create_order(req):
     return usecase.execute(req)
 ```
 
-## Integração com ForgeProcess
+## Integration with ForgeProcess
 
-CLI First é a **Fase 4** do ciclo cognitivo ForgeProcess:
+CLI First is **Phase 4** of the ForgeProcess cognitive cycle:
 
 ```
 MDD → BDD → TDD → CLI → Feedback
                    ↑
-              Você está aqui
+              You are here
 ```
 
-Antes de entregar para usuários (Feedback), valide via CLI.
+Before delivering to users (Feedback), validate via CLI.
 
 ---
 
-**Referências:**
-- [CLIAdapter](../referencia/arquitetura.md) — Implementação do adapter
-- [ForgeProcess](../referencia/forge-process.md) — Ciclo completo
-- [UseCaseBase](../referencia/arquitetura.md) — Base para casos de uso
+**References:**
+- [CLIAdapter](../reference/architecture.md) -- Adapter implementation
+- [ForgeProcess](../reference/forge-process.md) -- Complete cycle
+- [UseCaseBase](../reference/architecture.md) -- Base for use cases

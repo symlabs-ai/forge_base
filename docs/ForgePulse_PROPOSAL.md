@@ -1,105 +1,105 @@
-# Proposta Formal — Evolução do ForgeBase com CL/CE e Camada Opcional ForgePulse (ValueTracks)
+# Formal Proposal — ForgeBase Evolution with CL/CE and Optional ForgePulse Layer (ValueTracks)
 
-## 1) Contexto e motivação
+## 1) Context and Motivation
 
-O ForgeBase hoje é usado com sucesso sem os conceitos formais de **ValueTracks** e sem uma fronteira explícita entre **núcleo estável** e **extensões por cliente/produto**. Isso resolve entrega, mas limita três objetivos estratégicos:
+ForgeBase is currently used successfully without the formal concepts of **ValueTracks** and without an explicit boundary between **stable core** and **customer/product extensions**. This works for delivery but limits three strategic objectives:
 
-1. **Mensurar entrega de valor de forma objetiva**
-   Sem ValueTracks, a gente mede “saúde técnica” solta (logs/métricas), mas não mede “valor entregue por eixo” (ex.: Governança de custo, Confiabilidade, Segurança, Qualidade de roteamento). Resultado: o roadmap vira narrativa.
+1. **Objectively measuring value delivery**
+   Without ValueTracks, we measure loose "technical health" (logs/metrics), but don't measure "value delivered per axis" (e.g., Cost Governance, Reliability, Security, Routing Quality). Result: the roadmap becomes narrative.
 
-2. **Padronizar instrumentação para dev + agent**
-   Queremos que o dev e o agent implementem features já dentro de padrões que facilitem medir performance/custo/qualidade/complexidade/segurança por ValueTrack. Sem um padrão nativo, cada equipe mede do seu jeito — e comparar vira impossibilidade.
+2. **Standardizing instrumentation for dev + agent**
+   We want developers and agents to implement features already following patterns that facilitate measuring performance/cost/quality/complexity/security per ValueTrack. Without a native standard, each team measures in its own way — and comparison becomes impossible.
 
-3. **Evoluir em produção com governança (sem quebrar core)**
-   A instrumentação precisa ser configurável por níveis (como logs), por tenant, por ValueTrack, com sampling e budgets. Isso é extensão (CE), não deveria contaminar o core (CL).
+3. **Evolving in production with governance (without breaking core)**
+   Instrumentation needs to be configurable by levels (like logs), by tenant, by ValueTrack, with sampling and budgets. This is an extension (CE), and should not contaminate the core (CL).
 
-**Princípio:** se ValueTrack não for mensurável, ele vira slogan.
-
----
-
-## 2) CL/CE: o que é, e por que isso guia a mudança
-
-### CL — Core Logic (núcleo estável)
-
-Tudo que deve permanecer confiável, consistente e compatível ao longo do tempo:
-
-* runtime de execução (engine)
-* contratos (interfaces/tipos) e schema base
-* propagação de contexto (correlation_id, tenant, versão)
-* mecanismos de plugin/hook e governança
-* compatibilidade retroativa e versionamento
-
-**CL não deve conter regras específicas de cliente, política específica, exporter específico.**
-
-### CE — Customer Extensions (extensões configuráveis)
-
-Tudo que varia por projeto/tenant/produto/ambiente e deve ser plugável:
-
-* mapeamentos de ValueTracks/SubTracks para UseCases (via spec)
-* políticas de monitoramento (nível, sampling, budgets)
-* exporters/sinks (OTEL/Prometheus/ClickHouse/Postgres/arquivo/etc.)
-* relatórios customizados por produto/cliente
-* classificações de risco e tags de segurança específicas
-
-**CE não pode “furar” o CL. CE pluga via contrato.**
-
-### Por que isso exige mudança no ForgeBase?
-
-Porque hoje falta um **ponto oficial** no CL para:
-
-* carregar um **ExecutionContext** consistente
-* emitir eventos/métricas/traces com schema estável
-* aplicar policy por níveis com fast-path
-* permitir CE acoplar exporters/mapeamentos/relatórios sem mexer no core
-
-Sem isso, cada produto cria instrumentação “ao lado”, duplicada, inconsistente e difícil de governar.
+**Principle:** if a ValueTrack is not measurable, it becomes a slogan.
 
 ---
 
-## 3) Objetivo da mudança
+## 2) CL/CE: What It Is, and Why It Guides the Change
 
-Adicionar ao ForgeBase uma **camada opcional** chamada **ForgePulse**, que instrumenta execuções por ValueTrack **sem quebrar compatibilidade**, preservando Clean Architecture e permitindo governança CL/CE.
+### CL — Core Logic (stable core)
 
-**Importante:** isso não substitui o ForgeBase atual. É uma **extensão do runtime** que pode ser desligada (OFF) e habilitada por níveis.
+Everything that must remain reliable, consistent, and compatible over time:
+
+* Execution runtime (engine)
+* Contracts (interfaces/types) and base schema
+* Context propagation (correlation_id, tenant, version)
+* Plugin/hook mechanisms and governance
+* Backward compatibility and versioning
+
+**CL must not contain** customer-specific rules, specific policies, or specific exporters.
+
+### CE — Customer Extensions (configurable extensions)
+
+Everything that varies by project/tenant/product/environment and must be pluggable:
+
+* ValueTrack/SubTrack mappings to UseCases (via spec)
+* Monitoring policies (level, sampling, budgets)
+* Exporters/sinks (OTEL/Prometheus/ClickHouse/Postgres/file/etc.)
+* Custom reports by product/customer
+* Risk classifications and security tags
+
+**CE cannot break through CL. CE plugs in via contract.**
+
+### Why This Requires Changes to ForgeBase
+
+Because today there is no **official point** in CL to:
+
+* Load a consistent **ExecutionContext**
+* Emit events/metrics/traces with a stable schema
+* Apply policy by levels with a fast-path
+* Allow CE to attach exporters/mappings/reports without touching the core
+
+Without this, each product creates "side" instrumentation — duplicated, inconsistent, and hard to govern.
 
 ---
 
-## 4) Premissas e restrições
+## 3) Objective of the Change
 
-* **Compatibilidade total**: o ForgeBase atual deve continuar funcionando sem alteração de código do consumidor.
-* **Opt-in**: nada de “decorator obrigatório”. Decorators (se existirem) são metadata opcional.
-* **Clean Architecture intacta**: UseCases não dependem de exporters, OTEL, banco, etc. Instrumentação ocorre no composition root e adapters.
-* **Overhead controlado**: níveis + sampling + budgets + buffer/drop.
-* **Schema estável**: eventos/metrics/traces seguem versão e compatibilidade.
+Add to ForgeBase an **optional layer** called **ForgePulse**, which instruments executions by ValueTrack **without breaking compatibility**, preserving Clean Architecture and enabling CL/CE governance.
+
+**Important:** this does not replace the current ForgeBase. It is a **runtime extension** that can be turned off (OFF) and enabled by levels.
 
 ---
 
-## 5) Visão geral da solução: ForgePulse como carapaça opcional
+## 4) Premises and Constraints
 
-### Componentes (alto nível)
+* **Full compatibility**: the current ForgeBase must continue working without any consumer code changes.
+* **Opt-in**: no "mandatory decorator". Decorators (if they exist) are optional metadata.
+* **Clean Architecture intact**: UseCases do not depend on exporters, OTEL, databases, etc. Instrumentation occurs in the composition root and adapters.
+* **Controlled overhead**: levels + sampling + budgets + buffer/drop.
+* **Stable schema**: events/metrics/traces follow versioning and compatibility.
 
-**ForgeBase (CL existente)**
-→ permanece como motor
+---
 
-**ForgePulse (CL opcional)**
-→ runtime de instrumentação: contexto, policy, coletores, reporter
+## 5) Solution Overview: ForgePulse as an Optional Shell
+
+### Components (high level)
+
+**ForgeBase (existing CL)**
+-> remains as the engine
+
+**ForgePulse (optional CL)**
+-> instrumentation runtime: context, policy, collectors, reporter
 
 **ForgePulse Extensions (CE)**
-→ mapeamentos (spec), exporters, políticas específicas, relatórios customizados
+-> mappings (spec), exporters, specific policies, custom reports
 
-### Onde a instrumentação acontece (para manter Clean)
+### Where Instrumentation Happens (to maintain Clean Architecture)
 
-* **UseCaseRunner/ExecutionRunner** (composition root): mede início/fim/erro, cria contexto
-* **Adapters** (LLM/HTTP/DB): medem custo/latência/retry/fallback e geram spans/eventos
-* UseCase continua “puro”
+* **UseCaseRunner/ExecutionRunner** (composition root): measures start/end/error, creates context
+* **Adapters** (LLM/HTTP/DB): measure cost/latency/retry/fallback and generate spans/events
+* UseCase remains "pure"
 
 ---
 
-## 6) ExecutionContext universal (mesmo no legado)
+## 6) Universal ExecutionContext (even in legacy)
 
-ForgePulse introduz `ExecutionContext` **sempre presente**, mesmo que o código não declare ValueTrack.
+ForgePulse introduces `ExecutionContext` as **always present**, even if the code does not declare a ValueTrack.
 
-Campos mínimos:
+Minimum fields:
 
 * `correlation_id`
 * `tenant_id`
@@ -110,124 +110,122 @@ Campos mínimos:
 * `version` (build/git sha)
 * `environment` (dev/stg/prod)
 
-### Fallback legado (compatibilidade)
+### Legacy Fallback (compatibility)
 
-Se não houver mapeamento nem decorators:
+If there is no mapping or decorators:
 
 * `value_track="legacy"`
 * `subtrack="legacy"`
-* `feature/use_case` inferidos por classe/módulo/rota
+* `feature/use_case` inferred from class/module/route
 
-**Resultado:** o legado vira observável sem refatorar.
-
----
-
-## 7) Níveis de monitoramento (policy) e controle de performance
-
-ForgePulse deve suportar:
-
-* **OFF**: no-op real (fast path)
-* **BASIC**: tempo total + sucesso/erro + contadores
-* **STANDARD**: + latência por adapter + erros por etapa (amostrado)
-* **DETAILED**: + tracing + custo (tokens/cpu) (amostragem agressiva)
-* **DIAGNOSTIC**: profiling/payload redigido (somente por flag/tenant/correlation_id)
-
-Regras obrigatórias:
-
-* **decidir nível antes** de alocar/serializar
-* sampling por `value_track`, `tenant`, `endpoint`
-* budgets por execução (limite de spans/eventos/bytes)
-* buffer assíncrono + drop controlado (não derrubar o sistema por telemetria)
+**Result:** legacy becomes observable without refactoring.
 
 ---
 
-## 8) ValueTracks/SubTracks: como mapear sem obrigar o time
+## 7) Monitoring Levels (policy) and Performance Control
 
-Ordem de resolução (prioridade):
+ForgePulse must support:
 
-1. **Spec/Registry (CE)** — recomendado (não mexe no código)
-2. **Decorators opcionais (metadata only)** — quando fizer sentido
-3. **Heurística legado** — fallback
+* **OFF**: real no-op (fast path)
+* **BASIC**: total time + success/error + counters
+* **STANDARD**: + latency per adapter + errors per stage (sampled)
+* **DETAILED**: + tracing + cost (tokens/cpu) (aggressive sampling)
+* **DIAGNOSTIC**: profiling/redacted payload (only by flag/tenant/correlation_id)
 
-Exemplo (CE) `forgepulse.value_tracks.yml`:
+Mandatory rules:
 
-* mapeia `use_case` → `value_track`/`subtrack`
-* permite tags (domínio, risco, etc.)
-
-Isso permite adoção gradual e governada.
-
----
-
-## 9) ECM — Extension Compatibility Matrix (governança de extensões)
-
-### O que é ECM
-
-ECM é a matriz formal de compatibilidade entre:
-
-* versão do ForgeBase (CL)
-* versão do ForgePulse Schema (CL)
-* versões de extensões (CE): exporters, pacotes de mapeamento, reporters
-
-**Função:** impedir que uma extensão CE incompatível entre em produção por acidente.
-
-### Comportamento esperado
-
-* no startup: runtime valida ECM
-* se incompatível: desabilita a extensão (ou falha hard, conforme policy)
-* registra evento/alerta de incompatibilidade
+* **Decide level before** allocating/serializing
+* Sampling by `value_track`, `tenant`, `endpoint`
+* Budgets per execution (span/event/byte limits)
+* Async buffer + controlled drop (don't crash the system due to telemetry)
 
 ---
 
-## 10) Relatórios (outputs mínimos)
+## 8) ValueTracks/SubTracks: How to Map Without Forcing the Team
 
-ForgePulse deve gerar, no mínimo:
+Resolution order (priority):
 
-### Relatório Operacional (técnico)
+1. **Spec/Registry (CE)** — recommended (doesn't touch code)
+2. **Optional decorators (metadata only)** — when it makes sense
+3. **Legacy heuristic** — fallback
 
-* Top ValueTracks por latência (p95/p99)
-* Top por taxa de erro
-* Gargalos por adapter/subtrack (quando disponível)
-* Regressão vs baseline por versão
+Example (CE) `forgepulse.value_tracks.yml`:
 
-### Relatório Estratégico (produto/exec)
+* Maps `use_case` -> `value_track`/`subtrack`
+* Allows tags (domain, risk, etc.)
 
-* Custo por ValueTrack (tokens/CPU quando habilitado)
-* Adoção/uso por ValueTrack e por tenant
-* Proxy de complexidade (spans/subtracks/calls externas)
-* Exposição/risco (policy denies, acessos inválidos, etc.)
-
-Formato: **Markdown + JSON**.
+This enables gradual and governed adoption.
 
 ---
 
-## 11) Critérios de aceitação
+## 9) ECM — Extension Compatibility Matrix (extension governance)
 
-1. Com ForgePulse **OFF**, todo o ForgeBase atual roda igual (testes passam).
-2. Em **BASIC**, overhead é mínimo e não cria gargalo perceptível.
-3. `ExecutionContext` existe sempre (mesmo legado com `legacy/*`).
-4. Policy funciona: níveis, sampling, budgets, toggles por tenant/correlation_id.
-5. ECM é validado e impede extensão incompatível.
-6. Relatórios gerados (operacional + estratégico) ao menos para `legacy` e para tracks mapeados.
-7. Clean Architecture preservada: use cases não dependem de infra.
+### What Is ECM
 
----
+ECM is the formal compatibility matrix between:
 
-## 12) Plano de adoção (sem trauma)
+* ForgeBase version (CL)
+* ForgePulse Schema version (CL)
+* Extension versions (CE): exporters, mapping packages, reporters
 
-* **Fase 0**: integrar ForgePulse como no-op (OFF)
-* **Fase 1**: ligar BASIC/STANDARD com heurística para legado → primeiros relatórios
-* **Fase 2**: adicionar mapeamento por spec (CE) → ValueTracks reais sem mexer no código
-* **Fase 3**: decorators opcionais em módulos novos → precisão de subtracks/traces
-* **Fase 4**: strict mode por escopo (somente onde controlado)
+**Purpose:** prevent an incompatible CE extension from entering production by accident.
+
+### Expected Behavior
+
+* On startup: runtime validates ECM
+* If incompatible: disables the extension (or hard fails, per policy)
+* Logs incompatibility event/alert
 
 ---
 
-## 13) Benefícios diretos (por que vale mexer)
+## 10) Reports (minimum outputs)
 
-* Roadmap deixa de ser narrativa: vira evidência por ValueTrack
-* Agent e dev passam a codar dentro de padrões mensuráveis
-* Governança CL/CE evita “telemetria acoplada” e gambiarra por produto
-* Diagnóstico rápido com níveis (microscópio quando precisa, leve no dia a dia)
-* Comparação de versões e regressão vira rotina, não caçada
+ForgePulse must generate, at minimum:
 
+### Operational Report (technical)
 
+* Top ValueTracks by latency (p95/p99)
+* Top by error rate
+* Bottlenecks by adapter/subtrack (when available)
+* Regression vs baseline by version
+
+### Strategic Report (product/executive)
+
+* Cost per ValueTrack (tokens/CPU when enabled)
+* Adoption/usage per ValueTrack and per tenant
+* Complexity proxy (spans/subtracks/external calls)
+* Exposure/risk (policy denies, invalid accesses, etc.)
+
+Format: **Markdown + JSON**.
+
+---
+
+## 11) Acceptance Criteria
+
+1. With ForgePulse **OFF**, the entire current ForgeBase runs identically (tests pass).
+2. In **BASIC**, overhead is minimal and does not create a noticeable bottleneck.
+3. `ExecutionContext` always exists (even legacy with `legacy/*`).
+4. Policy works: levels, sampling, budgets, toggles by tenant/correlation_id.
+5. ECM is validated and prevents incompatible extensions.
+6. Reports generated (operational + strategic) at least for `legacy` and for mapped tracks.
+7. Clean Architecture preserved: use cases do not depend on infrastructure.
+
+---
+
+## 12) Adoption Plan (trauma-free)
+
+* **Phase 0**: integrate ForgePulse as no-op (OFF)
+* **Phase 1**: enable BASIC/STANDARD with legacy heuristic -> first reports
+* **Phase 2**: add mapping via spec (CE) -> real ValueTracks without touching code
+* **Phase 3**: optional decorators in new modules -> subtrack/trace precision
+* **Phase 4**: strict mode per scope (only where controlled)
+
+---
+
+## 13) Direct Benefits (why it's worth the effort)
+
+* Roadmap stops being narrative: becomes evidence per ValueTrack
+* Agents and developers code within measurable patterns
+* CL/CE governance prevents "coupled telemetry" and product-specific hacks
+* Quick diagnosis with levels (microscope when needed, lightweight day-to-day)
+* Version comparison and regression detection becomes routine, not a hunt

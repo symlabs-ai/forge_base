@@ -2,15 +2,15 @@
 
 ## Status
 
-**Aceita** (2025-11-03)
+**Accepted** (2025-11-03)
 
 ## Context
 
-ForgeBase não é apenas um framework técnico, é um framework **cognitivo** — código que pensa, mede e explica. Testes tradicionais validam **comportamento** ("o código faz o que deveria fazer?"), mas não validam **intenção** ("o código faz o que PRETENDÍAMOS que fizesse?").
+ForgeBase is not just a technical framework, it is a **cognitive** framework — code that thinks, measures, and explains. Traditional tests validate **behavior** ("does the code do what it should do?"), but do not validate **intent** ("does the code do what we INTENDED it to do?").
 
-### Limitações de Testes Tradicionais
+### Limitations of Traditional Tests
 
-**Testes Unitários Convencionais:**
+**Conventional Unit Tests:**
 ```python
 def test_create_user():
     user = create_user("Alice", "alice@example.com")
@@ -18,60 +18,60 @@ def test_create_user():
     assert user.email == "alice@example.com"
 ```
 
-**O que validam:**
-- ✅ Sintaxe correta
-- ✅ Tipo correto
-- ✅ Valor esperado
+**What they validate:**
+- ✅ Correct syntax
+- ✅ Correct type
+- ✅ Expected value
 
-**O que NÃO validam:**
-- ❌ Intenção original foi cumprida?
-- ❌ Coerência com especificação (YAML/ForgeProcess)?
-- ❌ Instrumentação está funcionando?
-- ❌ Side effects indesejados?
-- ❌ Performance aceitável?
+**What they DO NOT validate:**
+- ❌ Was the original intent fulfilled?
+- ❌ Coherence with specification (YAML/ForgeProcess)?
+- ❌ Is instrumentation working?
+- ❌ Unintended side effects?
+- ❌ Acceptable performance?
 
-### Necessidades do ForgeBase
+### ForgeBase Needs
 
-Como framework cognitivo, precisamos validar:
+As a cognitive framework, we need to validate:
 
-1. **Coerência Cognitiva**: Intent vs Execution
-2. **Observabilidade**: Métricas estão sendo coletadas?
-3. **Pureza**: Funções sem side effects indesejados?
-4. **Performance**: Execução dentro de limites aceitáveis?
-5. **Rastreabilidade**: Correlation IDs propagando?
-6. **Feedback Loops**: Learning data sendo gerado?
+1. **Cognitive Coherence**: Intent vs Execution
+2. **Observability**: Are metrics being collected?
+3. **Purity**: Functions without unintended side effects?
+4. **Performance**: Execution within acceptable limits?
+5. **Traceability**: Are correlation IDs propagating?
+6. **Feedback Loops**: Is learning data being generated?
 
-### Forças em Jogo
+### Forces at Play
 
-**Necessidades:**
-- Validar não apenas "funciona", mas "funciona como PRETENDIDO"
-- Detectar drift entre especificação e implementação
-- Garantir observabilidade está ativa
-- Validar integração ForgeProcess ↔ ForgeBase
+**Needs:**
+- Validate not just "it works", but "it works as INTENDED"
+- Detect drift between specification and implementation
+- Ensure observability is active
+- Validate ForgeProcess ↔ ForgeBase integration
 
-**Riscos:**
-- Testes mais complexos de escrever
-- Overhead de validação adicional
-- Curva de aprendizado para novos desenvolvedores
-- Potencial para over-testing
+**Risks:**
+- More complex tests to write
+- Additional validation overhead
+- Learning curve for new developers
+- Potential for over-testing
 
 ## Decision
 
-**Adotamos "Cognitive Testing" como filosofia de teste: validar intenção, não apenas comportamento.**
+**We adopted "Cognitive Testing" as a testing philosophy: validate intent, not just behavior.**
 
-### Conceito: ForgeTestCase
+### Concept: ForgeTestCase
 
-Criamos `ForgeTestCase`, uma extensão de `unittest.TestCase` com **assertions cognitivas**:
+We created `ForgeTestCase`, an extension of `unittest.TestCase` with **cognitive assertions**:
 
 ```python
 class ForgeTestCase(unittest.TestCase):
     """
-    Base class para testes cognitivos.
+    Base class for cognitive tests.
 
-    Adiciona validações de:
-    - Intenção vs execução
-    - Métricas coletadas
-    - Pureza funcional
+    Adds validations for:
+    - Intent vs execution
+    - Collected metrics
+    - Functional purity
     - Performance
     """
 
@@ -81,42 +81,42 @@ class ForgeTestCase(unittest.TestCase):
     def assert_performance_within(self, fn: Callable, max_duration_ms: float)
 ```
 
-### Assertions Cognitivas
+### Cognitive Assertions
 
 #### 1. assert_intent_matches
 
-**Propósito**: Validar que a execução real corresponde à intenção original.
+**Purpose**: Validate that the actual execution corresponds to the original intent.
 
 ```python
 class TestCreateUser(ForgeTestCase):
     def test_creates_user_with_intent(self):
-        # Captura intenção
+        # Capture intent
         intent = "Create a new user with valid email address"
 
-        # Execução
+        # Execution
         result = usecase.execute(CreateUserInput(
             name="Alice",
             email="alice@example.com"
         ))
 
-        # Validação cognitiva
+        # Cognitive validation
         actual = f"Created user {result.user_id} with email {result.email}"
 
         self.assert_intent_matches(
             expected=intent,
             actual=actual,
-            threshold=0.8  # 80% similarity mínima
+            threshold=0.8  # 80% minimum similarity
         )
 ```
 
-**Implementação:**
-- Usa similarity analysis (difflib.SequenceMatcher)
-- Threshold configurável
-- Mensagem descritiva em caso de falha
+**Implementation:**
+- Uses similarity analysis (difflib.SequenceMatcher)
+- Configurable threshold
+- Descriptive message on failure
 
 #### 2. assert_metrics_collected
 
-**Propósito**: Garantir que métricas estão sendo coletadas.
+**Purpose**: Ensure that metrics are being collected.
 
 ```python
 class TestCreateUser(ForgeTestCase):
@@ -129,7 +129,7 @@ class TestCreateUser(ForgeTestCase):
 
         usecase.execute(input_dto)
 
-        # Valida que métricas esperadas foram coletadas
+        # Validate that expected metrics were collected
         self.assert_metrics_collected({
             'create_user.duration': lambda v: v > 0,
             'create_user.count': lambda v: v == 1,
@@ -137,60 +137,60 @@ class TestCreateUser(ForgeTestCase):
         })
 ```
 
-**Implementação:**
-- Verifica presença de métricas
-- Valida valores com predicates
-- Falha descritiva mostrando métricas ausentes
+**Implementation:**
+- Checks metric presence
+- Validates values with predicates
+- Descriptive failure showing missing metrics
 
 #### 3. assert_no_side_effects
 
-**Propósito**: Validar pureza funcional (ausência de side effects).
+**Purpose**: Validate functional purity (absence of side effects).
 
 ```python
 class TestEmailValueObject(ForgeTestCase):
     def test_validation_has_no_side_effects(self):
         email = Email("alice@example.com")
 
-        # Validar que múltiplas chamadas não mudam estado
+        # Validate that multiple calls don't change state
         self.assert_no_side_effects(
             lambda: email.validate()
         )
 
-        # Email deve ser imutável após criação
+        # Email should be immutable after creation
         with self.assertRaises(AttributeError):
             email.address = "bob@example.com"
 ```
 
-**Implementação:**
-- Executa função múltiplas vezes
-- Verifica estado antes e depois
-- Detecta mutações indesejadas
+**Implementation:**
+- Executes function multiple times
+- Checks state before and after
+- Detects unwanted mutations
 
 #### 4. assert_performance_within
 
-**Propósito**: Garantir performance aceitável.
+**Purpose**: Ensure acceptable performance.
 
 ```python
 class TestCreateUser(ForgeTestCase):
     def test_executes_within_acceptable_time(self):
-        # Deve executar em menos de 50ms
+        # Should execute in less than 50ms
         self.assert_performance_within(
             lambda: usecase.execute(input_dto),
             max_duration_ms=50.0
         )
 ```
 
-**Implementação:**
-- Mede tempo de execução
-- Falha se exceder threshold
-- Mostra duração real vs esperada
+**Implementation:**
+- Measures execution time
+- Fails if it exceeds the threshold
+- Shows actual vs expected duration
 
-### Estrutura de um Teste Cognitivo
+### Structure of a Cognitive Test
 
 ```python
 class TestCreateUserUseCase(ForgeTestCase):
     def setUp(self):
-        """Setup com fakes e contexto."""
+        """Setup with fakes and context."""
         self.fake_repo = FakeRepository()
         self.fake_metrics = FakeMetricsCollector()
         self.fake_logger = FakeLogger()
@@ -203,41 +203,41 @@ class TestCreateUserUseCase(ForgeTestCase):
 
     def test_creates_user_cognitive_validation(self):
         """
-        Teste cognitivo completo:
-        - Valida comportamento
-        - Valida intenção
-        - Valida métricas
-        - Valida performance
+        Complete cognitive test:
+        - Validates behavior
+        - Validates intent
+        - Validates metrics
+        - Validates performance
         """
-        # 1. Captura intenção
+        # 1. Capture intent
         intent = "Create user with name Alice and email alice@example.com"
 
-        # 2. Execução
+        # 2. Execution
         result = self.usecase.execute(CreateUserInput(
             name="Alice",
             email="alice@example.com"
         ))
 
-        # 3. Validações tradicionais
+        # 3. Traditional validations
         self.assertEqual(result.name, "Alice")
         self.assertEqual(result.email, "alice@example.com")
         self.assertTrue(result.user_id)
 
-        # 4. Validações cognitivas
+        # 4. Cognitive validations
 
-        # 4a. Coerência de intenção
+        # 4a. Intent coherence
         self.assert_intent_matches(
             expected=intent,
             actual=f"Created user {result.name} with email {result.email}"
         )
 
-        # 4b. Métricas coletadas
+        # 4b. Metrics collected
         self.assert_metrics_collected({
             'create_user.duration': lambda v: v > 0,
             'create_user.count': lambda v: v == 1
         })
 
-        # 4c. Logs estruturados
+        # 4c. Structured logs
         logs = self.fake_logger.get_logs(level='info')
         self.assertTrue(any('user_created' in log['message'] for log in logs))
         self.assertTrue(any('user_id' in log['context'] for log in logs))
@@ -253,112 +253,112 @@ class TestCreateUserUseCase(ForgeTestCase):
         self.assertTrue(self.fake_repo.exists(result.user_id))
 ```
 
-### Test Doubles Cognitivos
+### Cognitive Test Doubles
 
-ForgeBase fornece fakes especializados para testes cognitivos:
+ForgeBase provides specialized fakes for cognitive tests:
 
 #### FakeLogger
 ```python
 class FakeLogger(LoggerPort):
-    """Logger in-memory para testes."""
+    """In-memory logger for tests."""
 
     def get_logs(self, level: str = None) -> List[dict]:
-        """Retorna logs coletados."""
+        """Returns collected logs."""
 
     def assert_logged(self, message: str, level: str = 'info'):
-        """Assert que mensagem foi logada."""
+        """Assert that a message was logged."""
 
     def assert_context_present(self, **context):
-        """Assert que contexto está presente em algum log."""
+        """Assert that context is present in some log."""
 ```
 
 #### FakeMetricsCollector
 ```python
 class FakeMetricsCollector:
-    """Coletor de métricas in-memory."""
+    """In-memory metrics collector."""
 
     def get_metric(self, name: str) -> Optional[Metric]:
-        """Retorna métrica coletada."""
+        """Returns collected metric."""
 
     def assert_metric_collected(self, name: str, predicate: Callable):
-        """Assert sobre valor de métrica."""
+        """Assert on metric value."""
 
     def get_all_metrics(self) -> dict:
-        """Retorna todas métricas coletadas."""
+        """Returns all collected metrics."""
 ```
 
 #### FakeRepository
 ```python
 class FakeRepository(RepositoryBase[T]):
-    """Repository in-memory para testes."""
+    """In-memory repository for tests."""
 
     def count(self) -> int:
-        """Quantidade de entidades."""
+        """Number of entities."""
 
     def contains(self, id: str) -> bool:
-        """Se contém entidade."""
+        """Whether it contains the entity."""
 
     def get_all(self) -> List[T]:
-        """Todas entidades."""
+        """All entities."""
 ```
 
-### Testes de Coerência YAML ↔ Code
+### YAML ↔ Code Coherence Tests
 
-Para validar sincronização ForgeProcess:
+To validate ForgeProcess synchronization:
 
 ```python
 class TestYAMLCodeCoherence(ForgeTestCase):
     def test_usecase_matches_yaml_spec(self):
-        """Valida que código implementa spec YAML."""
-        # Carrega spec YAML
+        """Validate that code implements the YAML spec."""
+        # Load YAML spec
         sync = YAMLSync()
         spec = sync.parse_yaml("specs/create_user.yaml")
 
-        # Detecta drift
+        # Detect drift
         drift = sync.detect_drift(CreateUserUseCase, spec)
 
-        # Deve ter zero drift
+        # Should have zero drift
         self.assertEqual(len(drift), 0,
             f"Drift detected between YAML and code: {drift}")
 
     def test_generated_code_matches_manual_implementation(self):
-        """Valida que código gerado seria idêntico ao manual."""
+        """Validate that generated code would be identical to manual."""
         spec = sync.parse_yaml("specs/create_user.yaml")
         generated = sync.generate_code(spec)
 
-        # Parse ambos e compare AST
-        # (implementação simplificada)
+        # Parse both and compare AST
+        # (simplified implementation)
         self.assertCodeStructureMatches(generated, CreateUserUseCase)
 ```
 
-### Testes de Intent Tracking
+### Intent Tracking Tests
 
 ```python
 class TestIntentTracking(ForgeTestCase):
     def test_tracks_intent_coherence(self):
-        """Valida tracking de coerência cognitiva."""
+        """Validate cognitive coherence tracking."""
         tracker = IntentTracker()
 
-        # Captura intenção
+        # Capture intent
         intent_id = tracker.capture_intent(
             description="Create user",
             expected_outcome="User created successfully"
         )
 
-        # Executa
+        # Execute
         result = usecase.execute(input_dto)
 
-        # Registra execução
+        # Record execution
         tracker.record_execution(
             intent_id=intent_id,
             actual_outcome=result.message,
             success=True
         )
 
-        # Valida coerência
+        # Validate coherence
         report = tracker.validate_coherence(intent_id)
 
-        # Assertções cognitivas
+        # Cognitive assertions
         self.assertIn(report.coherence_level, [
             CoherenceLevel.PERFECT,
             CoherenceLevel.HIGH
@@ -369,16 +369,16 @@ class TestIntentTracking(ForgeTestCase):
 
 ## Consequences
 
-### Positivas
+### Positive
 
-✅ **Validação Holística**
-- Não apenas "funciona", mas "funciona como pretendido"
-- Detecta drift entre intenção e implementação
-- Garante observabilidade está ativa
+✅ **Holistic Validation**
+- Not just "it works", but "it works as intended"
+- Detects drift between intent and implementation
+- Ensures observability is active
 
-✅ **Debugging Melhorado**
+✅ **Improved Debugging**
 ```python
-# Quando teste falha, temos contexto rico:
+# When a test fails, we have rich context:
 AssertionError: Intent match failed
 Expected: "Create user with email alice@example.com"
 Actual: "User created with ID 123"
@@ -386,69 +386,69 @@ Similarity: 0.42 (below threshold 0.80)
 Recommendation: Include email in success message for better coherence
 ```
 
-✅ **Documentação Viva**
-- Testes documentam intenção
-- ForgeTestCase mostra padrões de uso
-- Assertions explicam contratos cognitivos
+✅ **Living Documentation**
+- Tests document intent
+- ForgeTestCase shows usage patterns
+- Assertions explain cognitive contracts
 
-✅ **Regressão Cognitiva**
-- Detecta quando código "funciona mas não como antes"
-- Previne degradação de coerência ao longo do tempo
-- Mantém alinhamento com ForgeProcess
+✅ **Cognitive Regression**
+- Detects when code "works but not as before"
+- Prevents coherence degradation over time
+- Maintains alignment with ForgeProcess
 
-✅ **Confiança em Refatorings**
-- Refatorar sem medo de quebrar coerência
-- Validação automática de intenção
-- Safety net cognitivo
+✅ **Confidence in Refactoring**
+- Refactor without fear of breaking coherence
+- Automatic intent validation
+- Cognitive safety net
 
-### Negativas
+### Negative
 
-⚠️ **Complexidade Adicional**
-- Testes mais verbosos
-- Curva de aprendizado
-- Mais código de teste
+⚠️ **Additional Complexity**
+- More verbose tests
+- Learning curve
+- More test code
 
-⚠️ **Overhead de Manutenção**
-- Atualizar testes quando intenção muda
-- Manter thresholds calibrados
-- Revisar assertions cognitivas
+⚠️ **Maintenance Overhead**
+- Update tests when intent changes
+- Keep thresholds calibrated
+- Review cognitive assertions
 
-⚠️ **Potencial para Flakiness**
-- Similarity thresholds podem ser sensíveis
-- Performance tests podem falhar em CI lento
+⚠️ **Potential for Flakiness**
+- Similarity thresholds can be sensitive
+- Performance tests may fail on slow CI
 - Context-dependent validations
 
-### Mitigações
+### Mitigations
 
 1. **Tooling**
-   - Generators de testes cognitivos
-   - Templates para casos comuns
-   - Linters para validar padrões
+   - Cognitive test generators
+   - Templates for common cases
+   - Linters to validate patterns
 
-2. **Defaults Sensatos**
-   - Thresholds calibrados por uso real
-   - Timeouts ajustados para CI
-   - Fakes otimizados
+2. **Sensible Defaults**
+   - Thresholds calibrated by real usage
+   - Timeouts adjusted for CI
+   - Optimized fakes
 
-3. **Documentação**
-   - Cookbook de testes cognitivos
-   - Exemplos para cada padrão
-   - ADR explicando filosofia
+3. **Documentation**
+   - Cognitive testing cookbook
+   - Examples for each pattern
+   - ADR explaining philosophy
 
-4. **Pragmatismo**
-   - Nem todo teste precisa ser cognitivo
-   - Cognitive tests para UseCases críticos
-   - Unit tests tradicionais para utilities
+4. **Pragmatism**
+   - Not every test needs to be cognitive
+   - Cognitive tests for critical UseCases
+   - Traditional unit tests for utilities
 
 ## Alternatives Considered
 
-### 1. Testes Tradicionais Apenas
+### 1. Traditional Tests Only
 
-**Rejeitado porque:**
-- Não valida intenção
-- Não detecta drift
-- Não verifica observabilidade
-- Miss oportunidade de validar coerência
+**Rejected because:**
+- Does not validate intent
+- Does not detect drift
+- Does not verify observability
+- Misses opportunity to validate coherence
 
 ### 2. Property-Based Testing (Hypothesis)
 
@@ -459,10 +459,10 @@ def test_create_user(name, email):
     assert user.name == name
 ```
 
-**Não rejeitado, mas complementar:**
-- Property-based tests são úteis para edge cases
-- Cognitive tests validam intenção específica
-- Ambos podem coexistir
+**Not rejected, but complementary:**
+- Property-based tests are useful for edge cases
+- Cognitive tests validate specific intent
+- Both can coexist
 
 ### 3. Snapshot Testing
 
@@ -472,45 +472,45 @@ def test_create_user():
     assert_snapshot_matches(result, "create_user_snapshot.json")
 ```
 
-**Não rejeitado, mas limitado:**
-- Snapshots validam estrutura, não intenção
-- Útil para regressão de formato
-- Cognitive tests validam semântica
+**Not rejected, but limited:**
+- Snapshots validate structure, not intent
+- Useful for format regression
+- Cognitive tests validate semantics
 
 ### 4. Contract Testing (Pact)
 
-**Não rejeitado, mas diferente escopo:**
-- Pact valida contratos entre serviços
-- Cognitive tests validam intenção dentro de um serviço
-- Complementares, não excludentes
+**Not rejected, but different scope:**
+- Pact validates contracts between services
+- Cognitive tests validate intent within a service
+- Complementary, not mutually exclusive
 
 ## Implementation Guidelines
 
-### Quando Usar Cognitive Tests
+### When to Use Cognitive Tests
 
-**Use para:**
-- ✅ UseCases críticos de negócio
-- ✅ Código que muda frequentemente
-- ✅ Integração ForgeProcess ↔ ForgeBase
-- ✅ Validação de observabilidade
+**Use for:**
+- ✅ Critical business UseCases
+- ✅ Code that changes frequently
+- ✅ ForgeProcess ↔ ForgeBase integration
+- ✅ Observability validation
 - ✅ Performance-critical paths
 
-**Não use para:**
-- ❌ Utilities simples (use unit tests tradicionais)
+**Do not use for:**
+- ❌ Simple utilities (use traditional unit tests)
 - ❌ Third-party libraries
 - ❌ One-off scripts
-- ❌ Código puramente técnico sem intent
+- ❌ Purely technical code without intent
 
-### Estrutura Recomendada
+### Recommended Structure
 
 ```
 tests/
-├── unit/                       # Testes unitários tradicionais
+├── unit/                       # Traditional unit tests
 │   ├── test_entity_base.py
 │   └── test_value_object.py
-├── integration/                # Testes de integração
+├── integration/                # Integration tests
 │   └── test_repository_sql.py
-└── cognitive/                  # Testes cognitivos
+└── cognitive/                  # Cognitive tests
     ├── test_create_user_cognitive.py
     ├── test_yaml_sync_coherence.py
     └── test_intent_tracking.py

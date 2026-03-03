@@ -1,6 +1,6 @@
 # ForgeBase - Quick Start Guide for AI Agents
 
-**Target audience**: AI coding agents (Claude Code, Cursor, GitHub Copilot, Aider, etc.)
+**Target audience**: AI code agents (Claude Code, Cursor, GitHub Copilot, Aider, etc.)
 
 ## Quick Reference
 
@@ -27,7 +27,7 @@ print(guide)  # Full markdown content of this file
 
 **Why this matters for AI agents:**
 - Works even when installed via `pip install git+...`
-- No internet required
+- No internet access needed
 - Always in sync with the installed version
 - Can be parsed for API discovery
 
@@ -40,7 +40,7 @@ print(guide)  # Full markdown content of this file
 ```python
 checker = QualityChecker()
 
-# Run specific tool
+# Run a specific tool
 ruff_result = checker.run_ruff()
 mypy_result = checker.run_mypy()
 
@@ -84,7 +84,7 @@ CheckResult(
 | `F841` | Unused variable | Remove or use |
 | `E501` | Line too long | Reformat |
 | `no-untyped-def` | Missing type hints | Add |
-| `import-outside-toplevel` | Import outside top level | Move |
+| `import-outside-toplevel` | Import not at top level | Move |
 
 ---
 
@@ -95,7 +95,7 @@ CheckResult(
 ```python
 generator = ScaffoldGenerator()
 
-# Generate UseCase
+# Generate a UseCase
 result = generator.create_usecase(
     name="CreateOrder",
     input_type="CreateOrderInput",
@@ -109,11 +109,11 @@ if result.success:
     # AI can customize the code
     code = code.replace("# TODO: Implement", "# Custom implementation")
 
-    # Write to suggested path
+    # Write to the suggested path
     with open(result.file_path, 'w') as f:
         f.write(code)
 
-# Generate Entity
+# Generate an Entity
 entity_result = generator.create_entity(
     name="Order",
     attributes=["customer_id", "total", "items"]
@@ -125,7 +125,7 @@ entity_result = generator.create_entity(
 ScaffoldResult(
     component_type="usecase",
     name="CreateOrder",
-    code="...",              # Full generated code as string
+    code="...",              # Full generated code as a string
     file_path="src/...",     # Suggested location
     success=True,
     metadata={
@@ -156,22 +156,6 @@ for usecase in result.usecases:
     print(f"  Imports: {usecase.imports}")
 ```
 
-### Discovery in Apps That Use ForgeBase
-
-If you are working on an **app that depends on ForgeBase**, you can reuse the same discovery mechanism for the app's package (installed via `pip`):
-
-```python
-from forge_base.dev.api import ComponentDiscovery
-
-discovery = ComponentDiscovery(package_name="my_app")  # installed package name
-result = discovery.scan_project()
-```
-
-Best practices for derived apps:
-
-- Create a `my_app.dev.api` module that exposes your own `ComponentDiscovery` based on this;
-- Document for your client agents that they should use `from my_app.dev import get_agent_quickstart` and `from my_app.dev.api import ComponentDiscovery`.
-
 **Data Structure**:
 ```python
 ComponentInfo(
@@ -194,7 +178,7 @@ ComponentInfo(
 ```python
 runner = TestRunner()
 
-# Run specific suite
+# Run a specific suite
 unit_result = runner.run_unit_tests()
 integration_result = runner.run_integration_tests()
 
@@ -244,7 +228,7 @@ discovery = ComponentDiscovery()
 components = discovery.scan_project()
 print(f"Found {len(components.entities)} entities")
 
-# 2. Generate new component
+# 2. Generate a new component
 generator = ScaffoldGenerator()
 result = generator.create_usecase("ProcessPayment")
 if result.success:
@@ -256,7 +240,7 @@ if result.success:
 checker = QualityChecker()
 quality_results = checker.run_all()
 
-# 4. Fix errors automatically
+# 4. Auto-fix errors
 for tool, result in quality_results.items():
     if not result.passed:
         for error in result.errors:
@@ -309,10 +293,10 @@ ERROR_ACTIONS = {
 
 ### DO:
 1. **Import directly** - Use Python APIs, not CLI calls via subprocess
-2. **Check error codes** - Use `error['code']` to determine action
+2. **Check error codes** - Use `error['code']` to determine the action
 3. **Modify generated code** - Customize before writing files
 4. **Use structured data** - Access `file`, `line`, `column` directly
-5. **Run quality before commit** - Always check with `run_all()`
+5. **Run quality checks before commit** - Always verify with `run_all()`
 
 ### DON'T:
 1. **Don't parse CLI output** - Use APIs instead
@@ -328,18 +312,18 @@ ERROR_ACTIONS = {
 1. **Use `to_dict()` for logging**: All results have `.to_dict()` for JSON
 2. **Check `success` first**: All operations have a `success` boolean
 3. **Use metadata**: ScaffoldResult includes imports and dependencies
-4. **Batch operations**: `run_all()` methods execute everything at once
+4. **Batch operations**: `run_all()` methods run everything at once
 5. **Cross-platform**: All APIs work on Windows, macOS, Linux
 
 ---
 
 ## Additional Documentation
 
-- **[Complete Guide](complete-guide.md)** — Full API reference
-- **[Discovery](discovery.md)** — How agents discover ForgeBase
-- **[Ecosystem](ecosystem.md)** — Integration with different agents
+- **[Complete Guide](complete-guide.md)** -- Full API reference
+- **[Discovery](discovery.md)** -- How agents discover ForgeBase
+- **[Ecosystem](ecosystem.md)** -- Integration with different agents
 
 ---
 
 **Version**: ForgeBase 0.1.4
-**For**: AI Coding Agents
+**For**: AI Code Agents

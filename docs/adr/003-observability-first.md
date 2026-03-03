@@ -2,62 +2,62 @@
 
 ## Status
 
-**Aceita** (2025-11-03)
+**Accepted** (2025-11-03)
 
 ## Context
 
-ForgeBase foi projetado para ser um framework **cognitivo** — não apenas executa código, mas **entende, mede e explica** seu próprio comportamento. Para isso, observabilidade não pode ser um "add-on" posterior, mas sim uma **característica nativa** da arquitetura.
+ForgeBase was designed to be a **cognitive** framework — it does not just execute code, but **understands, measures, and explains** its own behavior. For this, observability cannot be an afterthought "add-on", but rather a **native characteristic** of the architecture.
 
-### Desafios de Sistemas Tradicionais
+### Challenges of Traditional Systems
 
-Em sistemas tradicionais, observabilidade é frequentemente:
-- **Adicionada depois**: "Vamos adicionar logs quando der problema"
-- **Inconsistente**: Alguns módulos logam, outros não
-- **Superficial**: Logs sem contexto, métricas sem significado
-- **Cara**: Overhead de instrumentação manual
-- **Fragmentada**: Logs aqui, métricas ali, traces em outro lugar
+In traditional systems, observability is frequently:
+- **Added later**: "We'll add logs when something breaks"
+- **Inconsistent**: Some modules log, others don't
+- **Superficial**: Logs without context, metrics without meaning
+- **Expensive**: Manual instrumentation overhead
+- **Fragmented**: Logs here, metrics there, traces somewhere else
 
-### Necessidades do ForgeBase
+### ForgeBase Needs
 
-Como framework cognitivo, ForgeBase precisa:
+As a cognitive framework, ForgeBase needs:
 
-1. **Auto-Reflexão**: Capacidade de introspectar seu próprio comportamento
-2. **Rastreabilidade**: Entender a jornada de cada execução
-3. **Medição Contínua**: Métricas de performance, sucesso, coerência
-4. **Debugging Cognitivo**: Não apenas "onde falhou", mas "por que falhou"
-5. **Feedback Loops**: Dados para aprendizado contínuo
-6. **Transparência**: Explicar decisões e execuções
+1. **Self-Reflection**: Ability to introspect its own behavior
+2. **Traceability**: Understanding the journey of each execution
+3. **Continuous Measurement**: Performance, success, and coherence metrics
+4. **Cognitive Debugging**: Not just "where it failed", but "why it failed"
+5. **Feedback Loops**: Data for continuous learning
+6. **Transparency**: Explaining decisions and executions
 
-### Forças em Jogo
+### Forces at Play
 
-**Necessidades:**
-- Debugging eficiente em produção
-- Monitoramento de performance
-- Validação de coerência cognitiva (intent vs execution)
-- Feedback para ForgeProcess
-- Auditoria de decisões
+**Needs:**
+- Efficient debugging in production
+- Performance monitoring
+- Cognitive coherence validation (intent vs execution)
+- Feedback for ForgeProcess
+- Decision auditing
 
-**Riscos:**
-- Overhead de performance
-- Custo de storage (logs, métricas)
-- Complexidade de configuração
-- Excesso de informação (signal vs noise)
+**Risks:**
+- Performance overhead
+- Storage cost (logs, metrics)
+- Configuration complexity
+- Information overload (signal vs noise)
 
 ## Decision
 
-**Adotamos "Observability First" como princípio fundamental: observabilidade é nativa, não opcional.**
+**We adopted "Observability First" as a fundamental principle: observability is native, not optional.**
 
-### Pilares de Observabilidade
+### Observability Pillars
 
-#### 1. Logging Estruturado (LogService)
+#### 1. Structured Logging (LogService)
 
-**Decisão**: Todos os logs são estruturados (JSON), não strings.
+**Decision**: All logs are structured (JSON), not strings.
 
 ```python
-# ❌ Tradicional (não estruturado)
+# ❌ Traditional (unstructured)
 logger.info("User created: Alice")
 
-# ✅ ForgeBase (estruturado)
+# ✅ ForgeBase (structured)
 logger.info(
     "User created",
     user_id="123",
@@ -68,55 +68,55 @@ logger.info(
 )
 ```
 
-**Benefícios:**
-- Queryable: Buscar por `user_id=123` facilmente
-- Context propagation automático
-- Correlation IDs rastreiam requests
-- Machine-readable para análise
+**Benefits:**
+- Queryable: Easily search by `user_id=123`
+- Automatic context propagation
+- Correlation IDs trace requests
+- Machine-readable for analysis
 
-**Implementação**:
+**Implementation**:
 - `src/forge_base/observability/log_service.py` (~489 LOC)
 - Handlers: stdout, file, remote (Elasticsearch, CloudWatch)
-- Níveis: DEBUG, INFO, WARNING, ERROR, CRITICAL
-- Sampling para high-volume scenarios
+- Levels: DEBUG, INFO, WARNING, ERROR, CRITICAL
+- Sampling for high-volume scenarios
 
-#### 2. Métricas Ativas (TrackMetrics)
+#### 2. Active Metrics (TrackMetrics)
 
-**Decisão**: UseCases e Ports são automaticamente instrumentados.
+**Decision**: UseCases and Ports are automatically instrumented.
 
-**Tipos de Métricas:**
+**Types of Metrics:**
 
 ```python
-# Counters: Contagem de eventos
+# Counters: Event counts
 track_metrics.increment("usecase.execution.count", usecase="CreateUser")
 track_metrics.increment("usecase.execution.errors", usecase="CreateUser")
 
-# Gauges: Valores instantâneos
+# Gauges: Instantaneous values
 track_metrics.gauge("system.memory.usage", value=512.5, unit="MB")
 
-# Histograms: Distribuições de valores
+# Histograms: Value distributions
 track_metrics.histogram("usecase.execution.duration", value=42.5, usecase="CreateUser")
 ```
 
-**Métricas Padrão (Auto-coletadas):**
-- `usecase.execution.duration` — Tempo de execução
-- `usecase.execution.count` — Quantidade de execuções
-- `usecase.execution.errors` — Quantidade de erros
-- `usecase.execution.success_rate` — Taxa de sucesso
-- `port.call.duration` — Tempo de chamadas a ports
-- `adapter.request.count` — Requests por adapter
+**Standard Metrics (Auto-collected):**
+- `usecase.execution.duration` — Execution time
+- `usecase.execution.count` — Number of executions
+- `usecase.execution.errors` — Number of errors
+- `usecase.execution.success_rate` — Success rate
+- `port.call.duration` — Port call duration
+- `adapter.request.count` — Requests per adapter
 
-**Implementação**:
+**Implementation**:
 - `src/forge_base/observability/track_metrics.py` (~447 LOC)
 - Export formats: Prometheus, JSON, StatsD
-- Aggregation em memória
+- In-memory aggregation
 - Overhead < 1ms per metric
 
 #### 3. Distributed Tracing (TracerPort)
 
-**Decisão**: Suporte nativo para distributed tracing (OpenTelemetry-compatible).
+**Decision**: Native support for distributed tracing (OpenTelemetry-compatible).
 
-**Conceito**: Cada execução cria uma **trace** com múltiplos **spans**:
+**Concept**: Each execution creates a **trace** with multiple **spans**:
 
 ```
 Trace: CreateUser (correlation_id: abc-123)
@@ -127,18 +127,18 @@ Trace: CreateUser (correlation_id: abc-123)
 └─ Span: adapter.respond [3ms]
 ```
 
-**Implementação**:
+**Implementation**:
 - `src/forge_base/observability/tracer_port.py` (~504 LOC)
 - OpenTelemetry-compatible interface
-- Context propagation automática
+- Automatic context propagation
 - Adapters: Jaeger, Zipkin, DataDog
 
 #### 4. Cognitive Coherence (FeedbackManager + IntentTracker)
 
-**Decisão**: Rastrear coerência entre intenção e execução.
+**Decision**: Track coherence between intent and execution.
 
-**Fluxo:**
-1. **Capture Intent** (antes da execução)
+**Flow:**
+1. **Capture Intent** (before execution)
    ```python
    intent_id = tracker.capture_intent(
        description="Create user with valid email",
@@ -151,7 +151,7 @@ Trace: CreateUser (correlation_id: abc-123)
    result = usecase.execute(input_dto)
    ```
 
-3. **Record Execution** (após execução)
+3. **Record Execution** (after execution)
    ```python
    tracker.record_execution(
        intent_id=intent_id,
@@ -169,17 +169,17 @@ Trace: CreateUser (correlation_id: abc-123)
    # report.recommendations: ["Improve error message clarity"]
    ```
 
-**Implementação**:
+**Implementation**:
 - `src/forge_base/observability/feedback_manager.py` (~455 LOC)
 - `src/forge_base/integration/intent_tracker.py` (~450 LOC)
-- Similarity analysis usando difflib
-- Learning data export para ML
+- Similarity analysis using difflib
+- Learning data export for ML
 
-### Instrumentação Automática
+### Automatic Instrumentation
 
 #### Decorator @track_metrics
 
-**Decisão**: UseCases podem ser instrumentados com um decorator.
+**Decision**: UseCases can be instrumented with a decorator.
 
 ```python
 from forge_base.application.decorators import track_metrics
@@ -191,37 +191,37 @@ class CreateUserUseCase(UseCaseBase):
         track_errors=True
     )
     def execute(self, input_dto: CreateUserInput) -> CreateUserOutput:
-        # Métricas coletadas automaticamente:
+        # Metrics collected automatically:
         # - create_user.duration
         # - create_user.count
-        # - create_user.errors (se exception)
+        # - create_user.errors (if exception)
         ...
 ```
 
-**Implementação**:
+**Implementation**:
 - `src/forge_base/application/decorators/track_metrics.py` (~283 LOC)
-- Zero overhead quando desabilitado
+- Zero overhead when disabled
 - Async-compatible
 - Context propagation
 
-### Níveis de Observabilidade
+### Observability Levels
 
-ForgeBase suporta 3 níveis configuráveis:
+ForgeBase supports 3 configurable levels:
 
-**1. MINIMAL (Produção)**
+**1. MINIMAL (Production)**
 - Logs: ERROR, CRITICAL
-- Métricas: Aggregated (1min resolution)
-- Traces: Sampling 1% (para performance)
+- Metrics: Aggregated (1min resolution)
+- Traces: 1% sampling (for performance)
 
 **2. STANDARD (Staging)**
 - Logs: INFO, WARNING, ERROR, CRITICAL
-- Métricas: All
-- Traces: Sampling 10%
+- Metrics: All
+- Traces: 10% sampling
 
-**3. DEBUG (Desenvolvimento)**
+**3. DEBUG (Development)**
 - Logs: ALL (DEBUG included)
-- Métricas: All (real-time)
-- Traces: 100% (todas requests)
+- Metrics: All (real-time)
+- Traces: 100% (all requests)
 
 ### Configuration
 
@@ -258,149 +258,149 @@ observability:
 
 ## Consequences
 
-### Positivas
+### Positive
 
-✅ **Debugging Eficiente**
+✅ **Efficient Debugging**
 ```python
-# Encontrar execução específica por correlation_id
+# Find a specific execution by correlation_id
 logs = log_service.query(correlation_id="abc-123")
 
-# Ver timeline completa de uma execução
+# See the complete timeline of an execution
 trace = tracer.get_trace("abc-123")
 
-# Analisar coerência de uma operação
+# Analyze coherence of an operation
 report = intent_tracker.validate_coherence(intent_id)
 ```
 
-✅ **Visibilidade Completa**
-- Saber exatamente o que está acontecendo em produção
-- Detectar degradação de performance antes de virar problema
-- Entender padrões de uso
+✅ **Full Visibility**
+- Know exactly what is happening in production
+- Detect performance degradation before it becomes a problem
+- Understand usage patterns
 
-✅ **Feedback Loop Cognitivo**
-- Dados de coerência alimentam ForgeProcess
-- Aprendizado contínuo sobre qualidade de execução
-- Melhoria iterativa baseada em dados reais
+✅ **Cognitive Feedback Loop**
+- Coherence data feeds ForgeProcess
+- Continuous learning about execution quality
+- Iterative improvement based on real data
 
-✅ **Auditoria & Compliance**
-- Trail completo de operações
-- Rastreabilidade de decisões
-- Conformidade com regulações
+✅ **Auditing & Compliance**
+- Complete trail of operations
+- Traceability of decisions
+- Regulatory compliance
 
 ✅ **Performance Tuning**
-- Identificar bottlenecks facilmente
-- Comparar performance de diferentes implementações
-- A/B testing de otimizações
+- Easily identify bottlenecks
+- Compare performance of different implementations
+- A/B testing of optimizations
 
-### Negativas
+### Negative
 
-⚠️ **Overhead de Performance**
-- Logging: ~0.1-0.5ms por log
-- Métricas: ~0.1ms por metric
-- Tracing: ~1-5ms por span
-- **Mitigation**: Sampling, async logging, níveis configuráveis
+⚠️ **Performance Overhead**
+- Logging: ~0.1-0.5ms per log
+- Metrics: ~0.1ms per metric
+- Tracing: ~1-5ms per span
+- **Mitigation**: Sampling, async logging, configurable levels
 
 ⚠️ **Storage Costs**
-- Logs podem crescer rapidamente
-- Métricas históricas requerem espaço
-- Traces podem ser volumosos
+- Logs can grow rapidly
+- Historical metrics require space
+- Traces can be voluminous
 - **Mitigation**: Retention policies, compression, aggregation
 
-⚠️ **Complexidade Operacional**
-- Infraestrutura de observabilidade (Elasticsearch, Prometheus, Jaeger)
-- Dashboards e alerting
-- Conhecimento técnico necessário
-- **Mitigation**: Defaults sensatos, self-hosted options, docs claras
+⚠️ **Operational Complexity**
+- Observability infrastructure (Elasticsearch, Prometheus, Jaeger)
+- Dashboards and alerting
+- Technical knowledge required
+- **Mitigation**: Sensible defaults, self-hosted options, clear docs
 
 ⚠️ **Signal vs Noise**
-- Excesso de logs pode dificultar debugging
-- Métricas demais podem confundir
-- Traces detalhados podem ser overwhelming
-- **Mitigation**: Níveis configuráveis, sampling inteligente, filtering
+- Excessive logs can hinder debugging
+- Too many metrics can be confusing
+- Detailed traces can be overwhelming
+- **Mitigation**: Configurable levels, smart sampling, filtering
 
-### Mitigações Implementadas
+### Implemented Mitigations
 
 1. **Performance**
-   - Logging assíncrono (não bloqueia execução)
-   - Metrics aggregation em memória
-   - Sampling configurável para traces
-   - Lazy evaluation de contexto
+   - Asynchronous logging (does not block execution)
+   - In-memory metrics aggregation
+   - Configurable sampling for traces
+   - Lazy context evaluation
 
 2. **Storage**
-   - Retention policies configuráveis
-   - Log rotation automático
-   - Metrics downsampling (ex: 1min → 1hour → 1day)
-   - Compression de logs
+   - Configurable retention policies
+   - Automatic log rotation
+   - Metrics downsampling (e.g., 1min → 1hour → 1day)
+   - Log compression
 
-3. **Usabilidade**
-   - Defaults funcionam out-of-the-box
-   - Pode desabilitar completamente se necessário
-   - Fakes para testes (zero overhead)
-   - Documentation clara
+3. **Usability**
+   - Defaults work out-of-the-box
+   - Can be completely disabled if needed
+   - Fakes for tests (zero overhead)
+   - Clear documentation
 
 ## Alternatives Considered
 
-### 1. Observabilidade Opcional (Add-on)
+### 1. Optional Observability (Add-on)
 
 ```python
-# Observabilidade como "extra"
+# Observability as an "extra"
 class CreateUserUseCase:
     def execute(self, input_dto):
-        # Lógica pura, sem instrumentação
+        # Pure logic, no instrumentation
         ...
 
-# Usuário adiciona observabilidade manualmente
+# User adds observability manually
 ```
 
-**Rejeitado porque:**
-- Inconsistência: Alguns UseCases instrumentados, outros não
-- Esquecimento: Fácil esquecer de adicionar
-- Overhead: Instrumentação manual é verbosa
-- Fragmentação: Cada dev faz de um jeito
+**Rejected because:**
+- Inconsistency: Some UseCases instrumented, others not
+- Forgetfulness: Easy to forget to add
+- Overhead: Manual instrumentation is verbose
+- Fragmentation: Each developer does it differently
 
-### 2. Logging Tradicional (Strings)
+### 2. Traditional Logging (Strings)
 
 ```python
 logger.info(f"User {user_id} created at {timestamp}")
 ```
 
-**Rejeitado porque:**
-- Não queryable
-- Parsing complexo
-- Sem contexto estruturado
-- Difícil análise automatizada
+**Rejected because:**
+- Not queryable
+- Complex parsing
+- No structured context
+- Hard to analyze automatically
 
-### 3. Métricas Apenas em Pontos Críticos
+### 3. Metrics Only at Critical Points
 
-**Rejeitado porque:**
-- Linha tênue entre "crítico" e "não crítico"
-- Tendência a sub-instrumentar
-- Debugging fica mais difícil
-- Melhor ter tudo e filtrar do que não ter
+**Rejected because:**
+- Thin line between "critical" and "non-critical"
+- Tendency to under-instrument
+- Debugging becomes harder
+- Better to have everything and filter than not to have it
 
-### 4. APM Comercial Obrigatório (DataDog, NewRelic)
+### 4. Mandatory Commercial APM (DataDog, NewRelic)
 
-**Rejeitado porque:**
+**Rejected because:**
 - Vendor lock-in
-- Custo alto
-- Dependência externa obrigatória
-- Preferimos open standards (OpenTelemetry)
-- Solução: Suportar APMs como *opção*, não requirement
+- High cost
+- Mandatory external dependency
+- We prefer open standards (OpenTelemetry)
+- Solution: Support APMs as an *option*, not a requirement
 
 ## Implementation Notes
 
-### Para Desenvolvedores de UseCases
+### For UseCase Developers
 
-**Observabilidade é automática:**
+**Observability is automatic:**
 ```python
 class MyUseCase(UseCaseBase):
     def execute(self, input_dto):
-        # Logging e métricas já estão ativos
-        # Apenas foque na lógica de negócio
+        # Logging and metrics are already active
+        # Just focus on business logic
         ...
 ```
 
-**Para adicionar contexto específico:**
+**To add specific context:**
 ```python
 def execute(self, input_dto):
     self.logger.info(
@@ -411,15 +411,15 @@ def execute(self, input_dto):
     ...
 ```
 
-### Para Operadores
+### For Operators
 
-**Configuração mínima:**
+**Minimal configuration:**
 ```yaml
 observability:
   level: standard
 ```
 
-**Produção otimizada:**
+**Optimized production:**
 ```yaml
 observability:
   level: minimal

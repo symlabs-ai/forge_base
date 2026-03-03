@@ -1,77 +1,76 @@
-# Documentação ForgeBase
+# ForgeBase Documentation
 
-> "Forjar é transformar pensamento em estrutura."
+> "To forge is to transform thought into structure."
 
-Esta documentação está organizada em três seções principais, dependendo do seu perfil de uso.
+This documentation is organized into three main sections, depending on your usage profile.
 
 ---
 
-## Navegação Rápida
+## Quick Navigation
 
-### Para Usuários Humanos
-Desenvolvedores que querem usar ForgeBase em seus projetos.
+### For Human Users
+Developers who want to use ForgeBase in their projects.
 
-| Documento | Descrição |
-|-----------|-----------|
-| [ForgeBase Rules](usuarios/forgebase-rules.md) | **Guia completo de regras e práticas** |
-| [Início Rápido](usuarios/inicio-rapido.md) | Instalação e primeiro uso |
-| [Receitas](usuarios/receitas.md) | Padrões e exemplos práticos |
-| [Guia de Testes](usuarios/guia-de-testes.md) | Como escrever testes cognitivos |
-| [CLI First](usuarios/cli-first.md) | Filosofia de desenvolvimento CLI First |
-| [Ambiente e Scripts](usuarios/ambiente_e_scripts.md) | Setup de ambiente e ferramentas |
-| [Extensão](usuarios/extending-forgebase.md) | Como estender ForgeBase |
-| [ForgePulse Quick Start](usuarios/pulse_quick_start.md) | Observabilidade nativa em 5 minutos |
-| [ForgePulse Cookbook](usuarios/pulse_cookbook.md) | Referência completa com receitas |
+| Document | Description |
+|----------|-------------|
+| [ForgeBase Rules](users/forgebase-rules.md) | **Complete guide to rules and practices** |
+| [Quick Start](users/quick-start.md) | Installation and first use |
+| [Recipes](users/recipes.md) | Patterns and practical examples |
+| [Testing Guide](users/testing-guide.md) | How to write cognitive tests |
+| [CLI First](users/cli-first.md) | CLI First development philosophy |
+| [Environment and Scripts](users/environment-and-scripts.md) | Environment setup and tools |
+| [Extending](users/extending-forgebase.md) | How to extend ForgeBase |
+| [ForgePulse Quick Start](users/pulse_quick_start.md) | Native observability in 5 minutes |
+| [ForgePulse Cookbook](users/pulse_cookbook.md) | Complete reference with recipes |
 
-### Para Agentes de IA
-Agentes de IA (Claude Code, Cursor, Aider, etc.) que interagem com ForgeBase.
+### For AI Agents
+AI agents (Claude Code, Cursor, Aider, etc.) that interact with ForgeBase.
 
-| Documento | Descrição |
-|-----------|-----------|
-| [Início Rápido](agentes-ia/inicio-rapido.md) | APIs programáticas para AI agents |
-| [Guia Completo](agentes-ia/guia-completo.md) | Referência completa de APIs |
-| [Descoberta](agentes-ia/descoberta.md) | Como agents descobrem ForgeBase |
-| [Ecossistema](agentes-ia/ecossistema.md) | Integração com diferentes agents |
+| Document | Description |
+|----------|-------------|
+| [Quick Start](ai-agents/quick-start.md) | Programmatic APIs for AI agents |
+| [Complete Guide](ai-agents/complete-guide.md) | Full API reference |
+| [Discovery](ai-agents/discovery.md) | How agents discover ForgeBase |
+| [Ecosystem](ai-agents/ecosystem.md) | Integration with different agents |
 
-### Referência Técnica
-Documentação de arquitetura e decisões de design.
+### Technical Reference
+Architecture documentation and design decisions.
 
-| Documento | Descrição |
-|-----------|-----------|
-| [Arquitetura](referencia/arquitetura.md) | Estrutura modular e princípios |
-| [ForgeProcess](referencia/forge-process.md) | Ciclo cognitivo completo |
-| [ForgeProcess Visual](referencia/forge-process-visual.md) | Guia visual do ciclo |
-| [Backlog](referencia/backlog.md) | Roadmap de desenvolvimento |
-| [Acesso à Documentação](referencia/acesso-documentacao.md) | Como docs são distribuídas |
-| [Guia de Documentação](referencia/documentation_guide.md) | Padrões de docstrings |
+| Document | Description |
+|----------|-------------|
+| [Architecture](reference/architecture.md) | Modular structure and principles |
+| [ForgeProcess](reference/forge-process.md) | Complete cognitive cycle |
+| [ForgeProcess Visual](reference/forge-process-visual.md) | Visual guide to the cycle |
+| [Documentation Access](reference/documentation-access.md) | How docs are distributed |
+| [Documentation Guide](reference/documentation_guide.md) | Docstring standards |
 
-### Decisões Arquiteturais (ADRs)
+### Architectural Decision Records (ADRs)
 
-| ADR | Decisão |
-|-----|---------|
+| ADR | Decision |
+|-----|----------|
 | [001](adr/001-clean-architecture-choice.md) | Clean Architecture |
 | [002](adr/002-hexagonal-ports-adapters.md) | Hexagonal (Ports & Adapters) |
-| [003](adr/003-observability-first.md) | Observabilidade First |
-| [004](adr/004-cognitive-testing.md) | Testes Cognitivos |
-| [005](adr/005-dependency-injection.md) | Injeção de Dependência |
-| [006](adr/006-forgeprocess-integration.md) | Integração ForgeProcess |
+| [003](adr/003-observability-first.md) | Observability First |
+| [004](adr/004-cognitive-testing.md) | Cognitive Testing |
+| [005](adr/005-dependency-injection.md) | Dependency Injection |
+| [006](adr/006-forgeprocess-integration.md) | ForgeProcess Integration |
 | [007](adr/007-opentelemetry-integration.md) | OpenTelemetry |
 
 ---
 
-## Acesso Programático (AI Agents)
+## Programmatic Access (AI Agents)
 
 ```python
 from forge_base.dev import get_agent_quickstart
 
-# Obter guia completo de APIs para AI agents
-guia = get_agent_quickstart()
-print(guia)
+# Get the complete API guide for AI agents
+guide = get_agent_quickstart()
+print(guide)
 ```
 
 ---
 
-## Versão
+## Version
 
 - **ForgeBase**: v0.1.4
-- **Documentação**: 2025-12
+- **Documentation**: 2025-12
