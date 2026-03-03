@@ -226,6 +226,38 @@ class TestSnapshotLevelAware:
         snap = PulseSnapshot.from_records([rec], metrics, MonitoringLevel.DIAGNOSTIC, "0.3")
         assert "dropped_spans" not in snap.executions[0]
 
+    def test_track_type_always_serialized(self):
+        rec = ExecutionRecord(
+            correlation_id="c1", use_case_name="T", value_track="v",
+            subtrack="", feature="", duration_ms=1.0, success=True,
+            error_type="",
+        )
+        metrics = FakeMetricsCollector()
+        snap = PulseSnapshot.from_records([rec], metrics, MonitoringLevel.BASIC, "0.3")
+        assert snap.executions[0]["track_type"] == "value"
+
+    def test_track_type_support(self):
+        rec = ExecutionRecord(
+            correlation_id="c1", use_case_name="T", value_track="Infra",
+            subtrack="", feature="", duration_ms=1.0, success=True,
+            error_type="", track_type="support", supports=("ProcessOrder",),
+        )
+        metrics = FakeMetricsCollector()
+        snap = PulseSnapshot.from_records([rec], metrics, MonitoringLevel.BASIC, "0.3")
+        exec_dict = snap.executions[0]
+        assert exec_dict["track_type"] == "support"
+        assert exec_dict["supports"] == ["ProcessOrder"]
+
+    def test_supports_absent_when_empty(self):
+        rec = ExecutionRecord(
+            correlation_id="c1", use_case_name="T", value_track="v",
+            subtrack="", feature="", duration_ms=1.0, success=True,
+            error_type="",
+        )
+        metrics = FakeMetricsCollector()
+        snap = PulseSnapshot.from_records([rec], metrics, MonitoringLevel.BASIC, "0.3")
+        assert "supports" not in snap.executions[0]
+
 
 @pytest.mark.pulse
 class TestHistogramStats:

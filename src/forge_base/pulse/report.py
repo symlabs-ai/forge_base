@@ -85,7 +85,10 @@ class PulseSnapshot:
                 "success": r.success,
                 "error_type": r.error_type,
                 "timestamp": r.timestamp,
+                "track_type": r.track_type,
             }
+            if r.supports:
+                exec_dict["supports"] = list(r.supports)
             if r.spans:
                 if level >= MonitoringLevel.DIAGNOSTIC:
                     exec_dict["spans"] = [_span_diagnostic(s) for s in r.spans]

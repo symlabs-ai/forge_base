@@ -19,6 +19,8 @@ class TestExecutionContext:
         assert ctx.level == MonitoringLevel.OFF
         assert ctx.use_case_name == ""
         assert dict(ctx.extra) == {}
+        assert ctx.track_type == "value"
+        assert ctx.supports == ()
 
     def test_frozen(self):
         ctx = ExecutionContext(correlation_id="abc")
@@ -47,6 +49,24 @@ class TestExecutionContext:
         ctx = ExecutionContext.build(level=MonitoringLevel.BASIC, use_case_name="Test")
         assert ctx.level == MonitoringLevel.BASIC
         assert ctx.use_case_name == "Test"
+
+    def test_build_with_track_type_and_supports(self):
+        ctx = ExecutionContext.build(
+            track_type="support",
+            supports=("ProcessOrder",),
+        )
+        assert ctx.track_type == "support"
+        assert ctx.supports == ("ProcessOrder",)
+
+    def test_track_type_frozen(self):
+        ctx = ExecutionContext(correlation_id="abc")
+        with pytest.raises(AttributeError):
+            ctx.track_type = "support"  # type: ignore[misc]
+
+    def test_supports_frozen(self):
+        ctx = ExecutionContext(correlation_id="abc")
+        with pytest.raises(AttributeError):
+            ctx.supports = ("x",)  # type: ignore[misc]
 
 
 @pytest.mark.pulse

@@ -27,6 +27,7 @@ def infer_context(use_case: UseCaseBase) -> dict[str, str]:  # type: ignore[type
         "value_track": "legacy",
         "subtrack": _extract_domain(module),
         "mapping_source": "heuristic",
+        "track_type": "value",
     }
 
 

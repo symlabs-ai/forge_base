@@ -48,6 +48,7 @@ class TestDashboardSummaryEmpty:
         assert ds.mean_duration_ms == 0.0
         assert ds.top_error_types == ()
         assert ds.by_value_track == ()
+        assert ds.by_support_track == ()
 
 
 @pytest.mark.pulse
@@ -187,6 +188,53 @@ class TestDashboardSummaryEdgeCases:
         ds = DashboardSummary.from_snapshot(snap, top_n=10)
         assert len(ds.top_error_types) == 1
         assert ds.top_error_types[0] == ("OnlyError", 1)
+
+
+@pytest.mark.pulse
+class TestDashboardSummarySupportTracks:
+    def test_support_tracks_separated(self):
+        execs = [
+            _exec(value_track="billing"),
+            {**_exec(value_track="ManageInventory"), "track_type": "support"},
+        ]
+        snap = _make_snapshot(execs)
+        ds = DashboardSummary.from_snapshot(snap)
+        assert len(ds.by_value_track) == 1
+        assert ds.by_value_track[0].value_track == "billing"
+        assert len(ds.by_support_track) == 1
+        assert ds.by_support_track[0].value_track == "ManageInventory"
+
+    def test_no_support_tracks_empty(self):
+        execs = [_exec(value_track="billing")]
+        snap = _make_snapshot(execs)
+        ds = DashboardSummary.from_snapshot(snap)
+        assert ds.by_support_track == ()
+
+    def test_backward_compat_missing_track_type(self):
+        execs = [_exec(value_track="billing")]
+        # No "track_type" key at all - should default to "value"
+        snap = _make_snapshot(execs)
+        ds = DashboardSummary.from_snapshot(snap)
+        assert len(ds.by_value_track) == 1
+        assert ds.by_support_track == ()
+
+    def test_support_track_counts(self):
+        execs = [
+            {**_exec(value_track="Infra", success=True), "track_type": "support"},
+            {**_exec(value_track="Infra", success=False, error_type="E"), "track_type": "support"},
+        ]
+        snap = _make_snapshot(execs)
+        ds = DashboardSummary.from_snapshot(snap)
+        assert len(ds.by_support_track) == 1
+        st = ds.by_support_track[0]
+        assert st.total_executions == 2
+        assert st.successful == 1
+        assert st.failed == 1
+
+    def test_by_support_track_is_tuple(self):
+        snap = _make_snapshot([_exec()])
+        ds = DashboardSummary.from_snapshot(snap)
+        assert isinstance(ds.by_support_track, tuple)
 
 
 @pytest.mark.pulse

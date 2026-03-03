@@ -19,6 +19,8 @@ class ExecutionContext:
     subtrack: str = ""
     feature: str = ""
     mapping_source: str = "legacy"
+    track_type: str = "value"
+    supports: tuple[str, ...] = ()
     tags: MappingProxyType[str, str] = field(default_factory=lambda: _EMPTY_TAGS)
     extra: MappingProxyType[str, Any] = field(default_factory=lambda: MappingProxyType({}))
 

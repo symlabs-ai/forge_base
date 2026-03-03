@@ -24,6 +24,7 @@ from forge_base.pulse.report import HistogramStats, PulseSnapshot
 from forge_base.pulse.runner import UseCaseRunner
 from forge_base.pulse.span import SpanRecord, pulse_span
 from forge_base.pulse.spec_schema import SUPPORTED_SPEC_VERSIONS, validate_spec
+from forge_base.pulse.support_tracks import SupportTrackMapping, SupportTrackRegistry
 from forge_base.pulse.value_tracks import ValueTrackMapping, ValueTrackRegistry
 
 __all__ = [
@@ -54,6 +55,8 @@ __all__ = [
     "SUPPORTED_SPEC_VERSIONS",
     "SamplingPolicy",
     "SpanRecord",
+    "SupportTrackMapping",
+    "SupportTrackRegistry",
     "TrackSummary",
     "UseCaseRunner",
     "ValueTrackMapping",

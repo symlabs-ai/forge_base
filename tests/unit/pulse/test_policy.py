@@ -9,13 +9,18 @@ from forge_base.pulse.level import MonitoringLevel
 from forge_base.pulse.policy import SamplingPolicy
 
 
-def _ctx(value_track: str = "legacy", tenant: str = "") -> ExecutionContext:
+def _ctx(
+    value_track: str = "legacy",
+    tenant: str = "",
+    track_type: str = "value",
+) -> ExecutionContext:
     extra = {"tenant": tenant} if tenant else {}
     return ExecutionContext(
         correlation_id="test",
         level=MonitoringLevel.BASIC,
         use_case_name="TestUC",
         value_track=value_track,
+        track_type=track_type,
         extra=MappingProxyType(extra),
     )
 
@@ -26,6 +31,7 @@ class TestSamplingPolicyValidation:
         policy = SamplingPolicy()
         assert policy.default_rate == 1.0
         assert policy.by_value_track == {}
+        assert policy.by_support_track == {}
         assert policy.by_tenant == {}
 
     def test_rate_below_zero_raises(self):
@@ -39,6 +45,10 @@ class TestSamplingPolicyValidation:
     def test_by_value_track_invalid_rate(self):
         with pytest.raises(PulseConfigError, match="by_value_track"):
             SamplingPolicy(by_value_track={"rev": 2.0})
+
+    def test_by_support_track_invalid_rate(self):
+        with pytest.raises(PulseConfigError, match="by_support_track"):
+            SamplingPolicy(by_support_track={"infra": 2.0})
 
     def test_by_tenant_invalid_rate(self):
         with pytest.raises(PulseConfigError, match="by_tenant"):
@@ -62,6 +72,12 @@ class TestSamplingPolicyValidation:
         assert isinstance(policy.by_value_track, MappingProxyType)
         with pytest.raises(TypeError):
             policy.by_value_track["new"] = 0.1  # type: ignore[index]
+
+    def test_by_support_track_immutable(self):
+        policy = SamplingPolicy(by_support_track={"infra": 0.5})
+        assert isinstance(policy.by_support_track, MappingProxyType)
+        with pytest.raises(TypeError):
+            policy.by_support_track["new"] = 0.1  # type: ignore[index]
 
     def test_by_tenant_immutable(self):
         policy = SamplingPolicy(by_tenant={"acme": 0.8})
@@ -131,6 +147,38 @@ class TestSamplingPolicyBehavior:
             by_value_track={"revenue": 0.0},
         )
         ctx = _ctx(value_track="growth")
+        assert all(policy.should_sample(ctx) for _ in range(100))
+
+    def test_by_support_track_override(self):
+        policy = SamplingPolicy(default_rate=1.0, by_support_track={"ManageInventory": 0.0})
+        ctx = _ctx(value_track="ManageInventory", track_type="support")
+        assert not any(policy.should_sample(ctx) for _ in range(100))
+
+    def test_support_track_only_applies_when_track_type_support(self):
+        policy = SamplingPolicy(
+            default_rate=1.0,
+            by_support_track={"ManageInventory": 0.0},
+        )
+        ctx = _ctx(value_track="ManageInventory", track_type="value")
+        # track_type is "value", so by_support_track should NOT match
+        assert all(policy.should_sample(ctx) for _ in range(100))
+
+    def test_tenant_takes_precedence_over_support_track(self):
+        policy = SamplingPolicy(
+            default_rate=0.0,
+            by_support_track={"ManageInventory": 0.0},
+            by_tenant={"acme": 1.0},
+        )
+        ctx = _ctx(value_track="ManageInventory", track_type="support", tenant="acme")
+        assert all(policy.should_sample(ctx) for _ in range(100))
+
+    def test_support_track_takes_precedence_over_value_track(self):
+        policy = SamplingPolicy(
+            default_rate=0.0,
+            by_value_track={"ManageInventory": 0.0},
+            by_support_track={"ManageInventory": 1.0},
+        )
+        ctx = _ctx(value_track="ManageInventory", track_type="support")
         assert all(policy.should_sample(ctx) for _ in range(100))
 
     @patch("forge_base.pulse.policy.random.random", return_value=0.49)

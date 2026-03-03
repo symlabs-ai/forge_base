@@ -34,6 +34,8 @@ class ExecutionRecord:
     tags: MappingProxyType[str, str] = field(default_factory=lambda: _EMPTY_TAGS)
     extra: MappingProxyType[str, Any] = field(default_factory=lambda: _EMPTY_EXTRA)
     mapping_source: str = ""
+    track_type: str = "value"
+    supports: tuple[str, ...] = ()
     dropped_spans: int = 0
 
 
@@ -159,6 +161,8 @@ class BasicCollector:
             tags=context.tags if self._level >= MonitoringLevel.DETAILED else _EMPTY_TAGS,
             extra=context.extra if self._level >= MonitoringLevel.DIAGNOSTIC else _EMPTY_EXTRA,
             mapping_source=context.mapping_source if self._level >= MonitoringLevel.DIAGNOSTIC else "",
+            track_type=context.track_type,
+            supports=context.supports,
             dropped_spans=dropped if self._level >= MonitoringLevel.DIAGNOSTIC else 0,
         )
         with self._lock:

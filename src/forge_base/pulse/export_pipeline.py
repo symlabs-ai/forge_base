@@ -37,7 +37,10 @@ def _record_to_dict(record: ExecutionRecord) -> dict[str, Any]:
         "success": record.success,
         "error_type": record.error_type,
         "timestamp": record.timestamp,
+        "track_type": record.track_type,
     }
+    if record.supports:
+        d["supports"] = list(record.supports)
     if record.mapping_source:
         d["mapping_source"] = record.mapping_source
     if record.tags:
@@ -60,6 +63,8 @@ def _record_to_context(record: ExecutionRecord) -> ExecutionContext:
         feature=record.feature,
         tags=dict(record.tags) if record.tags else None,
         mapping_source=record.mapping_source,
+        track_type=record.track_type,
+        supports=record.supports,
     )
 
 

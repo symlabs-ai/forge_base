@@ -13,6 +13,7 @@ from forge_base.pulse.meta import read_pulse_meta
 if TYPE_CHECKING:
     from forge_base.pulse.budget import BudgetPolicy
     from forge_base.pulse.policy import SamplingPolicy
+    from forge_base.pulse.support_tracks import SupportTrackRegistry
     from forge_base.pulse.value_tracks import ValueTrackRegistry
 
 TInput = TypeVar("TInput")
@@ -22,7 +23,7 @@ TOutput = TypeVar("TOutput")
 class UseCaseRunner(Generic[TInput, TOutput]):
     __slots__ = (
         "_use_case", "_level", "_off", "_collector", "_execute", "_inferred", "_registry",
-        "_policy", "_budget", "_meta_tags",
+        "_support_registry", "_policy", "_budget", "_meta_tags",
     )
 
     def __init__(
@@ -31,6 +32,7 @@ class UseCaseRunner(Generic[TInput, TOutput]):
         level: MonitoringLevel = MonitoringLevel.OFF,
         collector: PulseCollector | None = None,
         registry: ValueTrackRegistry | None = None,
+        support_registry: SupportTrackRegistry | None = None,
         policy: SamplingPolicy | None = None,
         budget: BudgetPolicy | None = None,
     ) -> None:
@@ -39,6 +41,7 @@ class UseCaseRunner(Generic[TInput, TOutput]):
         self._off: bool = level == MonitoringLevel.OFF
         self._collector: PulseCollector = collector or NoOpCollector()
         self._registry = registry
+        self._support_registry = support_registry
         self._policy = policy
         self._budget = budget
         self._meta_tags: MappingProxyType[str, str] = _EMPTY_TAGS
@@ -68,12 +71,22 @@ class UseCaseRunner(Generic[TInput, TOutput]):
             return self._execute(input_dto)
 
         resolved = dict(self._inferred)
+        resolved_from_value = False
         if self._registry is not None:
             mapping = self._registry.resolve(resolved.get("use_case_name", ""))
             if mapping is not None:
                 resolved["value_track"] = mapping.value_track
                 resolved["subtrack"] = mapping.subtrack or resolved.get("subtrack", "")
                 resolved["mapping_source"] = mapping.mapping_source
+                resolved_from_value = True
+        if not resolved_from_value and self._support_registry is not None:
+            s_mapping = self._support_registry.resolve(resolved.get("use_case_name", ""))
+            if s_mapping is not None:
+                resolved["track_type"] = "support"
+                resolved["value_track"] = s_mapping.support_track
+                resolved["subtrack"] = ""
+                resolved["supports"] = s_mapping.supports
+                resolved["mapping_source"] = s_mapping.mapping_source
         resolved.update(ctx_overrides)
 
         tags_override = resolved.pop("tags", None)

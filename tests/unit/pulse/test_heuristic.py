@@ -52,8 +52,13 @@ class TestInferContext:
     def test_all_keys_present(self):
         uc = _DummyUseCase()
         result = infer_context(uc)
-        expected_keys = {"use_case_name", "feature", "value_track", "subtrack", "mapping_source"}
+        expected_keys = {"use_case_name", "feature", "value_track", "subtrack", "mapping_source", "track_type"}
         assert set(result.keys()) == expected_keys
+
+    def test_track_type_is_value(self):
+        uc = _DummyUseCase()
+        result = infer_context(uc)
+        assert result["track_type"] == "value"
 
 
 @pytest.mark.pulse

@@ -26,12 +26,14 @@ class SamplingPolicy:
 
     Resolution order (most specific wins):
         1. by_tenant — keyed on ctx.extra["tenant"]
-        2. by_value_track — keyed on ctx.value_track
-        3. default_rate — fallback
+        2. by_support_track — keyed on ctx.value_track when track_type=="support"
+        3. by_value_track — keyed on ctx.value_track
+        4. default_rate — fallback
     """
 
     default_rate: float = 1.0
     by_value_track: MappingProxyType[str, float] = field(default_factory=lambda: _EMPTY_RATES)
+    by_support_track: MappingProxyType[str, float] = field(default_factory=lambda: _EMPTY_RATES)
     by_tenant: MappingProxyType[str, float] = field(default_factory=lambda: _EMPTY_RATES)
 
     def __post_init__(self) -> None:
@@ -39,18 +41,31 @@ class SamplingPolicy:
         # Freeze mutable dicts passed by callers (copy to detach from original)
         if isinstance(self.by_value_track, dict):
             object.__setattr__(self, "by_value_track", MappingProxyType(dict(self.by_value_track)))
+        if isinstance(self.by_support_track, dict):
+            object.__setattr__(self, "by_support_track", MappingProxyType(dict(self.by_support_track)))
         if isinstance(self.by_tenant, dict):
             object.__setattr__(self, "by_tenant", MappingProxyType(dict(self.by_tenant)))
         for key, rate in self.by_value_track.items():
             _validate_rate(rate, f"by_value_track[{key!r}]")
+        for key, rate in self.by_support_track.items():
+            _validate_rate(rate, f"by_support_track[{key!r}]")
         for key, rate in self.by_tenant.items():
             _validate_rate(rate, f"by_tenant[{key!r}]")
 
     def should_sample(self, ctx: ExecutionContext) -> bool:
-        """Decide whether this execution should be instrumented."""
+        """Decide whether this execution should be instrumented.
+
+        Resolution order (most specific wins):
+            1. by_tenant — keyed on ctx.extra["tenant"]
+            2. by_support_track — keyed on ctx.value_track when track_type=="support"
+            3. by_value_track — keyed on ctx.value_track
+            4. default_rate — fallback
+        """
         tenant = ctx.extra.get("tenant", "")
         if tenant and tenant in self.by_tenant:
             rate = self.by_tenant[tenant]
+        elif ctx.track_type == "support" and ctx.value_track in self.by_support_track:
+            rate = self.by_support_track[ctx.value_track]
         elif ctx.value_track in self.by_value_track:
             rate = self.by_value_track[ctx.value_track]
         else:

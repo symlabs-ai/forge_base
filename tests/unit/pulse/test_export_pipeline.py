@@ -70,6 +70,25 @@ class TestRecordToDict:
 
 
 @pytest.mark.pulse
+class TestRecordToDictTrackType:
+    def test_track_type_always_present(self):
+        record = _make_record()
+        d = _record_to_dict(record)
+        assert d["track_type"] == "value"
+
+    def test_track_type_support(self):
+        record = _make_record(track_type="support", supports=("ProcessOrder",))
+        d = _record_to_dict(record)
+        assert d["track_type"] == "support"
+        assert d["supports"] == ["ProcessOrder"]
+
+    def test_supports_absent_when_empty(self):
+        record = _make_record()
+        d = _record_to_dict(record)
+        assert "supports" not in d
+
+
+@pytest.mark.pulse
 class TestRecordToDictNewFields:
     def test_tags_included_when_present(self):
         record = _make_record(tags=MappingProxyType({"tier": "premium"}))
@@ -129,6 +148,18 @@ class TestRecordToContext:
         record = _make_record(mapping_source="spec")
         ctx = _record_to_context(record)
         assert ctx.mapping_source == "spec"
+
+    def test_context_propagates_track_type(self):
+        record = _make_record(track_type="support", supports=("ProcessOrder",))
+        ctx = _record_to_context(record)
+        assert ctx.track_type == "support"
+        assert ctx.supports == ("ProcessOrder",)
+
+    def test_context_default_track_type(self):
+        record = _make_record()
+        ctx = _record_to_context(record)
+        assert ctx.track_type == "value"
+        assert ctx.supports == ()
 
 
 @pytest.mark.pulse

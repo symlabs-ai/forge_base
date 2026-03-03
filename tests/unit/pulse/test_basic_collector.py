@@ -358,3 +358,69 @@ class TestExecutionRecord:
         assert rec.extra["debug"] == "1"
         assert rec.mapping_source == "spec"
         assert rec.dropped_spans == 3
+
+    def test_track_type_default(self):
+        rec = ExecutionRecord(
+            correlation_id="abc",
+            use_case_name="Test",
+            value_track="legacy",
+            subtrack="",
+            feature="",
+            duration_ms=1.0,
+            success=True,
+            error_type="",
+        )
+        assert rec.track_type == "value"
+        assert rec.supports == ()
+
+    def test_track_type_support(self):
+        rec = ExecutionRecord(
+            correlation_id="abc",
+            use_case_name="Test",
+            value_track="ManageInventory",
+            subtrack="",
+            feature="",
+            duration_ms=1.0,
+            success=True,
+            error_type="",
+            track_type="support",
+            supports=("ProcessOrder",),
+        )
+        assert rec.track_type == "support"
+        assert rec.supports == ("ProcessOrder",)
+
+
+@pytest.mark.pulse
+class TestBasicCollectorTrackTypePropagation:
+    def test_support_track_propagated_to_record(self):
+        metrics = FakeMetricsCollector()
+        collector = BasicCollector(metrics, level=MonitoringLevel.BASIC)
+        ctx = ExecutionContext.build(
+            correlation_id="t1",
+            level=MonitoringLevel.BASIC,
+            use_case_name="SyncInventory",
+            value_track="ManageInventory",
+            track_type="support",
+            supports=("ProcessOrder",),
+        )
+        collector.on_start(ctx)
+        collector.on_success(ctx, "ok")
+        collector.on_finish(ctx)
+
+        snap = collector.snapshot()
+        exec_dict = snap.executions[0]
+        assert exec_dict["track_type"] == "support"
+        assert exec_dict["supports"] == ["ProcessOrder"]
+
+    def test_value_track_default_in_record(self):
+        metrics = FakeMetricsCollector()
+        collector = BasicCollector(metrics, level=MonitoringLevel.BASIC)
+        ctx = _make_ctx()
+        collector.on_start(ctx)
+        collector.on_success(ctx, "ok")
+        collector.on_finish(ctx)
+
+        snap = collector.snapshot()
+        exec_dict = snap.executions[0]
+        assert exec_dict["track_type"] == "value"
+        assert "supports" not in exec_dict

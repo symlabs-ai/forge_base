@@ -45,6 +45,39 @@ class TestValidateSpecValid:
     def test_supported_versions_is_frozenset(self):
         assert isinstance(SUPPORTED_SPEC_VERSIONS, frozenset)
         assert "0.1" in SUPPORTED_SPEC_VERSIONS
+        assert "0.2" in SUPPORTED_SPEC_VERSIONS
+
+    def test_v02_minimal_spec(self):
+        validate_spec({
+            "schema_version": "0.2",
+            "value_tracks": {"core": {"usecases": ["CreateOrder"]}},
+        })
+
+    def test_v02_with_support_tracks(self):
+        validate_spec({
+            "schema_version": "0.2",
+            "value_tracks": {"ProcessOrder": {"usecases": ["CreateOrder"]}},
+            "support_tracks": {
+                "ManageInventory": {
+                    "supports": ["ProcessOrder"],
+                    "usecases": ["SyncInventory"],
+                },
+            },
+        })
+
+    def test_v02_support_tracks_with_tags_and_description(self):
+        validate_spec({
+            "schema_version": "0.2",
+            "value_tracks": {"ProcessOrder": {"usecases": ["CreateOrder"]}},
+            "support_tracks": {
+                "ManageInventory": {
+                    "supports": ["ProcessOrder"],
+                    "usecases": ["SyncInventory"],
+                    "description": "Inventory control",
+                    "tags": {"tier": "infra"},
+                },
+            },
+        })
 
 
 @pytest.mark.pulse
@@ -154,5 +187,101 @@ class TestValidateSpecInvalid:
                 "schema_version": "0.1",
                 "value_tracks": {
                     "core": {"usecases": ["CreateOrder", "CancelOrder", "CreateOrder"]},
+                },
+            })
+
+    def test_support_tracks_in_v01_raises(self):
+        with pytest.raises(PulseConfigError, match="requires schema_version"):
+            validate_spec({
+                "schema_version": "0.1",
+                "value_tracks": {"core": {"usecases": ["A"]}},
+                "support_tracks": {
+                    "infra": {"supports": ["core"], "usecases": ["B"]},
+                },
+            })
+
+    def test_support_tracks_not_dict_raises(self):
+        with pytest.raises(PulseConfigError, match="must be a dict"):
+            validate_spec({
+                "schema_version": "0.2",
+                "value_tracks": {"core": {"usecases": ["A"]}},
+                "support_tracks": "bad",
+            })
+
+    def test_support_track_missing_usecases(self):
+        with pytest.raises(PulseConfigError, match="missing required key 'usecases'"):
+            validate_spec({
+                "schema_version": "0.2",
+                "value_tracks": {"core": {"usecases": ["A"]}},
+                "support_tracks": {
+                    "infra": {"supports": ["core"]},
+                },
+            })
+
+    def test_support_track_empty_usecases(self):
+        with pytest.raises(PulseConfigError, match="must not be empty"):
+            validate_spec({
+                "schema_version": "0.2",
+                "value_tracks": {"core": {"usecases": ["A"]}},
+                "support_tracks": {
+                    "infra": {"supports": ["core"], "usecases": []},
+                },
+            })
+
+    def test_support_track_missing_supports(self):
+        with pytest.raises(PulseConfigError, match="missing required key 'supports'"):
+            validate_spec({
+                "schema_version": "0.2",
+                "value_tracks": {"core": {"usecases": ["A"]}},
+                "support_tracks": {
+                    "infra": {"usecases": ["B"]},
+                },
+            })
+
+    def test_support_track_empty_supports(self):
+        with pytest.raises(PulseConfigError, match="must not be empty"):
+            validate_spec({
+                "schema_version": "0.2",
+                "value_tracks": {"core": {"usecases": ["A"]}},
+                "support_tracks": {
+                    "infra": {"supports": [], "usecases": ["B"]},
+                },
+            })
+
+    def test_support_track_supports_unknown_value_track(self):
+        with pytest.raises(PulseConfigError, match="unknown value_track 'nonexistent'"):
+            validate_spec({
+                "schema_version": "0.2",
+                "value_tracks": {"core": {"usecases": ["A"]}},
+                "support_tracks": {
+                    "infra": {"supports": ["nonexistent"], "usecases": ["B"]},
+                },
+            })
+
+    def test_support_track_not_dict_raises(self):
+        with pytest.raises(PulseConfigError, match="must be a dict"):
+            validate_spec({
+                "schema_version": "0.2",
+                "value_tracks": {"core": {"usecases": ["A"]}},
+                "support_tracks": {"infra": "bad"},
+            })
+
+    def test_support_track_usecases_not_list(self):
+        with pytest.raises(PulseConfigError, match="must be a list"):
+            validate_spec({
+                "schema_version": "0.2",
+                "value_tracks": {"core": {"usecases": ["A"]}},
+                "support_tracks": {
+                    "infra": {"supports": ["core"], "usecases": "bad"},
+                },
+            })
+
+    def test_support_track_supports_not_list(self):
+        with pytest.raises(PulseConfigError, match="must be a list"):
+            validate_spec({
+                "schema_version": "0.2",
+                "value_tracks": {"core": {"usecases": ["A"]}},
+                "support_tracks": {
+                    "infra": {"supports": "core", "usecases": ["B"]},
                 },
             })

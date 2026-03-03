@@ -28,6 +28,7 @@ class DashboardSummary:
     mean_duration_ms: float
     top_error_types: tuple[tuple[str, int], ...]
     by_value_track: tuple[TrackSummary, ...]
+    by_support_track: tuple[TrackSummary, ...] = ()
 
     @classmethod
     def from_snapshot(cls, snapshot: PulseSnapshot, top_n: int = 5) -> DashboardSummary:
@@ -43,6 +44,7 @@ class DashboardSummary:
                 mean_duration_ms=0.0,
                 top_error_types=(),
                 by_value_track=(),
+                by_support_track=(),
             )
 
         successful = sum(1 for e in execs if e.get("success", False))
@@ -59,29 +61,18 @@ class DashboardSummary:
                 error_counts[et] += 1
         top_errors = tuple(error_counts.most_common(top_n))
 
-        tracks: dict[str, list[dict]] = {}
+        value_execs: dict[str, list[dict]] = {}
+        support_execs: dict[str, list[dict]] = {}
         for e in execs:
+            track_type = e.get("track_type", "value")
             vt = e.get("value_track", "legacy")
-            tracks.setdefault(vt, []).append(e)
+            if track_type == "support":
+                support_execs.setdefault(vt, []).append(e)
+            else:
+                value_execs.setdefault(vt, []).append(e)
 
-        track_summaries = []
-        for vt_name in sorted(tracks):
-            track_execs = tracks[vt_name]
-            t_total = len(track_execs)
-            t_success = sum(1 for e in track_execs if e.get("success", False))
-            t_failed = t_total - t_success
-            t_durations = [e["duration_ms"] for e in track_execs]
-            track_summaries.append(
-                TrackSummary(
-                    value_track=vt_name,
-                    total_executions=t_total,
-                    successful=t_success,
-                    failed=t_failed,
-                    error_rate=t_failed / t_total,
-                    mean_duration_ms=sum(t_durations) / t_total,
-                    p95_duration_ms=_percentile(t_durations, 95),
-                )
-            )
+        value_summaries = _build_summaries(value_execs)
+        support_summaries = _build_summaries(support_execs)
 
         return cls(
             total_executions=total,
@@ -90,8 +81,31 @@ class DashboardSummary:
             error_rate=error_rate,
             mean_duration_ms=mean_duration,
             top_error_types=top_errors,
-            by_value_track=tuple(track_summaries),
+            by_value_track=tuple(value_summaries),
+            by_support_track=tuple(support_summaries),
         )
+
+
+def _build_summaries(tracks: dict[str, list[dict]]) -> list[TrackSummary]:
+    summaries = []
+    for vt_name in sorted(tracks):
+        track_execs = tracks[vt_name]
+        t_total = len(track_execs)
+        t_success = sum(1 for e in track_execs if e.get("success", False))
+        t_failed = t_total - t_success
+        t_durations = [e["duration_ms"] for e in track_execs]
+        summaries.append(
+            TrackSummary(
+                value_track=vt_name,
+                total_executions=t_total,
+                successful=t_success,
+                failed=t_failed,
+                error_rate=t_failed / t_total,
+                mean_duration_ms=sum(t_durations) / t_total,
+                p95_duration_ms=_percentile(t_durations, 95),
+            )
+        )
+    return summaries
 
 
 def _percentile(values: list[float], pct: int) -> float:

@@ -1,6 +1,6 @@
 from forge_base.pulse.exceptions import PulseConfigError
 
-SUPPORTED_SPEC_VERSIONS: frozenset[str] = frozenset({"0.1"})
+SUPPORTED_SPEC_VERSIONS: frozenset[str] = frozenset({"0.1", "0.2"})
 
 
 def validate_spec(data: dict) -> None:  # noqa: C901
@@ -36,6 +36,22 @@ def validate_spec(data: dict) -> None:  # noqa: C901
 
     for track_name, track_def in tracks.items():
         _validate_track(track_name, track_def)
+
+    # --- support_tracks (optional, only in "0.2"+) ---
+    _SUPPORT_TRACKS_VERSIONS = frozenset({"0.2"})
+    if "support_tracks" in data:
+        if version not in _SUPPORT_TRACKS_VERSIONS:
+            raise PulseConfigError(
+                "'support_tracks' requires schema_version >= '0.2'"
+            )
+        support_tracks = data["support_tracks"]
+        if not isinstance(support_tracks, dict):
+            raise PulseConfigError(
+                f"'support_tracks' must be a dict, got {type(support_tracks).__name__}"
+            )
+        value_track_names = set(tracks.keys())
+        for st_name, st_def in support_tracks.items():
+            _validate_support_track(st_name, st_def, value_track_names)
 
 
 def _validate_track(track_name: str, track_def: dict) -> None:
@@ -121,5 +137,88 @@ def _validate_track(track_name: str, track_def: dict) -> None:
         if not isinstance(desc, str):
             raise PulseConfigError(
                 f"track '{track_name}' 'description' must be a string, "
+                f"got {type(desc).__name__}"
+            )
+
+
+def _validate_support_track(
+    track_name: str, track_def: dict, value_track_names: set[str]
+) -> None:
+    if not isinstance(track_def, dict):
+        raise PulseConfigError(
+            f"support_track '{track_name}' must be a dict, "
+            f"got {type(track_def).__name__}"
+        )
+
+    # --- usecases (required) ---
+    if "usecases" not in track_def:
+        raise PulseConfigError(
+            f"support_track '{track_name}' missing required key 'usecases'"
+        )
+    usecases = track_def["usecases"]
+    if not isinstance(usecases, list):
+        raise PulseConfigError(
+            f"support_track '{track_name}' 'usecases' must be a list, "
+            f"got {type(usecases).__name__}"
+        )
+    if not usecases:
+        raise PulseConfigError(
+            f"support_track '{track_name}' 'usecases' must not be empty"
+        )
+    for i, uc in enumerate(usecases):
+        if not isinstance(uc, str):
+            raise PulseConfigError(
+                f"support_track '{track_name}' usecases[{i}] must be a string, "
+                f"got {type(uc).__name__}"
+            )
+
+    # --- supports (required, references value tracks) ---
+    if "supports" not in track_def:
+        raise PulseConfigError(
+            f"support_track '{track_name}' missing required key 'supports'"
+        )
+    supports = track_def["supports"]
+    if not isinstance(supports, list):
+        raise PulseConfigError(
+            f"support_track '{track_name}' 'supports' must be a list, "
+            f"got {type(supports).__name__}"
+        )
+    if not supports:
+        raise PulseConfigError(
+            f"support_track '{track_name}' 'supports' must not be empty"
+        )
+    for i, ref in enumerate(supports):
+        if not isinstance(ref, str):
+            raise PulseConfigError(
+                f"support_track '{track_name}' supports[{i}] must be a string, "
+                f"got {type(ref).__name__}"
+            )
+        if ref not in value_track_names:
+            raise PulseConfigError(
+                f"support_track '{track_name}' supports references "
+                f"unknown value_track '{ref}'"
+            )
+
+    # --- tags (optional) ---
+    if "tags" in track_def:
+        tags = track_def["tags"]
+        if not isinstance(tags, dict):
+            raise PulseConfigError(
+                f"support_track '{track_name}' 'tags' must be a dict, "
+                f"got {type(tags).__name__}"
+            )
+        for k, v in tags.items():
+            if not isinstance(v, str):
+                raise PulseConfigError(
+                    f"support_track '{track_name}' tag '{k}' value must be a string, "
+                    f"got {type(v).__name__}"
+                )
+
+    # --- description (optional) ---
+    if "description" in track_def:
+        desc = track_def["description"]
+        if not isinstance(desc, str):
+            raise PulseConfigError(
+                f"support_track '{track_name}' 'description' must be a string, "
                 f"got {type(desc).__name__}"
             )
