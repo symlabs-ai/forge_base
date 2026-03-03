@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge_base"
-version = "0.3.6"
+version = "0.3.7"
 description = "Cognitive Architecture Framework - Clean + Hexagonal Architecture with native observability. AI agent-friendly with programmatic API access."
 readme = "README.md"
 requires-python = ">=3.11"
